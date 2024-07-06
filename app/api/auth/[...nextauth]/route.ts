@@ -5,7 +5,7 @@ import GoogleProvider from "next-auth/providers/google";
 //
 // const agent = new HttpProxyAgent("http://127.0.0.1:8234");
 
-export const authOptions: NextAuthOptions = {
+const authOptions: NextAuthOptions = {
   debug: true,
   providers: [
     GoogleProvider({
