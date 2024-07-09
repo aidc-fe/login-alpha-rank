@@ -2,12 +2,12 @@
 import { signIn, signOut, useSession } from "next-auth/react";
 import { Loader } from "lucide-react";
 import { cn } from "@/utils/className";
-import { useSearchParams } from "next/navigation";
+// import { useSearchParams } from "next/navigation";
 
 export default function SignBtn() {
   const { data: session, status } = useSession();
-  const searchParams = useSearchParams();
-  const host = searchParams.get("host");
+  // const searchParams = useSearchParams();
+  // const host = searchParams.get("host");
 
   return (
     <div className="flex flex-col gap-4">
@@ -18,7 +18,7 @@ export default function SignBtn() {
       >
         邮箱登录
       </button>
-      <p>{searchParams.get("host")}</p>
+      {/* <p>{searchParams.get("host")}</p> */}
       <p>{status}</p>
       <p>{JSON.stringify(session)}</p>
 
