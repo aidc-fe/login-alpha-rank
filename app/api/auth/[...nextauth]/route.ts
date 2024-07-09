@@ -9,6 +9,11 @@ const prisma = new PrismaClient();
 const authOptions: NextAuthOptions = {
   debug: true,
   adapter: PrismaAdapter(prisma),
+  session: {
+    strategy: "jwt",
+  },
+  callbacks: {},
+  secret: process.env.NEXT_AUTH_SECRET,
   providers: [
     GoogleProvider({
       clientId: process.env.AUTH_GOOGLE_ID!,
@@ -27,11 +32,6 @@ const authOptions: NextAuthOptions = {
       from: process.env.EMAIL_FROM,
     }),
   ],
-  session: {
-    strategy: "jwt",
-  },
-  callbacks: {},
-  secret: process.env.NEXT_AUTH_SECRET,
 };
 
 const handler = NextAuth(authOptions);
