@@ -11,13 +11,6 @@ export default function SignBtn() {
 
   return (
     <div className="flex flex-col gap-4">
-      <button
-        onClick={() => {
-          signIn("email");
-        }}
-      >
-        邮箱登录
-      </button>
       {/* <p>{searchParams.get("host")}</p> */}
       <p>{status}</p>
       <p>{JSON.stringify(session)}</p>
@@ -41,14 +34,14 @@ export default function SignBtn() {
         </button>
       </form> */}
       <button
-        onClick={() => (session ? signOut() : signIn("google"))}
+        onClick={() => (session ? signOut() : signIn())}
         className={cn(
           "w-fit flex gap-2 items-center bg-blue-500 rounded-md text-white px-4 py-1 duration-100 focus:scale-95 hover:scale-110",
           { "opacity-50 pointer-events-none": status === "loading" }
         )}
       >
         {status === "loading" && <Loader className="animate-spin" size="18" />}
-        {session ? "Sign out" : "Sigh in"}
+        {session ? "Sign out" : "Sign in"}
       </button>
     </div>
   );
