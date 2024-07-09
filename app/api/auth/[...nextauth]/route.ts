@@ -1,18 +1,36 @@
 import NextAuth, { NextAuthOptions } from "next-auth";
-
 import GoogleProvider from "next-auth/providers/google";
-// import { HttpProxyAgent } from "http-proxy-agent";
-//
-// const agent = new HttpProxyAgent("http://127.0.0.1:8234");
+import EmailProvider from "next-auth/providers/email";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 const authOptions: NextAuthOptions = {
   debug: true,
+  adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
       clientId: process.env.AUTH_GOOGLE_ID!,
       clientSecret: process.env.AUTH_GOOGLE_SECRET!,
     }),
+    EmailProvider({
+      server: {
+        host: process.env.EMAIL_SERVER_HOST,
+        port: process.env.EMAIL_SERVER_PORT,
+        auth: {
+          user: process.env.EMAIL_SERVER_USER,
+          pass: process.env.EMAIL_SERVER_PASSWORD,
+        },
+        secure: true, // 使用SSL/TLS
+      },
+      from: process.env.EMAIL_FROM,
+    }),
   ],
+  session: {
+    strategy: "jwt",
+  },
+  callbacks: {},
   secret: process.env.NEXT_AUTH_SECRET,
 };
 
