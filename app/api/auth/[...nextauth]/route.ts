@@ -6,6 +6,7 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+console.log("*******************envs***************", process.env);
 const authOptions: NextAuthOptions = {
   debug: true,
   adapter: PrismaAdapter(prisma),
@@ -13,7 +14,7 @@ const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   callbacks: {},
-  secret: process.env.NEXT_AUTH_SECRET,
+  secret: process.env.NEXT_AUTH_SECRET!,
   providers: [
     GoogleProvider({
       clientId: process.env.AUTH_GOOGLE_ID!,
