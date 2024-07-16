@@ -15,30 +15,30 @@ const redirectUrls = [
 
 const SignInButton = () => {
   // const router = useRouter();
-  const searchParams = useSearchParams();
+  // const searchParams = useSearchParams();
   const { data: session, status } = useSession();
-  const callbackUrl = searchParams.get("callback") ?? "";
+  // const callbackUrl = searchParams.get("callback") ?? "";
 
-  useEffect(() => {
-    if (session) {
-      // const token = session.jwt;
-      // window.location.href = `http://dev.alpha-rank.com:8000/login?token=${token}&nextUrl=${callbackUrl}`;
-      // const chainRedirect = async (urls: string[]) => {
-      // for (const url of urls) {
-      // window.location.href = url;
-      // 延时等待每次跳转
-      // await new Promise((resolve) => setTimeout(resolve, 2000));
-      // }
-      // if (callbackUrl) {
-      //   window.location.href = callbackUrl;
-      // }
-    }
-    // chainRedirect([
-    //   ...redirectUrls.map((item) => `${item}?token=${token}`),
-    //   callbackUrl,
-    // ]);
-    // }
-  }, [callbackUrl, session]);
+  // useEffect(() => {
+  //   if (session) {
+  //     // const token = session.jwt;
+  //     // window.location.href = `http://dev.alpha-rank.com:8000/login?token=${token}&nextUrl=${callbackUrl}`;
+  //     // const chainRedirect = async (urls: string[]) => {
+  //     // for (const url of urls) {
+  //     // window.location.href = url;
+  //     // 延时等待每次跳转
+  //     // await new Promise((resolve) => setTimeout(resolve, 2000));
+  //     // }
+  //     // if (callbackUrl) {
+  //     //   window.location.href = callbackUrl;
+  //     // }
+  //   }
+  //   // chainRedirect([
+  //   //   ...redirectUrls.map((item) => `${item}?token=${token}`),
+  //   //   callbackUrl,
+  //   // ]);
+  //   // }
+  // }, [callbackUrl, session]);
 
   return (
     <div className="flex flex-col gap-2">
