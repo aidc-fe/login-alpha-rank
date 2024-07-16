@@ -1,48 +1,63 @@
 "use client";
-import { signIn, signOut, useSession } from "next-auth/react";
-import { Loader } from "lucide-react";
-import { cn } from "@/utils/className";
-// import { useSearchParams } from "next/navigation";
 
-export default function SignBtn() {
+import { signIn, signOut, useSession, getSession } from "next-auth/react";
+import Cookies from "js-cookie";
+import { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Session } from "inspector";
+
+// 处理链式跳转逻辑
+const redirectUrls = [
+  "http://dev.alpha-rank.com:8000/login",
+  // "https://your-site.com/second-url",
+  // "https://your-site.com/third-url",
+];
+
+const SignInButton = () => {
+  // const router = useRouter();
+  const searchParams = useSearchParams();
   const { data: session, status } = useSession();
-  // const searchParams = useSearchParams();
-  // const host = searchParams.get("host");
+  const callbackUrl = searchParams.get("callback") ?? "";
+
+  useEffect(() => {
+    if (session) {
+      // const token = session.jwt;
+      // window.location.href = `http://dev.alpha-rank.com:8000/login?token=${token}&nextUrl=${callbackUrl}`;
+      // const chainRedirect = async (urls: string[]) => {
+      // for (const url of urls) {
+      // window.location.href = url;
+      // 延时等待每次跳转
+      // await new Promise((resolve) => setTimeout(resolve, 2000));
+      // }
+      // if (callbackUrl) {
+      //   window.location.href = callbackUrl;
+      // }
+    }
+    // chainRedirect([
+    //   ...redirectUrls.map((item) => `${item}?token=${token}`),
+    //   callbackUrl,
+    // ]);
+    // }
+  }, [callbackUrl, session]);
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* <p>{searchParams.get("host")}</p> */}
-      <p>{status}</p>
-      <p>{JSON.stringify(session)}</p>
-
-      {/* <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          const formData = new FormData(e.target as HTMLFormElement);
-          signIn("email", { email: formData.get("email") });
-        }}
-        className="flex gap-2 items-center"
-      >
-        <input
-          className=" outline-none px-2 py-1 rounded-lg w-80 focus:ring"
-          required
-          name="email"
-          type="email"
-        />
-        <button className="bg-green-600 py-1 px-2 rounded-lg text-white hover:scale-105 focus:scale-95">
-          Sign in with Email
-        </button>
-      </form> */}
+    <div className="flex flex-col gap-2">
+      {JSON.stringify(session)}
       <button
-        onClick={() => (session ? signOut() : signIn())}
-        className={cn(
-          "w-fit flex gap-2 items-center bg-blue-500 rounded-md text-white px-4 py-1 duration-100 focus:scale-95 hover:scale-110",
-          { "opacity-50 pointer-events-none": status === "loading" }
-        )}
+        className="bg-blue-600 rounded-lg px-4 py-1 w-fit text-white text-lg"
+        onClick={
+          session
+            ? () => signOut()
+            : () =>
+                signIn("", {
+                  // callbackUrl: window.location.href,
+                })
+        }
       >
-        {status === "loading" && <Loader className="animate-spin" size="18" />}
         {session ? "Sign out" : "Sign in"}
       </button>
     </div>
   );
-}
+};
+
+export default SignInButton;
