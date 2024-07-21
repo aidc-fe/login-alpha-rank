@@ -3,6 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
+import SuspenseWrapper from "@/components/suspend-wrapper";
 
 const LOGIN_SERVER_LIST = [
   "http://localhost:3000/home",
@@ -14,7 +15,8 @@ declare module "next-auth" {
     jwt: string;
   }
 }
-export default function LoginLandingPage() {
+
+function LoginLandingPage() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
   const targetUrl = searchParams.get("targetUrl");
@@ -29,4 +31,12 @@ export default function LoginLandingPage() {
   // }, [jwt, targetUrl]);
 
   return <div>{JSON.stringify(session?.jwt)}</div>;
+}
+
+export default function PageWrapper() {
+  return (
+    <SuspenseWrapper>
+      <LoginLandingPage />
+    </SuspenseWrapper>
+  );
 }
