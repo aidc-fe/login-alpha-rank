@@ -1,8 +1,13 @@
 "use client";
 
-import { signIn, signOut, useSession, getSession } from "next-auth/react";
-import Cookies from "js-cookie";
-import { useEffect } from "react";
+import {
+  signIn,
+  signOut,
+  useSession,
+  getSession,
+  getCsrfToken,
+} from "next-auth/react";
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Session } from "inspector";
 
@@ -16,7 +21,11 @@ const redirectUrls = [
 const SignInButton = () => {
   // const router = useRouter();
   // const searchParams = useSearchParams();
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
+  const [csrfToken, setCsrfToken] = useState("");
+  getCsrfToken().then((res: string) => {
+    setCsrfToken(res);
+  });
   // const callbackUrl = searchParams.get("callback") ?? "";
 
   // useEffect(() => {
@@ -48,10 +57,15 @@ const SignInButton = () => {
         onClick={
           session
             ? () => signOut()
-            : () =>
-                signIn("", {
-                  // callbackUrl: window.location.href,
-                })
+            : () => {
+                signIn("shopify", {
+                  shopDomain: "f3f8a8-4.myshopify.com",
+                });
+              }
+          // : () => signIn("shopify", { shop: "f3f8a8-4.myshopify.com" })
+          // signIn("shopify", {
+          //   // callbackUrl: window.location.href,
+          // })
         }
       >
         {session ? "Sign out" : "Sign in"}

@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { cn } from "@/utils/className";
+
 import SessionProvider from "@/providers/session-provider";
+import { cn } from "@/lib/utils";
+import { ThemeProvider } from "@/components/theme/provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,9 +20,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={cn(inter.className, "h-screen")}>
-        <SessionProvider>{children}</SessionProvider>
-      </body>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="light"
+        enableSystem
+        disableTransitionOnChange
+      >
+        <body className={cn(inter.className, "h-screen")}>
+          <SessionProvider>{children}</SessionProvider>
+        </body>
+      </ThemeProvider>
     </html>
   );
 }
