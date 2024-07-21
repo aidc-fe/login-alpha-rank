@@ -2,7 +2,9 @@ import { HttpsProxyAgent } from "https-proxy-agent";
 import { NextRequest, NextResponse } from "next/server";
 import fetch from "node-fetch";
 
-const proxyAgent = new HttpsProxyAgent(process.env.PROXY_URL!);
+const proxyAgent = process.env.PROXY_URL
+  ? new HttpsProxyAgent(process.env.PROXY_URL)
+  : undefined;
 
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
@@ -26,7 +28,7 @@ export async function GET(request: NextRequest) {
     }
   );
 
-  const token = await tokenResponse.json();
+  const token = (await tokenResponse.json()) as { access_token: string };
 
   const shop = await fetch(
     `https://${url.searchParams.get("shop")}/admin/api/2023-07/shop.json`,
@@ -39,8 +41,7 @@ export async function GET(request: NextRequest) {
     }
   );
 
-  const shopData = await shop.json();
-  console.log(shopData);
+  const shopData = (await shop.json()) as { shop: any };
   const { id, name, email, domain } = shopData?.shop || {};
   const searchParams = new URLSearchParams({ id, name, email, domain });
   return NextResponse.redirect(

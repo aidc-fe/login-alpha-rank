@@ -39,10 +39,17 @@ const authOptions: NextAuthOptions = {
     CredentialsProvider({
       id: "shopify",
       name: "Shopify",
+      credentials: { id: {}, domain: {}, name: {}, email: {} },
       async authorize(credentials, req) {
         console.log("*********** CredentialsProvider **********", credentials);
-        if (credentials) {
-          return credentials;
+        // const { id, domain, email, name } = credentials;
+        const id = credentials?.id || "";
+        const domain = credentials?.domain || "";
+        const name = credentials?.name || "";
+        const email = credentials?.email || "";
+        const user = { id, domain, email, name };
+        if (user) {
+          return user;
         } else {
           return null;
         }
