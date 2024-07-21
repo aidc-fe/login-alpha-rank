@@ -9,6 +9,11 @@ const LOGIN_SERVER_LIST = [
   "http://localhost:8000/dashboard",
 ];
 
+declare module "next-auth" {
+  interface Session {
+    jwt: string;
+  }
+}
 export default function LoginLandingPage() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
