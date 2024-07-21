@@ -19,6 +19,4 @@ export default function ShopifyAuthPage() {
       window.location.href = `https://${shopDomain}/admin/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_SHOPIFY_CLIENT_ID}&scope=read_products,write_products&redirect_uri=${redirectUri}&state=${csrfToken}`;
     });
   }, [shopDomain]);
-
-  return <></>;
 }
