@@ -42,8 +42,21 @@ export async function GET(request: NextRequest) {
   );
 
   const shopData = (await shop.json()) as { shop: any };
-  const { id, name, email, domain } = shopData?.shop || {};
-  const searchParams = new URLSearchParams({ id, name, email, domain });
+  // return NextResponse.json(shopData.shop);
+  const {
+    name: shopName,
+    email,
+    domain: displayDomain,
+    myshopify_domain: shopDomain,
+    shop_owner: name,
+  } = shopData?.shop || {};
+  const searchParams = new URLSearchParams({
+    shopName,
+    email,
+    displayDomain,
+    shopDomain,
+    name,
+  });
   return NextResponse.redirect(
     `${
       process.env.NEXT_PUBLIC_NEXT_AUTH_URL

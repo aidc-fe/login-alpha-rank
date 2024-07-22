@@ -21,7 +21,11 @@ function ShopifyAuthLoginPage() {
       ...userData,
       callbackUrl: `/login-landing-page?targetUrl=${sessionStorage.getItem(
         "shopifyTargetUrl"
-      )}?shopDomain=${searchParams.get("domain")}`,
+      )}?shopDomain=${searchParams.get(
+        "shopDomain"
+      )}&shopName=${searchParams.get(
+        "shopName"
+      )}&displayDomain=${searchParams.get("displayDomain")}`,
     });
   }, [searchParams]);
 
