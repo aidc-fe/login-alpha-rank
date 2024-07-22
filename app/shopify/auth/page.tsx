@@ -10,6 +10,11 @@ const redirectUri = `${process.env.NEXT_PUBLIC_NEXT_AUTH_URL}/api/shopify/auth/c
 function ShopifyAuthPage() {
   const searchParams = useSearchParams();
   const shopDomain = searchParams.get("shopDomain");
+  const targetUrl = searchParams.get("targetUrl");
+  sessionStorage.setItem(
+    "shopifyTargetUrl",
+    targetUrl || `https://blog.alpha-rank.com`
+  );
 
   useEffect(() => {
     if (!shopDomain) {

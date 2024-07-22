@@ -5,8 +5,6 @@ import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
-const callbackUrl = `${process.env.NEXT_PUBLIC_NEXT_AUTH_URL}/login-landing-page`;
-
 function ShopifyAuthLoginPage() {
   const searchParams = useSearchParams();
 
@@ -19,7 +17,12 @@ function ShopifyAuthLoginPage() {
       {}
     );
 
-    signIn("shopify", { ...userData, callbackUrl });
+    signIn("shopify", {
+      ...userData,
+      callbackUrl: `/login-landing-page?targetUrl=${sessionStorage.getItem(
+        "shopifyTargetUrl"
+      )}?shopDomain=${searchParams.get("domain")}`,
+    });
   }, [searchParams]);
 
   return <div>Redirecting...</div>;

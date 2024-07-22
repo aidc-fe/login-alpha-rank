@@ -6,13 +6,13 @@ import { useEffect } from "react";
 import SuspenseWrapper from "@/components/suspend-wrapper";
 
 const LOGIN_SERVER_LIST = [
-  "http://localhost:3000/home",
-  "http://localhost:8000/dashboard",
+  // "http://localhost:3000/home",
+  "https://pre-blog.alpha-rank.com/dashboard",
 ];
 
 declare module "next-auth" {
   interface Session {
-    jwt: string;
+    jwtToken: string;
   }
 }
 
@@ -20,17 +20,18 @@ function LoginLandingPage() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
   const targetUrl = searchParams.get("targetUrl");
-  const jwt = session?.jwt;
+  const jwt = session?.jwtToken;
 
-  // useEffect(() => {
-  //   if (jwt) {
-  //     const nextUrls = LOGIN_SERVER_LIST.slice(1).join(",");
-  //     const redirectUrl = `${LOGIN_SERVER_LIST[0]}?nextUrls=${nextUrls}&targetUrl=${targetUrl}&_jwtToken=${jwt}`;
-  //     window.location.href = redirectUrl;
-  //   }
-  // }, [jwt, targetUrl]);
+  useEffect(() => {
+    console.log(session);
+    if (jwt) {
+      const nextUrls = LOGIN_SERVER_LIST.slice(1).join(",");
+      const redirectUrl = `${LOGIN_SERVER_LIST[0]}?nextUrls=${nextUrls}&targetUrl=${targetUrl}&_jwtToken=${jwt}`;
+      window.location.href = redirectUrl;
+    }
+  }, [jwt, session, targetUrl]);
 
-  return <div>{JSON.stringify(session?.jwt)}</div>;
+  return <div>{JSON.stringify(session?.jwtToken)}</div>;
 }
 
 export default function PageWrapper() {
