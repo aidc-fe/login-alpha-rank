@@ -7,7 +7,7 @@ import SuspenseWrapper from "@/components/suspend-wrapper";
 
 const LOGIN_SERVER_LIST = [
   // "http://localhost:3000/home",
-  "https://pre-blog.alpha-rank.com/dashboard",
+  "https://pre-blog.alpha-rank.com/login",
 ];
 
 declare module "next-auth" {
