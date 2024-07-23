@@ -24,8 +24,8 @@ function LoginLandingPage() {
 
   useEffect(() => {
     if (jwtToken) {
-      fetch("https://pre-blog.alpha-rank.com/web/api/account/register", {
-        // fetch("http://localhost:3000/api/auth/login", {
+      // fetch("https://pre-blog.alpha-rank.com/web/api/account/register", {
+      fetch("http://localhost:3001/api/auth/login", {
         method: "POST",
         credentials: "include", // 确保 cookie 被发送
 
