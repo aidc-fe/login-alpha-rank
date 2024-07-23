@@ -20,16 +20,32 @@ function LoginLandingPage() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
   const targetUrl = searchParams.get("targetUrl");
-  const jwt = session?.jwtToken;
+  const jwtToken = session?.jwtToken;
 
   useEffect(() => {
-    console.log(session);
-    if (jwt) {
-      const nextUrls = LOGIN_SERVER_LIST.slice(1).join(",");
-      const redirectUrl = `${LOGIN_SERVER_LIST[0]}?nextUrls=${nextUrls}&targetUrl=${targetUrl}&_jwtToken=${jwt}`;
-      window.location.href = redirectUrl;
+    if (jwtToken) {
+      fetch("https://pre-blog.alpha-rank.com/web/api/account/register", {
+        // fetch("http://localhost:3000/api/auth/login", {
+        method: "POST",
+        credentials: "include", // 确保 cookie 被发送
+
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwtToken}` ?? "",
+        },
+        body: JSON.stringify({}),
+      });
     }
-  }, [jwt, session, targetUrl]);
+  }, [jwtToken]);
+
+  // useEffect(() => {
+  //   console.log(session);
+  //   if (jwt) {
+  //     const nextUrls = LOGIN_SERVER_LIST.slice(1).join(",");
+  //     const redirectUrl = `${LOGIN_SERVER_LIST[0]}?nextUrls=${nextUrls}&targetUrl=${targetUrl}&_jwtToken=${jwt}`;
+  //     window.location.href = redirectUrl;
+  //   }
+  // }, [jwt, session, targetUrl]);
 
   return <div>{JSON.stringify(session?.jwtToken)}</div>;
 }
