@@ -15,15 +15,18 @@ declare module "next-auth" {
 function PageContent() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
-  const targetUrl = searchParams.get("targetUrl") || "";
+  const targetUrl =
+    searchParams.get("targetUrl") ||
+    process.env.NEXT_PUBLIC_DEFAULT_TARGET_URL ||
+    "";
+
   const shopDomain = searchParams.get("shopDomain");
   const jwtToken = session?.jwtToken;
 
-  console.log(1231231, targetUrl);
   useEffect(() => {
     if (jwtToken) {
       plantCookies(jwtToken, shopDomain).then(() => {
-        window.location.href = targetUrl || "https://blog.alpha-rank.com";
+        window.location.href = targetUrl;
       });
     }
   }, [jwtToken, targetUrl, shopDomain]);
