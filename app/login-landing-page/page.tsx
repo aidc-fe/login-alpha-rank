@@ -15,10 +15,11 @@ declare module "next-auth" {
 function PageContent() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
-  const targetUrl = searchParams.get("targetUrl");
+  const targetUrl = searchParams.get("targetUrl") || "";
   const shopDomain = searchParams.get("shopDomain");
   const jwtToken = session?.jwtToken;
 
+  console.log(1231231, targetUrl);
   useEffect(() => {
     if (jwtToken) {
       plantCookies(jwtToken, shopDomain).then(() => {

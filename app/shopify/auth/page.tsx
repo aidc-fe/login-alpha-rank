@@ -6,6 +6,14 @@ import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
 const redirectUri = `${process.env.NEXT_PUBLIC_NEXT_AUTH_URL}/api/shopify/auth/callback`;
+const scope = [
+  "write_products",
+  "write_content",
+  "write_themes",
+  "read_products",
+  "read_content",
+  "read_themes",
+].join(",");
 
 function PageContent() {
   const searchParams = useSearchParams();
@@ -21,7 +29,7 @@ function PageContent() {
       return;
     }
     getCsrfToken().then((csrfToken) => {
-      window.location.href = `https://${shopDomain}/admin/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_SHOPIFY_CLIENT_ID}&scope=read_products,write_products&redirect_uri=${redirectUri}&state=${csrfToken}`;
+      window.location.href = `https://${shopDomain}/admin/oauth/authorize?client_id=${process.env.NEXT_PUBLIC_SHOPIFY_CLIENT_ID}&scope=${scope}&redirect_uri=${redirectUri}&state=${csrfToken}`;
     });
   }, [shopDomain]);
 
