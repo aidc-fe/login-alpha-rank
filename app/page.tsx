@@ -1,5 +1,6 @@
 "use client";
 
+import SuspenseWrapper from "@/components/suspend-wrapper";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
@@ -11,7 +12,7 @@ import { useEffect, useMemo } from "react";
 const btnClass =
   "flex items-center justify-center py-4 gap-4 w-full bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 text-white rounded-lg font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]";
 
-export default function Home() {
+function PageContent() {
   const { data: session, status } = useSession();
   const searchParams = useSearchParams();
   const targetUrl = searchParams.get("targetUrl");
@@ -171,3 +172,11 @@ const LabelInputContainer = ({
     </div>
   );
 };
+
+export default function Home() {
+  return (
+    <SuspenseWrapper>
+      <PageContent />
+    </SuspenseWrapper>
+  );
+}

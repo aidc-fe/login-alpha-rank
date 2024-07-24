@@ -7,7 +7,7 @@ import { useEffect } from "react";
 
 const redirectUri = `${process.env.NEXT_PUBLIC_NEXT_AUTH_URL}/api/shopify/auth/callback`;
 
-function ShopifyAuthPage() {
+function PageContent() {
   const searchParams = useSearchParams();
   const shopDomain = searchParams.get("shopDomain");
   const targetUrl = searchParams.get("targetUrl");
@@ -28,10 +28,10 @@ function ShopifyAuthPage() {
   return <></>;
 }
 
-export default function PageWrapper() {
+export default function ShopifyAuthPage() {
   return (
     <SuspenseWrapper>
-      <ShopifyAuthPage />
+      <PageContent />
     </SuspenseWrapper>
   );
 }

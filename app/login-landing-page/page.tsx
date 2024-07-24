@@ -12,7 +12,7 @@ declare module "next-auth" {
   }
 }
 
-function LoginLandingPage() {
+function PageContent() {
   const { data: session } = useSession();
   const searchParams = useSearchParams();
   const targetUrl = searchParams.get("targetUrl");
@@ -30,10 +30,10 @@ function LoginLandingPage() {
   return <div>{JSON.stringify(session?.jwtToken)}</div>;
 }
 
-export default function PageWrapper() {
+export default function LoginLandingPage() {
   return (
     <SuspenseWrapper>
-      <LoginLandingPage />
+      <PageContent />
     </SuspenseWrapper>
   );
 }
