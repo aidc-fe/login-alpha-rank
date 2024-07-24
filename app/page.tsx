@@ -3,6 +3,13 @@
 import SuspenseWrapper from "@/components/suspend-wrapper";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
@@ -19,6 +26,9 @@ function PageContent() {
   const callbackUrl = `/login-landing-page?${
     targetUrl ? "targetUrl=" + targetUrl : ""
   }`;
+  const signedStoreList = JSON.parse(
+    localStorage.getItem("signedStoreList") || "[]"
+  );
 
   const content = useMemo(() => {
     switch (status) {
@@ -102,21 +112,50 @@ function PageContent() {
                 e.preventDefault();
                 const formData = new FormData(e.target as HTMLFormElement);
                 const shopDomain = formData.get("shopDomain");
+                console.log(shopDomain);
                 if (!shopDomain) {
                   return;
                 }
-                window.location.href = `${process.env.NEXT_PUBLIC_NEXT_AUTH_URL}/shopify/auth?shopDomain=${shopDomain}&targetUrl=${targetUrl}`;
+                // window.location.href = `${process.env.NEXT_PUBLIC_NEXT_AUTH_URL}/shopify/auth?shopDomain=${shopDomain}&targetUrl=${targetUrl}`;
               }}
             >
               <LabelInputContainer>
                 <Label htmlFor="Shopify Shop Domain">Shopify Shop Domain</Label>
-                <Input
+                {/* <Input
                   name="shopDomain"
                   required
                   id="Shopify Shop Domain"
                   placeholder="e.g. f3f8a8-4.myshopify.com"
                   type="text"
-                />
+                /> */}
+
+                <Select
+                  disabled={signedStoreList?.length < 1}
+                  required
+                  name="shopDomain"
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Please select your shop domain" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    {signedStoreList.map(
+                      (item: {
+                        shopDomain: string;
+                        shopName: string;
+                        displayDomain: string;
+                      }) => {
+                        return (
+                          <SelectItem
+                            key={item.shopDomain}
+                            value={item.shopDomain}
+                          >
+                            {item.shopName}:{item.displayDomain}
+                          </SelectItem>
+                        );
+                      }
+                    )}
+                  </SelectContent>
+                </Select>
               </LabelInputContainer>
 
               <button className={btnClass} type="submit">
