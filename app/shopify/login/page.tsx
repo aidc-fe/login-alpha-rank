@@ -5,7 +5,7 @@ import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
-function ShopifyAuthLoginPage() {
+function PageContent() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -53,10 +53,10 @@ function ShopifyAuthLoginPage() {
   return <div>Redirecting...</div>;
 }
 
-export default function PageWrapper() {
+export default function ShopifyAuthLoginPage() {
   return (
     <SuspenseWrapper>
-      <ShopifyAuthLoginPage />
+      <PageContent />
     </SuspenseWrapper>
   );
 }
