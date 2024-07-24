@@ -17,15 +17,36 @@ function ShopifyAuthLoginPage() {
       {}
     );
 
+    const shopDomain = searchParams.get("shopDomain");
+    const shopName = searchParams.get("shopName");
+    const displayDomain = searchParams.get("displayDomain");
+
+    const signedStoreList = JSON.parse(
+      localStorage.getItem("signedStoreList") || "[]"
+    );
+    if (
+      !signedStoreList.some(
+        (item: {
+          shopDomain: string;
+          shopName: string;
+          displayDomain: string;
+        }) => item.shopDomain === shopDomain
+      )
+    ) {
+      localStorage.setItem(
+        "signedStoreList",
+        JSON.stringify([
+          ...signedStoreList,
+          { shopDomain, shopName, displayDomain },
+        ])
+      );
+    }
+
     signIn("shopify", {
       ...userData,
       callbackUrl: `/login-landing-page?targetUrl=${sessionStorage.getItem(
         "shopifyTargetUrl"
-      )}?shopDomain=${searchParams.get(
-        "shopDomain"
-      )}&shopName=${searchParams.get(
-        "shopName"
-      )}&displayDomain=${searchParams.get("displayDomain")}`,
+      )}&shopDomain=${shopDomain}`,
     });
   }, [searchParams]);
 

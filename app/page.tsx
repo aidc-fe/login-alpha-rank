@@ -5,18 +5,17 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo } from "react";
 
-const callbackUrl = `/login-landing-page`;
 const btnClass =
   "flex items-center justify-center py-4 gap-4 w-full bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 text-white rounded-lg font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]";
 
 export default function Home() {
   const { data: session, status } = useSession();
-
-  useEffect(() => {
-    console.log(session, status);
-  }, [status, session]);
+  const searchParams = useSearchParams();
+  const targetUrl = searchParams.get("targetUrl");
+  const callbackUrl = `/login-landing-page?targetUrl=${targetUrl}`;
 
   const content = useMemo(() => {
     switch (status) {
@@ -103,7 +102,7 @@ export default function Home() {
                 if (!shopDomain) {
                   return;
                 }
-                window.location.href = `${process.env.NEXT_PUBLIC_NEXT_AUTH_URL}/shopify/auth?shopDomain=${shopDomain}`;
+                window.location.href = `${process.env.NEXT_PUBLIC_NEXT_AUTH_URL}/shopify/auth?shopDomain=${shopDomain}&targetUrl=${targetUrl}`;
               }}
             >
               <LabelInputContainer>
@@ -137,7 +136,8 @@ export default function Home() {
       case "loading":
         return <div>loading</div>;
     }
-  }, [status]);
+  }, [callbackUrl, status, targetUrl]);
+
   return (
     <main className="h-full flex flex-col justify-center items-center ">
       <div className=" whitespace-break-spaces break-words w-full px-8">
