@@ -1,8 +1,8 @@
 "use client";
 
 import SuspenseWrapper from "@/components/suspend-wrapper";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -14,10 +14,7 @@ import { cn } from "@/lib/utils";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { useMemo } from "react";
-
-const btnClass =
-  "flex items-center justify-center py-4 gap-4 w-full bg-gradient-to-br relative group/btn from-black dark:from-zinc-900 dark:to-zinc-900 to-neutral-600 block dark:bg-zinc-800 text-white rounded-lg font-medium shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:shadow-[0px_1px_0px_0px_var(--zinc-800)_inset,0px_-1px_0px_0px_var(--zinc-800)_inset]";
+import { useEffect, useMemo } from "react";
 
 function PageContent() {
   const { data: session, status } = useSession();
@@ -30,28 +27,40 @@ function PageContent() {
     localStorage.getItem("signedStoreList") || "[]"
   );
 
+  // 如果用户已经登录，则自动重定向到默认地址
+  useEffect(() => {
+    if (status === "authenticated") {
+      window.location.href =
+        targetUrl || process.env.NEXT_PUBLIC_DEFAULT_TARGET_URL || "";
+    }
+  }, [status, targetUrl]);
+
   const content = useMemo(() => {
     switch (status) {
       case "authenticated":
         return (
-          <button
+          <Button
+            className="w-full h-12 flex gap-4"
+            variant={"outline"}
+            size={"lg"}
             onClick={() => {
               signOut();
             }}
-            className={btnClass}
           >
             <span className="text-neutral-700 text-lg font-medium dark:text-neutral-300">
               Sigh Out
             </span>
             <BottomGradient />
-          </button>
+          </Button>
         );
       case "unauthenticated":
         return (
           <>
-            <button
+            <Button
+              variant={"outline"}
+              size={"lg"}
+              className="w-full h-12 flex gap-4"
               onClick={() => signIn("google", { callbackUrl })}
-              className={btnClass}
             >
               <Image
                 height="24"
@@ -59,14 +68,13 @@ function PageContent() {
                 alt="provider-logo-dark"
                 src="https://authjs.dev/img/providers/google.svg"
               ></Image>
-              {/* <IconBrandGoogle className=" text-neutral-800 dark:text-neutral-300" /> */}
               <span className="text-neutral-700 text-lg font-medium dark:text-neutral-300">
                 Google
               </span>
               <BottomGradient />
-            </button>
+            </Button>
 
-            <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
+            <div className="bg-gradient-to-r from-transparent via-primary/40 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
 
             <form
               className="space-y-4"
@@ -78,17 +86,21 @@ function PageContent() {
               }}
             >
               <LabelInputContainer>
-                {/* <Label htmlFor="Shopify Shop Domain">Shopify Shop Domain</Label> */}
                 <Input
                   name="email"
                   required
-                  id="email"
                   placeholder="Please enter your email"
                   type="email"
+                  className="h-10"
                 />
               </LabelInputContainer>
 
-              <button className={btnClass} type="submit">
+              <Button
+                className="w-full h-12 flex gap-4"
+                variant={"outline"}
+                size={"lg"}
+                type="submit"
+              >
                 <Image
                   src={
                     "https://img.icons8.com/?size=100&id=44829&format=png&color=000000"
@@ -101,91 +113,82 @@ function PageContent() {
                   Email
                 </span>
                 <BottomGradient />
-              </button>
+              </Button>
             </form>
 
-            <div className="bg-gradient-to-r from-transparent via-neutral-300 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
+            {signedStoreList?.length > 0 ? (
+              <>
+                <div className="bg-gradient-to-r from-transparent via-primary/40 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
 
-            <form
-              className="space-y-4"
-              onSubmit={(e) => {
-                e.preventDefault();
-                const formData = new FormData(e.target as HTMLFormElement);
-                const shopDomain = formData.get("shopDomain");
-                console.log(shopDomain);
-                if (!shopDomain) {
-                  return;
-                }
-                // window.location.href = `${process.env.NEXT_PUBLIC_NEXT_AUTH_URL}/shopify/auth?shopDomain=${shopDomain}&targetUrl=${targetUrl}`;
-              }}
-            >
-              <LabelInputContainer>
-                <Label htmlFor="Shopify Shop Domain">Shopify Shop Domain</Label>
-                {/* <Input
-                  name="shopDomain"
-                  required
-                  id="Shopify Shop Domain"
-                  placeholder="e.g. f3f8a8-4.myshopify.com"
-                  type="text"
-                /> */}
-
-                <Select
-                  disabled={signedStoreList?.length < 1}
-                  required
-                  name="shopDomain"
+                <form
+                  className="space-y-4"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.target as HTMLFormElement);
+                    const shopDomain = formData.get("shopDomain");
+                    if (!shopDomain) {
+                      return;
+                    }
+                    window.location.href = `${process.env.NEXT_PUBLIC_NEXT_AUTH_URL}/shopify/auth?shopDomain=${shopDomain}&targetUrl=${targetUrl}`;
+                  }}
                 >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Please select your shop domain" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-white">
-                    {signedStoreList.map(
-                      (item: {
-                        shopDomain: string;
-                        shopName: string;
-                        displayDomain: string;
-                      }) => {
-                        return (
-                          <SelectItem
-                            key={item.shopDomain}
-                            value={item.shopDomain}
-                          >
-                            {item.shopName}:{item.displayDomain}
-                          </SelectItem>
-                        );
-                      }
-                    )}
-                  </SelectContent>
-                </Select>
-              </LabelInputContainer>
+                  <Select required name="shopDomain">
+                    <SelectTrigger>
+                      <SelectValue placeholder="Please select your shop domain" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white">
+                      {signedStoreList.map(
+                        (item: {
+                          shopDomain: string;
+                          shopName: string;
+                          displayDomain: string;
+                        }) => {
+                          return (
+                            <SelectItem
+                              key={item.shopDomain}
+                              value={item.shopDomain}
+                            >
+                              {item.shopName}:{item.displayDomain}
+                            </SelectItem>
+                          );
+                        }
+                      )}
+                    </SelectContent>
+                  </Select>
 
-              <button className={btnClass} type="submit">
-                <Image
-                  src={
-                    "https://img.icons8.com/?size=100&id=uSHYbs6PJfMT&format=png&color=000000"
-                  }
-                  width={28}
-                  height={28}
-                  alt="shopify login logo"
-                ></Image>
-                <span className="text-neutral-700 text-lg font-medium dark:text-neutral-300">
-                  Shopify
-                </span>
-                <BottomGradient />
-              </button>
-            </form>
+                  <Button
+                    className="w-full h-12 flex gap-4"
+                    variant={"outline"}
+                    size={"lg"}
+                    type="submit"
+                  >
+                    <Image
+                      src={
+                        "https://img.icons8.com/?size=100&id=uSHYbs6PJfMT&format=png&color=000000"
+                      }
+                      width={28}
+                      height={28}
+                      alt="shopify login logo"
+                    ></Image>
+                    <span className="text-neutral-700 text-lg font-medium dark:text-neutral-300">
+                      Shopify
+                    </span>
+                    <BottomGradient />
+                  </Button>
+                </form>
+              </>
+            ) : (
+              <></>
+            )}
           </>
         );
       case "loading":
         return <div>loading</div>;
     }
-  }, [callbackUrl, status, targetUrl]);
+  }, [callbackUrl, signedStoreList, status, targetUrl]);
 
   return (
     <main className="h-full flex flex-col justify-center items-center ">
-      <div className=" whitespace-break-spaces break-words w-full px-8">
-        {JSON.stringify(session)}
-      </div>
-
       <div className="w-3/5 space-y-8">{content}</div>
     </main>
   );

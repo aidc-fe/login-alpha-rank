@@ -20,16 +20,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <ThemeProvider
-        attribute="class"
-        defaultTheme="light"
-        enableSystem
-        disableTransitionOnChange
-      >
-        <body className={cn(inter.className, "h-screen")}>
+      <body className={cn(inter.className, "h-screen")}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          // enableSystem
+          disableTransitionOnChange
+        >
           <SessionProvider>{children}</SessionProvider>
-        </body>
-      </ThemeProvider>
+        </ThemeProvider>
+      </body>
     </html>
   );
 }
