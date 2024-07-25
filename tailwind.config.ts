@@ -58,6 +58,10 @@ const config = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      backgroundImage: {
+        "circle-gradient":
+          "radial-gradient(circle at 30% 20%, rgba(153, 102, 255, 0.3), transparent 40%), radial-gradient(circle at 70% 80%, rgba(102, 178, 255, 0.3), transparent 60%), linear-gradient(to bottom, rgba(153, 102, 255, 0.1), transparent, rgba(102, 178, 255, 0.1))",
+      },
       keyframes: {
         "accordion-down": {
           from: { height: "0" },

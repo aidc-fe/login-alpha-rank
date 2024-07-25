@@ -13,6 +13,7 @@ const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
+
   callbacks: {
     async signIn({ user, account, profile, email, credentials }) {
       console.log(
@@ -78,6 +79,31 @@ const authOptions: NextAuthOptions = {
         secure: true, // 使用SSL/TLS
       },
       from: process.env.EMAIL_FROM,
+    }),
+    EmailProvider({
+      // 配置一个虚拟的邮件服务器
+      server: "fake",
+      from: "no-reply@example.com",
+      async sendVerificationRequest({ identifier: email, token }) {
+        const sendMailResponse = await fetch(
+          "https://copilot-edm.alibaba-inc.com/edm/triggerEdmActivityDynamic",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              id: 829,
+              toEmail: email,
+              params: { code: token },
+            }),
+          }
+        );
+        if (!sendMailResponse.ok) {
+          console.error("Failed to send verification email");
+          // 在这里处理错误，例如记录日志或抛出异常
+        }
+      },
     }),
   ],
   pages: {

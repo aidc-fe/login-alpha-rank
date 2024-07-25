@@ -1,7 +1,9 @@
 "use client";
 
+import LoginCarousel from "@/components/login-carousel";
 import SuspenseWrapper from "@/components/suspend-wrapper";
 import { Button } from "@/components/ui/button";
+// import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -11,6 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
+import { Store } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
@@ -77,7 +80,7 @@ function PageContent() {
             <div className="bg-gradient-to-r from-transparent via-primary/40 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
 
             <form
-              className="space-y-4"
+              className="space-y-4 w-full"
               onSubmit={(e) => {
                 e.preventDefault();
                 const formData = new FormData(e.target as HTMLFormElement);
@@ -85,15 +88,13 @@ function PageContent() {
                 signIn("email", { email, callbackUrl });
               }}
             >
-              <LabelInputContainer>
-                <Input
-                  name="email"
-                  required
-                  placeholder="Please enter your email"
-                  type="email"
-                  className="h-10"
-                />
-              </LabelInputContainer>
+              <Input
+                name="email"
+                required
+                placeholder="Please enter your email"
+                type="email"
+                className="h-12 border-primary/50 hover:border-primary"
+              />
 
               <Button
                 className="w-full h-12 flex gap-4"
@@ -121,7 +122,7 @@ function PageContent() {
                 <div className="bg-gradient-to-r from-transparent via-primary/40 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
 
                 <form
-                  className="space-y-4"
+                  className="space-y-4 w-full"
                   onSubmit={(e) => {
                     e.preventDefault();
                     const formData = new FormData(e.target as HTMLFormElement);
@@ -133,7 +134,7 @@ function PageContent() {
                   }}
                 >
                   <Select required name="shopDomain">
-                    <SelectTrigger>
+                    <SelectTrigger className="h-12 border-primary/50 hover:border-primary">
                       <SelectValue placeholder="Please select your shop domain" />
                     </SelectTrigger>
                     <SelectContent className="bg-white">
@@ -147,8 +148,17 @@ function PageContent() {
                             <SelectItem
                               key={item.shopDomain}
                               value={item.shopDomain}
+                              className="cursor-pointer"
                             >
-                              {item.shopName}:{item.displayDomain}
+                              <Store
+                                className="inline text-primary mr-3"
+                                size={20}
+                              />{" "}
+                              <strong>{item.shopName}</strong>
+                              {"    "}
+                              <span className="italic">
+                                （https://{item.displayDomain}）
+                              </span>
                             </SelectItem>
                           );
                         }
@@ -180,17 +190,46 @@ function PageContent() {
             ) : (
               <></>
             )}
+
+            <div className="inline italic text-accent-foreground">
+              {/* <Checkbox className="mr-2" /> */}
+              By signing in, you are agreeing to our{" "}
+              <Button
+                onClick={() => {
+                  window.open(
+                    "https://terms.alicdn.com/legal-agreement/terms/privacy_policy_full/20230725101625561/20230725101625561.html"
+                  );
+                }}
+                variant="link"
+                className="p-0 h-fit italic"
+              >
+                Privacy Policy
+              </Button>{" "}
+              and{" "}
+              <Button
+                onClick={() => {
+                  window.open(
+                    "https://terms.alicdn.com/legal-agreement/terms/c_platform_service_agreement/20230724215237251/20230724215237251.html"
+                  );
+                }}
+                variant="link"
+                className="p-0 italic h-fit"
+              >
+                Terms of Use
+              </Button>
+              .
+            </div>
           </>
         );
       case "loading":
-        return <div>loading</div>;
+        return <div></div>;
     }
   }, [callbackUrl, signedStoreList, status, targetUrl]);
 
   return (
-    <main className="h-full flex flex-col justify-center items-center ">
-      <div className="w-3/5 space-y-8">{content}</div>
-    </main>
+    <div className="flex flex-col justify-center items-center w-full px-20 space-y-8">
+      {content}
+    </div>
   );
 }
 
@@ -220,7 +259,10 @@ const LabelInputContainer = ({
 export default function Home() {
   return (
     <SuspenseWrapper>
-      <PageContent />
+      <main className="grid h-full bg-circle-gradient px-4 md:grid-cols-2">
+        <LoginCarousel className="h-full justify-center items-center hidden md:flex" />
+        <PageContent />
+      </main>
     </SuspenseWrapper>
   );
 }
