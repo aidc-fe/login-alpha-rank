@@ -8,7 +8,7 @@ import jwt from "jsonwebtoken";
 
 const prisma = new PrismaClient();
 const authOptions: NextAuthOptions = {
-  debug: true,
+  // debug: true,
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt",
@@ -71,7 +71,7 @@ const authOptions: NextAuthOptions = {
     EmailProvider({
       server: {
         host: process.env.EMAIL_SERVER_HOST,
-        port: process.env.EMAIL_SERVER_PORT,
+        port: Number(process.env.EMAIL_SERVER_PORT),
         auth: {
           user: process.env.EMAIL_SERVER_USER,
           pass: process.env.EMAIL_SERVER_PASSWORD,
