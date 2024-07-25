@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
 
   const params = new URLSearchParams({
     client_id: process.env.NEXT_PUBLIC_SHOPIFY_CLIENT_ID!,
-    client_secret: process.env.SHOPIDY_CLIENT_SECRET!,
+    client_secret: process.env.SHOPIFY_CLIENT_SECRET!,
     code: url.searchParams.get("code") as string,
   });
 

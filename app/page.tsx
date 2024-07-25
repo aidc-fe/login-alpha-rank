@@ -1,6 +1,5 @@
 "use client";
 
-import CircleLoader from "@/components/loader/circle";
 import LoginCarousel from "@/components/login-carousel";
 import SuspenseWrapper from "@/components/suspend-wrapper";
 import { Button } from "@/components/ui/button";
