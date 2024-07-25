@@ -20,7 +20,7 @@ import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
-function PageContent() {
+function LoginContent() {
   const { status } = useSession();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
@@ -238,7 +238,7 @@ function PageContent() {
   }, [callbackUrl, loading, signedStoreList, status, targetUrl]);
 
   return (
-    <div className="flex flex-col justify-center items-center w-full px-20 space-y-8">
+    <div className="flex flex-col justify-center items-center w-full px-4 space-y-8 lg:px-20">
       {content}
     </div>
   );
@@ -272,7 +272,7 @@ export default function Home() {
     <SuspenseWrapper>
       <main className="grid h-full bg-circle-gradient px-4 md:grid-cols-2">
         <LoginCarousel className="h-full justify-center items-center hidden md:flex" />
-        <PageContent />
+        <LoginContent />
       </main>
     </SuspenseWrapper>
   );
