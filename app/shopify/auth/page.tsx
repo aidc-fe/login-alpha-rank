@@ -1,6 +1,7 @@
 "use client";
 
 import SuspenseWrapper from "@/components/suspend-wrapper";
+import { Loader } from "lucide-react";
 import { getCsrfToken } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
@@ -33,7 +34,11 @@ function PageContent() {
     });
   }, [shopDomain]);
 
-  return <></>;
+  return (
+    <main className="w-full h-full flex justify-center items-center">
+      <Loader size={60} className="text-primary animate-spin" />
+    </main>
+  );
 }
 
 export default function ShopifyAuthPage() {

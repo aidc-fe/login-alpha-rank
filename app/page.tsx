@@ -1,5 +1,6 @@
 "use client";
 
+import CircleLoader from "@/components/loader/circle";
 import LoginCarousel from "@/components/login-carousel";
 import SuspenseWrapper from "@/components/suspend-wrapper";
 import { Button } from "@/components/ui/button";
@@ -13,15 +14,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
-import { Store } from "lucide-react";
+import { Loader, Store } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 function PageContent() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const searchParams = useSearchParams();
+  const [loading, setLoading] = useState(false);
   const targetUrl = searchParams.get("targetUrl") || "";
   const callbackUrl = `/login-landing-page?${
     targetUrl ? "targetUrl=" + targetUrl : ""
@@ -42,19 +44,20 @@ function PageContent() {
     switch (status) {
       case "authenticated":
         return (
-          <Button
-            className="w-full h-12 flex gap-4"
-            variant={"outline"}
-            size={"lg"}
-            onClick={() => {
-              signOut();
-            }}
-          >
-            <span className="text-neutral-700 text-lg font-medium dark:text-neutral-300">
-              Sigh Out
-            </span>
-            <BottomGradient />
-          </Button>
+          <></>
+          // <Button
+          //   className="w-full h-12 flex gap-4"
+          //   variant={"outline"}
+          //   size={"lg"}
+          //   onClick={() => {
+          //     signOut();
+          //   }}
+          // >
+          //   <span className="text-neutral-700 text-lg font-medium dark:text-neutral-300">
+          //     Sigh Out
+          //   </span>
+          //   <BottomGradient />
+          // </Button>
         );
       case "unauthenticated":
         return (
@@ -101,15 +104,23 @@ function PageContent() {
                 variant={"outline"}
                 size={"lg"}
                 type="submit"
+                disabled={loading}
+                onClick={() => {
+                  setLoading(true);
+                }}
               >
-                <Image
-                  src={
-                    "https://img.icons8.com/?size=100&id=44829&format=png&color=000000"
-                  }
-                  width={28}
-                  height={28}
-                  alt="shopify login logo"
-                ></Image>
+                {loading ? (
+                  <Loader className="text-primary animate-spin" />
+                ) : (
+                  <Image
+                    src={
+                      "https://img.icons8.com/?size=100&id=44829&format=png&color=000000"
+                    }
+                    width={28}
+                    height={28}
+                    alt="shopify login logo"
+                  ></Image>
+                )}
                 <span className="text-neutral-700 text-lg font-medium dark:text-neutral-300">
                   Email
                 </span>
@@ -222,9 +233,9 @@ function PageContent() {
           </>
         );
       case "loading":
-        return <div></div>;
+        return <></>;
     }
-  }, [callbackUrl, signedStoreList, status, targetUrl]);
+  }, [callbackUrl, loading, signedStoreList, status, targetUrl]);
 
   return (
     <div className="flex flex-col justify-center items-center w-full px-20 space-y-8">

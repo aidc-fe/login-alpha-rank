@@ -1,6 +1,7 @@
 "use client";
 
 import SuspenseWrapper from "@/components/suspend-wrapper";
+import { Loader } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
@@ -50,7 +51,11 @@ function PageContent() {
     });
   }, [searchParams]);
 
-  return <div>Redirecting...</div>;
+  return (
+    <main className="h-full flex justify-center items-center w-full">
+      <Loader size={60} className="text-primary animate-spin" />
+    </main>
+  );
 }
 
 export default function ShopifyAuthLoginPage() {
