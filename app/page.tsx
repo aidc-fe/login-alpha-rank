@@ -85,6 +85,7 @@ function LoginContent() {
               className="space-y-4 w-full"
               onSubmit={(e) => {
                 e.preventDefault();
+                setLoading(true);
                 const formData = new FormData(e.target as HTMLFormElement);
                 const email = formData.get("email");
                 signIn("email", { email, callbackUrl });
@@ -104,9 +105,6 @@ function LoginContent() {
                 size={"lg"}
                 type="submit"
                 disabled={loading}
-                onClick={() => {
-                  setLoading(true);
-                }}
               >
                 {loading ? (
                   <Loader className="text-primary animate-spin" />
