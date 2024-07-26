@@ -1,3 +1,4 @@
+// 往所有端种登录态cookie
 export function plantCookies(jwt: string, shopDomain?: string | null) {
   const urls = ["https://pre-blog.alpha-rank.com/web/api/account/register"];
 
