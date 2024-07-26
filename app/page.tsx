@@ -39,6 +39,11 @@ function LoginContent() {
     }
   }, [status, targetUrl]);
 
+  // 处理用户成功发送邮件后返回
+  useEffect(() => {
+    setLoading(false);
+  }, []);
+
   const content = useMemo(() => {
     switch (status) {
       case "authenticated":
