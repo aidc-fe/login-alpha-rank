@@ -58,14 +58,6 @@ export async function GET(request: NextRequest) {
     name,
   });
 
-  // fetch("/api/auth/signin/shopify", {});
-  // return NextResponse.json({
-  //   shopName,
-  //   email,
-  //   displayDomain,
-  //   shopDomain,
-  //   name,
-  // });
   return NextResponse.redirect(
     `${
       process.env.NEXT_PUBLIC_NEXT_AUTH_URL
