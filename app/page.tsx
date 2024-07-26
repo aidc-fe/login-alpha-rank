@@ -3,7 +3,6 @@
 import LoginCarousel from "@/components/login-carousel";
 import SuspenseWrapper from "@/components/suspend-wrapper";
 import { Button } from "@/components/ui/button";
-// import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -47,22 +46,7 @@ function LoginContent() {
   const content = useMemo(() => {
     switch (status) {
       case "authenticated":
-        return (
-          <></>
-          // <Button
-          //   className="w-full h-12 flex gap-4"
-          //   variant={"outline"}
-          //   size={"lg"}
-          //   onClick={() => {
-          //     signOut();
-          //   }}
-          // >
-          //   <span className="text-neutral-700 text-lg font-medium dark:text-neutral-300">
-          //     Sigh Out
-          //   </span>
-          //   <BottomGradient />
-          // </Button>
-        );
+        return <></>;
       case "unauthenticated":
         return (
           <>
