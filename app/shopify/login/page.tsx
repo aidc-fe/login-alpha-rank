@@ -45,9 +45,10 @@ function PageContent() {
 
     signIn("shopify", {
       ...userData,
-      callbackUrl: `/login-landing-page?targetUrl=${sessionStorage.getItem(
-        "shopifyTargetUrl"
-      )}&shopDomain=${shopDomain}`,
+      callbackUrl: `/login-landing-page?targetUrl=${
+        sessionStorage.getItem("shopifyTargetUrl") ||
+        searchParams.get("targetUrl")
+      }&shopDomain=${shopDomain}`,
     });
   }, [searchParams]);
 
