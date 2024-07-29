@@ -16,7 +16,7 @@ export default function SignOutPage() {
   res.headers.set(
     "Access-Control-Allow-Origin",
     `https://${
-      process.env.NODE_ENV === "development" ? "pre-" : ""
+      process.env.NODE_ENV === "production" ? "" : "pre-"
     }blog.alpha-rank.com`
   );
   res.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
