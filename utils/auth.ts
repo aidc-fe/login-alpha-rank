@@ -2,7 +2,7 @@
 export function plantCookies(jwt: string, shopDomain?: string | null) {
   const urls = [
     `https://${
-      process.env.NODE_ENV === "production" ? "" : "pre-"
+      process.env.NEXT_PUBLIC_VERCEL_ENV === "production" ? "" : "pre-"
     }blog.alpha-rank.com/web/api/account/register`,
   ];
 

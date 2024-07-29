@@ -13,6 +13,9 @@ const nextConfig = {
       { protocol: "https", hostname: "authjs.dev" },
     ],
   },
+  env: {
+    NEXT_PUBLIC_VERCEL_ENV: process.env.VERCEL_ENV,
+  },
 };
 
 export default nextConfig;
