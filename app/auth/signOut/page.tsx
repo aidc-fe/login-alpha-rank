@@ -16,7 +16,7 @@ export default function SignOutPage() {
   res.headers.set(
     "Access-Control-Allow-Origin",
     `https://${
-      process.env.VERCEL_ENV === "production" ? "" : "pre-"
+      process.env.NEXT_PUBLIC_VERCEL_ENV === "production" ? "" : "pre-"
     }blog.alpha-rank.com`
   );
   res.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
