@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
         "Content-Type": "application/x-www-form-urlencoded", // 更改 Content-Type
         Accept: "application/json",
       },
-      agent: process.env.VERCEL_ENV === "development" ? proxyAgent : undefined,
+      agent: process.env.NODE_ENV === "development" ? proxyAgent : undefined,
     }
   );
 

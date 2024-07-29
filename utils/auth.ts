@@ -1,5 +1,10 @@
+// 往所有端种登录态cookie
 export function plantCookies(jwt: string, shopDomain?: string | null) {
-  const urls = ["https://pre-blog.alpha-rank.com/web/api/account/register"];
+  const urls = [
+    `https://${
+      process.env.NEXT_PUBLIC_VERCEL_ENV === "production" ? "" : "pre-"
+    }blog.alpha-rank.com/web/api/account/register`,
+  ];
 
   const fetchPromises = urls.map((url) => {
     return fetch(url, {

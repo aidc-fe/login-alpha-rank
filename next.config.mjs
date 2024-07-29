@@ -13,6 +13,12 @@ const nextConfig = {
       { protocol: "https", hostname: "authjs.dev" },
     ],
   },
+  env: {
+    NEXT_PUBLIC_VERCEL_ENV: process.env.VERCEL_ENV,
+    NEXT_PUBLIC_SHOPIFY_CLIENT_ID: process.env.SHOPIFY_CLIENT_ID,
+    NEXT_PUBLIC_DEFAULT_TARGET_URL: process.env.DEFAULT_TARGET_URL,
+    NEXT_PUBLIC_NEXT_AUTH_URL: process.env.NEXT_AUTH_URL,
+  },
 };
 
 export default nextConfig;

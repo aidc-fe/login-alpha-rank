@@ -9,6 +9,7 @@ import { useEffect } from "react";
 function PageContent() {
   const searchParams = useSearchParams();
 
+  // 从searchParams提取用户信息
   useEffect(() => {
     const userData = Array.from(searchParams.keys()).reduce(
       (acc: { [key: string]: string }, curr: string) => {
