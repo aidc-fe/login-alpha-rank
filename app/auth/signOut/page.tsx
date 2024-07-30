@@ -11,17 +11,17 @@ export default function SignOutPage() {
   const { status } = useSession();
   const router = useRouter();
 
-  // useEffect(() => {
-  //   if (status === "authenticated") {
-  //     // 登出并清除登录态
-  //     plantCookies("").then(() => {
-  //       signOut();
-  //     });
-  //   } else if (status === "unauthenticated") {
-  //     // 登录
-  //     router.replace(`/${location.search}`);
-  //   }
-  // }, [router, status]);
+  useEffect(() => {
+    if (status === "authenticated") {
+      // 登出并清除登录态
+      plantCookies("").then(() => {
+        signOut();
+      });
+    } else if (status === "unauthenticated") {
+      // 登录
+      router.replace(`/${location.search}`);
+    }
+  }, [router, status]);
 
   return (
     <main className="h-full flex justify-center items-center w-full">
