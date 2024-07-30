@@ -26,7 +26,7 @@ const nextConfig = {
         headers: [
           {
             key: "Access-Control-Allow-Origin",
-            value: "https://aib-tools.alibaba-inc.com", // Set your origin
+            value: "http://localhost:3001", // Set your origin
           },
           {
             key: "Access-Control-Allow-Methods",
