@@ -18,12 +18,9 @@ export default function SignOutPage() {
   }blog.alpha-rank.com`;
 
   // 新增允许的跨域域名
-  const additionalOrigin = "https://aib-tools.alibaba-inc.com";
+  // const additionalOrigin = "https://aib-tools.alibaba-inc.com";
 
-  res.headers.set(
-    "Access-Control-Allow-Origin",
-    `${origin}, ${additionalOrigin}`
-  );
+  res.headers.set("Access-Control-Allow-Origin", `${origin}`);
   res.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.headers.set(
     "Access-Control-Allow-Headers",
