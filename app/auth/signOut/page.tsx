@@ -11,33 +11,17 @@ export default function SignOutPage() {
   const { status } = useSession();
   const router = useRouter();
 
-  // 允许接入方服务端访问
-  const res = NextResponse.next();
-  const origin = `https://${
-    process.env.NEXT_PUBLIC_VERCEL_ENV === "production" ? "" : "pre-"
-  }blog.alpha-rank.com`;
-
-  // 新增允许的跨域域名
-  const additionalOrigin = "https://aib-tools.alibaba-inc.com";
-
-  res.headers.set(
-    "Access-Control-Allow-Origin",
-    `${origin}, ${additionalOrigin}`
-  );
-  res.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.headers.set("Access-Control-Allow-Headers", "Content-Type");
-
-  useEffect(() => {
-    if (status === "authenticated") {
-      // 登出并清除登录态
-      plantCookies("").then(() => {
-        signOut();
-      });
-    } else if (status === "unauthenticated") {
-      // 登录
-      router.replace(`/${location.search}`);
-    }
-  }, [router, status]);
+  // useEffect(() => {
+  //   if (status === "authenticated") {
+  //     // 登出并清除登录态
+  //     plantCookies("").then(() => {
+  //       signOut();
+  //     });
+  //   } else if (status === "unauthenticated") {
+  //     // 登录
+  //     router.replace(`/${location.search}`);
+  //   }
+  // }, [router, status]);
 
   return (
     <main className="h-full flex justify-center items-center w-full">
