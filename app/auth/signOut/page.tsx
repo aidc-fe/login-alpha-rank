@@ -13,11 +13,16 @@ export default function SignOutPage() {
 
   // 允许接入方服务端访问
   const res = NextResponse.next();
+  const origin = `https://${
+    process.env.NEXT_PUBLIC_VERCEL_ENV === "production" ? "" : "pre-"
+  }blog.alpha-rank.com`;
+
+  // 新增允许的跨域域名
+  const additionalOrigin = "https://aib-tools.alibaba-inc.com";
+
   res.headers.set(
     "Access-Control-Allow-Origin",
-    `https://${
-      process.env.NEXT_PUBLIC_VERCEL_ENV === "production" ? "" : "pre-"
-    }blog.alpha-rank.com`
+    `${origin}, ${additionalOrigin}`
   );
   res.headers.set("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.headers.set(
