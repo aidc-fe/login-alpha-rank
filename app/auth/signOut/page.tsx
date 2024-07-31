@@ -5,7 +5,6 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { plantCookies } from "@/utils/auth";
 import { Loader } from "lucide-react";
-import { NextResponse } from "next/server";
 
 export default function SignOutPage() {
   const { status } = useSession();
