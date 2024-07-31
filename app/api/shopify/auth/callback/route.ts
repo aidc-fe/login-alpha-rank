@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
   );
 
   const shopData = (await shop.json()) as { shop: any };
-  // return NextResponse.json(shopData.shop);
+
   const {
     name: shopName,
     email,
