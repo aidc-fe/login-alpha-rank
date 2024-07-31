@@ -194,7 +194,7 @@ function LoginContent() {
               <Button
                 onClick={() => {
                   window.open(
-                    "https://terms.alicdn.com/legal-agreement/terms/privacy_policy_full/20230725101625561/20230725101625561.html"
+                    "https://terms.alicdn.com/legal-agreement/terms/privacy_policy_full/20231109180939630/20231109180939630.html"
                   );
                 }}
                 variant="link"
@@ -206,7 +206,7 @@ function LoginContent() {
               <Button
                 onClick={() => {
                   window.open(
-                    "https://terms.alicdn.com/legal-agreement/terms/c_platform_service_agreement/20230724215237251/20230724215237251.html"
+                    "https://terms.alicdn.com/legal-agreement/terms/b_platform_service_agreement/20231110160335349/20231110160335349.html"
                   );
                 }}
                 variant="link"
