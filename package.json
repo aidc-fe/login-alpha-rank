@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "prisma:migrate": "dotenv -e .env.development.local -- npx prisma migrate dev --name init",
-    "prisma:migrate.prod": "dotenv -e .env.production.local -- npx prisma migrate dev --name init"
+    "prisma:migrate.prod": "dotenv -e .env.production.local -- npx prisma migrate dev --name init",
+    "db:generate": "dotenvx run -f .env.development.local -- npx prisma generate",
+    "db:generate:prod": "dotenvx run -f .env.production.local -- npx prisma generate"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.4.1",
