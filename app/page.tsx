@@ -11,11 +11,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { cn } from "@/lib/utils";
 import { Loader, Store } from "lucide-react";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 function LoginContent() {
@@ -23,6 +22,7 @@ function LoginContent() {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const targetUrl = searchParams.get("targetUrl") || "";
+  const router = useRouter();
   const callbackUrl = `/login-landing-page?${
     targetUrl ? "targetUrl=" + targetUrl : ""
   }`;
@@ -30,13 +30,12 @@ function LoginContent() {
     localStorage.getItem("signedStoreList") || "[]"
   );
 
-  // 如果用户已经登录，则自动重定向到默认地址
+  // 如果用户已经登录，则进行续登
   useEffect(() => {
     if (status === "authenticated") {
-      window.location.href =
-        targetUrl || process.env.NEXT_PUBLIC_DEFAULT_TARGET_URL || "";
+      router.replace(`/login-landing-page${location.search}`);
     }
-  }, [status, targetUrl]);
+  }, [router, status, targetUrl]);
 
   // 处理用户成功发送邮件后返回
   useEffect(() => {
@@ -236,20 +235,6 @@ const BottomGradient = () => {
       <span className="group-hover/btn:opacity-100 block transition duration-500 opacity-0 absolute h-px w-full -bottom-px inset-x-0 bg-gradient-to-r from-transparent via-cyan-500 to-transparent" />
       <span className="group-hover/btn:opacity-100 blur-sm block transition duration-500 opacity-0 absolute h-px w-1/2 mx-auto -bottom-px inset-x-10 bg-gradient-to-r from-transparent via-indigo-500 to-transparent" />
     </>
-  );
-};
-
-const LabelInputContainer = ({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) => {
-  return (
-    <div className={cn("flex flex-col space-y-2 w-full", className)}>
-      {children}
-    </div>
   );
 };
 

@@ -26,9 +26,6 @@ const authOptions: NextAuthOptions = {
       );
       return true;
     },
-    // async redirect({ url, baseUrl }) {
-    //   return baseUrl;
-    // },
     async session({ session, token }) {
       console.log("********** session **********", session, token);
       const { user } = session || {};
