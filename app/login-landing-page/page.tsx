@@ -29,9 +29,13 @@ function PageContent() {
     switch (status) {
       case "authenticated":
         if (jwtToken) {
-          thirdPartySignIn(jwtToken, shopDomain).then(() => {
-            window.location.href = targetUrl;
-          });
+          thirdPartySignIn(jwtToken, shopDomain)
+            .then(() => {
+              window.location.href = targetUrl;
+            })
+            .catch(() => {
+              window.location.href = targetUrl;
+            });
         } else {
           router.replace(`/${searchParams.toString()}`);
         }
