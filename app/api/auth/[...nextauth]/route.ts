@@ -28,11 +28,14 @@ const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       console.log("********** session **********", session, token);
-      const { user } = session || {};
 
-      const jwtToken = jwt.sign(user || {}, process.env.NEXT_AUTH_SECRET!, {
-        expiresIn: (token.exp as number) - Math.floor(Date.now() / 1000),
-      });
+      const jwtToken = jwt.sign(
+        { ...session.user, expires: session.expires, id: token.sub } || {},
+        process.env.NEXT_AUTH_SECRET!,
+        {
+          expiresIn: (token.exp as number) - Math.floor(Date.now() / 1000),
+        }
+      );
       return { ...session, jwtToken };
     },
     async jwt({ token, user, account, profile }) {
