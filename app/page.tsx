@@ -4,13 +4,13 @@ import LoginCarousel from "@/components/login-carousel";
 import SuspenseWrapper from "@/components/suspend-wrapper";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
 import { Loader, Store } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
@@ -113,7 +113,7 @@ function LoginContent() {
               </Button>
             </form>
 
-            {signedStoreList?.length > 0 ? (
+            {/* {signedStoreList?.length > 0 ? (
               <>
                 <div className="bg-gradient-to-r from-transparent via-primary/40 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
 
@@ -185,7 +185,7 @@ function LoginContent() {
               </>
             ) : (
               <></>
-            )}
+            )} */}
 
             <div className="inline italic text-accent-foreground">
               {/* <Checkbox className="mr-2" /> */}
@@ -220,7 +220,8 @@ function LoginContent() {
       case "loading":
         return <></>;
     }
-  }, [callbackUrl, loading, signedStoreList, status, targetUrl]);
+    // }, [callbackUrl, loading, signedStoreList, status, targetUrl]);
+  }, [callbackUrl, loading, status]);
 
   return (
     <div className="flex flex-col justify-center items-center w-full px-4 space-y-8 lg:px-20">
