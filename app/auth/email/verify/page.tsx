@@ -1,10 +1,14 @@
 "use client";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function EmailVerify() {
-  const [email] = useState(sessionStorage.getItem("verifyEmail"));
+  const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    setEmail(sessionStorage.getItem("verifyEmail") || "");
+  }, []);
   return (
     <div className="bg-muted h-screen w-screen flex items-center justify-center">
       <div className="bg-white rounded-lg w-3/5 shadow-lg p-10">
