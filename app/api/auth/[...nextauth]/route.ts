@@ -15,20 +15,7 @@ const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    async signIn({ user, account, profile, email, credentials }) {
-      console.log(
-        "********** signIn **********",
-        user,
-        account,
-        profile,
-        email,
-        credentials
-      );
-      return true;
-    },
     async session({ session, token }) {
-      console.log("********** session **********", session, token);
-
       const jwtToken = jwt.sign(
         { ...session.user, expires: session.expires, id: token.sub } || {},
         process.env.NEXT_AUTH_SECRET!,
@@ -38,10 +25,6 @@ const authOptions: NextAuthOptions = {
       );
       return { ...session, jwtToken };
     },
-    async jwt({ token, user, account, profile }) {
-      console.log("********** jwt **********", token, user, account, profile);
-      return token;
-    },
   },
   secret: process.env.NEXT_AUTH_SECRET!,
   providers: [
@@ -49,9 +32,7 @@ const authOptions: NextAuthOptions = {
       id: "shopify",
       name: "Shopify",
       credentials: { id: {}, domain: {}, name: {}, email: {} },
-      async authorize(credentials, req) {
-        console.log("*********** CredentialsProvider **********", credentials);
-        // const { id, domain, email, name } = credentials;
+      async authorize(credentials) {
         const id = credentials?.id || "";
         const domain = credentials?.domain || "";
         const name = credentials?.name || "";
@@ -83,7 +64,7 @@ const authOptions: NextAuthOptions = {
   ],
   pages: {
     signIn: `/`,
-    // verifyRequest: `/login`,
+    verifyRequest: `/auth/email/verify`,
     error: "/", // Error code passed in query string as ?error=
   },
 };

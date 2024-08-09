@@ -26,9 +26,9 @@ function LoginContent() {
   const callbackUrl = `/login-landing-page?${
     targetUrl ? "targetUrl=" + targetUrl : ""
   }`;
-  const signedStoreList = JSON.parse(
-    localStorage.getItem("signedStoreList") || "[]"
-  );
+  // const signedStoreList = JSON.parse(
+  //   localStorage.getItem("signedStoreList") || "[]"
+  // );
 
   // 如果用户已经登录，则进行续登
   useEffect(() => {
@@ -76,6 +76,8 @@ function LoginContent() {
                 setLoading(true);
                 const formData = new FormData(e.target as HTMLFormElement);
                 const email = formData.get("email");
+                // email验证页面展示
+                sessionStorage.setItem("verifyEmail", email as string);
                 signIn("email", { email, callbackUrl });
               }}
             >
@@ -103,7 +105,7 @@ function LoginContent() {
                     }
                     width={28}
                     height={28}
-                    alt="shopify login logo"
+                    alt="email login logo"
                   ></Image>
                 )}
                 <span className="text-neutral-700 text-lg font-medium dark:text-neutral-300">
