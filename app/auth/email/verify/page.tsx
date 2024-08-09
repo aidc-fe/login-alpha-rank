@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
-export default function EmailVerify(props: any) {
+export default function EmailVerify() {
   return (
     <div className="bg-muted h-screen w-screen flex items-center justify-center">
       <div className="bg-white rounded-lg w-3/5 shadow-lg p-10">

@@ -33,11 +33,24 @@ const authOptions: NextAuthOptions = {
       name: "Shopify",
       credentials: { id: {}, domain: {}, name: {}, email: {} },
       async authorize(credentials) {
-        const id = credentials?.id || "";
-        const domain = credentials?.domain || "";
         const name = credentials?.name || "";
         const email = credentials?.email || "";
-        const user = { id, domain, email, name };
+
+        // 在数据库中查找用户
+        let user = await prisma.user.findUnique({
+          where: { email },
+        });
+
+        // 如果用户不存在，创建新用户
+        if (!user) {
+          user = await prisma.user.create({
+            data: {
+              name,
+              email,
+            },
+          });
+        }
+
         if (user) {
           return user;
         } else {
