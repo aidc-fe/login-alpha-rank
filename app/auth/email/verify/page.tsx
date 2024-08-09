@@ -1,8 +1,10 @@
 "use client";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 
 export default function EmailVerify() {
+  const [email] = useState(sessionStorage.getItem("verifyEmail"));
   return (
     <div className="bg-muted h-screen w-screen flex items-center justify-center">
       <div className="bg-white rounded-lg w-3/5 shadow-lg p-10">
@@ -21,9 +23,7 @@ export default function EmailVerify() {
           ></Image>
           <div className="mt-auto text-sm">{`We've sent a login confirmation email to:`}</div>
         </div>
-        <div className="my-4 font-semibold">
-          {sessionStorage.getItem("verifyEmail")}
-        </div>
+        <div className="my-4 font-semibold">{email}</div>
         <hr />
         <p className="text-muted-foreground text-xs my-4">
           Please open this email to complete your login.
