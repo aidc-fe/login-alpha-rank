@@ -4,18 +4,17 @@ import LoginCarousel from "@/components/login-carousel";
 import SuspenseWrapper from "@/components/suspend-wrapper";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { cn } from "@/lib/utils";
+// import {
+//   Select,
+//   SelectContent,
+//   SelectItem,
+//   SelectTrigger,
+//   SelectValue,
+// } from "@/components/ui/select";
 import { Loader, Store } from "lucide-react";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 function LoginContent() {
@@ -23,20 +22,20 @@ function LoginContent() {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const targetUrl = searchParams.get("targetUrl") || "";
+  const router = useRouter();
   const callbackUrl = `/login-landing-page?${
     targetUrl ? "targetUrl=" + targetUrl : ""
   }`;
-  const signedStoreList = JSON.parse(
-    localStorage.getItem("signedStoreList") || "[]"
-  );
+  // const signedStoreList = JSON.parse(
+  //   localStorage.getItem("signedStoreList") || "[]"
+  // );
 
-  // 如果用户已经登录，则自动重定向到默认地址
+  // 如果用户已经登录，则进行续登
   useEffect(() => {
     if (status === "authenticated") {
-      window.location.href =
-        targetUrl || process.env.NEXT_PUBLIC_DEFAULT_TARGET_URL || "";
+      router.replace(`/login-landing-page${location.search}`);
     }
-  }, [status, targetUrl]);
+  }, [router, status, targetUrl]);
 
   // 处理用户成功发送邮件后返回
   useEffect(() => {
@@ -77,6 +76,8 @@ function LoginContent() {
                 setLoading(true);
                 const formData = new FormData(e.target as HTMLFormElement);
                 const email = formData.get("email");
+                // email验证页面展示
+                sessionStorage.setItem("verifyEmail", email as string);
                 signIn("email", { email, callbackUrl });
               }}
             >
@@ -104,7 +105,7 @@ function LoginContent() {
                     }
                     width={28}
                     height={28}
-                    alt="shopify login logo"
+                    alt="email login logo"
                   ></Image>
                 )}
                 <span className="text-neutral-700 text-lg font-medium dark:text-neutral-300">
@@ -114,7 +115,7 @@ function LoginContent() {
               </Button>
             </form>
 
-            {signedStoreList?.length > 0 ? (
+            {/* {signedStoreList?.length > 0 ? (
               <>
                 <div className="bg-gradient-to-r from-transparent via-primary/40 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
 
@@ -186,7 +187,7 @@ function LoginContent() {
               </>
             ) : (
               <></>
-            )}
+            )} */}
 
             <div className="inline italic text-accent-foreground">
               {/* <Checkbox className="mr-2" /> */}
@@ -221,7 +222,8 @@ function LoginContent() {
       case "loading":
         return <></>;
     }
-  }, [callbackUrl, loading, signedStoreList, status, targetUrl]);
+    // }, [callbackUrl, loading, signedStoreList, status, targetUrl]);
+  }, [callbackUrl, loading, status]);
 
   return (
     <div className="flex flex-col justify-center items-center w-full px-4 space-y-8 lg:px-20">
@@ -236,20 +238,6 @@ const BottomGradient = () => {
       <span className="group-hover/btn:opacity-100 block transition duration-500 opacity-0 absolute h-px w-full -bottom-px inset-x-0 bg-gradient-to-r from-transparent via-cyan-500 to-transparent" />
       <span className="group-hover/btn:opacity-100 blur-sm block transition duration-500 opacity-0 absolute h-px w-1/2 mx-auto -bottom-px inset-x-10 bg-gradient-to-r from-transparent via-indigo-500 to-transparent" />
     </>
-  );
-};
-
-const LabelInputContainer = ({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) => {
-  return (
-    <div className={cn("flex flex-col space-y-2 w-full", className)}>
-      {children}
-    </div>
   );
 };
 

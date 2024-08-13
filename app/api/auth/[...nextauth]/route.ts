@@ -15,32 +15,15 @@ const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
-    async signIn({ user, account, profile, email, credentials }) {
-      console.log(
-        "********** signIn **********",
-        user,
-        account,
-        profile,
-        email,
-        credentials
-      );
-      return true;
-    },
-    // async redirect({ url, baseUrl }) {
-    //   return baseUrl;
-    // },
     async session({ session, token }) {
-      console.log("********** session **********", session, token);
-      const { user, expires: rawExpires } = session || {};
-
-      const jwtToken = jwt.sign(user || {}, process.env.NEXT_AUTH_SECRET!, {
-        expiresIn: (token.exp as number) - Math.floor(Date.now() / 1000),
-      });
+      const jwtToken = jwt.sign(
+        { ...session.user, expires: session.expires, id: token.sub } || {},
+        process.env.NEXT_AUTH_SECRET!,
+        {
+          expiresIn: (token.exp as number) - Math.floor(Date.now() / 1000),
+        }
+      );
       return { ...session, jwtToken };
-    },
-    async jwt({ token, user, account, profile }) {
-      console.log("********** jwt **********", token, user, account, profile);
-      return token;
     },
   },
   secret: process.env.NEXT_AUTH_SECRET!,
@@ -49,14 +32,25 @@ const authOptions: NextAuthOptions = {
       id: "shopify",
       name: "Shopify",
       credentials: { id: {}, domain: {}, name: {}, email: {} },
-      async authorize(credentials, req) {
-        console.log("*********** CredentialsProvider **********", credentials);
-        // const { id, domain, email, name } = credentials;
-        const id = credentials?.id || "";
-        const domain = credentials?.domain || "";
+      async authorize(credentials) {
         const name = credentials?.name || "";
         const email = credentials?.email || "";
-        const user = { id, domain, email, name };
+
+        // 在数据库中查找用户
+        let user = await prisma.user.findUnique({
+          where: { email },
+        });
+
+        // 如果用户不存在，创建新用户
+        if (!user) {
+          user = await prisma.user.create({
+            data: {
+              name,
+              email,
+            },
+          });
+        }
+
         if (user) {
           return user;
         } else {
@@ -83,7 +77,7 @@ const authOptions: NextAuthOptions = {
   ],
   pages: {
     signIn: `/`,
-    // verifyRequest: `/login`,
+    verifyRequest: `/auth/email/verify`,
     error: "/", // Error code passed in query string as ?error=
   },
 };

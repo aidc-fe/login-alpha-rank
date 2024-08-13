@@ -4,7 +4,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 import SuspenseWrapper from "@/components/suspend-wrapper";
-import { plantCookies } from "@/utils/auth";
+import { thirdPartySignIn } from "@/utils/auth";
 import { Loader } from "lucide-react";
 
 declare module "next-auth" {
@@ -29,7 +29,7 @@ function PageContent() {
     switch (status) {
       case "authenticated":
         if (jwtToken) {
-          plantCookies(jwtToken, shopDomain).then(() => {
+          thirdPartySignIn(jwtToken, shopDomain).then(() => {
             window.location.href = targetUrl;
           });
         } else {

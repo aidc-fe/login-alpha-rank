@@ -9,11 +9,15 @@ import { useEffect } from "react";
 const redirectUri = `${process.env.NEXT_PUBLIC_NEXT_AUTH_URL}/api/shopify/auth/callback`;
 const scope = [
   "write_products",
-  "write_content",
-  "write_themes",
   "read_products",
   "read_content",
+  "write_content",
+  "write_themes",
   "read_themes",
+  "read_locales",
+  "write_locales",
+  "write_translations",
+  "read_translations",
 ].join(",");
 
 function PageContent() {

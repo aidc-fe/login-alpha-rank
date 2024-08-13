@@ -3,7 +3,7 @@
 import { signOut, useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { plantCookies } from "@/utils/auth";
+import { thirdPartySignOut } from "@/utils/auth";
 import { Loader } from "lucide-react";
 
 export default function SignOutPage() {
@@ -13,7 +13,7 @@ export default function SignOutPage() {
   useEffect(() => {
     if (status === "authenticated") {
       // 登出并清除登录态
-      plantCookies("").then(() => {
+      thirdPartySignOut().then(() => {
         signOut();
       });
     } else if (status === "unauthenticated") {
