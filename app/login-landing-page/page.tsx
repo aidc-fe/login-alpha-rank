@@ -4,7 +4,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 import SuspenseWrapper from "@/components/suspend-wrapper";
-import { thirdPartySignIn } from "@/utils/auth";
+import { thirdPartySignIn } from "@/lib/auth";
 import { Loader } from "lucide-react";
 
 declare module "next-auth" {
