@@ -17,10 +17,7 @@ function PageContent() {
   const { data: session, status } = useSession();
   const searchParams = useSearchParams();
   const router = useRouter();
-  const targetUrl =
-    searchParams.get("targetUrl") ||
-    process.env.NEXT_PUBLIC_DEFAULT_TARGET_URL ||
-    "";
+  const targetUrl = searchParams.get("targetUrl");
 
   const shopDomain = searchParams.get("shopDomain");
   const jwtToken = session?.jwtToken;
@@ -30,7 +27,17 @@ function PageContent() {
       case "authenticated":
         if (jwtToken) {
           thirdPartySignIn(jwtToken, shopDomain).then(() => {
-            window.location.href = targetUrl;
+            const url = new URL(targetUrl);
+            if (
+              process.env.NEXT_PUBLIC_TARGET_URL_HOST?.split(",")?.includes(
+                url.host
+              )
+            ) {
+              window.location.href = targetUrl || "";
+            } else {
+              window.location.href =
+                process.env.NEXT_PUBLIC_DEFAULT_TARGET_URL || "";
+            }
           });
         } else {
           router.replace(`/${searchParams.toString()}`);
