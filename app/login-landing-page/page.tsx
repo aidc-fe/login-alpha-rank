@@ -27,7 +27,7 @@ function PageContent() {
       case "authenticated":
         if (jwtToken) {
           thirdPartySignIn(jwtToken, shopDomain).then(() => {
-            const url = new URL(targetUrl);
+            const url = new URL(targetUrl || "");
             if (
               process.env.NEXT_PUBLIC_TARGET_URL_HOST?.split(",")?.includes(
                 url.host
