@@ -27,16 +27,21 @@ function PageContent() {
       case "authenticated":
         if (jwtToken) {
           thirdPartySignIn(jwtToken, shopDomain).then(() => {
-            const url = new URL(targetUrl || "");
+            let url;
+            try {
+              url = new URL(targetUrl || "");
+            } catch {}
+
             if (
+              targetUrl &&
               process.env.NEXT_PUBLIC_TARGET_URL_HOST?.split(",")?.includes(
-                url.host
+                url?.host || ""
               )
             ) {
-              window.location.href = targetUrl || "";
+              window.location.href = targetUrl;
             } else {
               window.location.href =
-                process.env.NEXT_PUBLIC_DEFAULT_TARGET_URL || "";
+                process.env.NEXT_PUBLIC_DEFAULT_TARGET_URL!;
             }
           });
         } else {
