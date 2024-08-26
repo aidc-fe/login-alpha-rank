@@ -34,9 +34,9 @@ function PageContent() {
 
             if (
               targetUrl &&
-              process.env.NEXT_PUBLIC_TARGET_URL_HOST?.split(",")?.includes(
-                url?.host || ""
-              )
+              process.env.NEXT_PUBLIC_TARGET_HOST_WHITE_LIST?.split(
+                ","
+              )?.includes(url?.host || "")
             ) {
               window.location.href = targetUrl;
             } else {
