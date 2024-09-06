@@ -24,7 +24,7 @@ export default function GetAuthPage() {
       // 接收并处理用户信息
       signIn("thirdParty", {
         ...event.data,
-        callbackUrl: `/login-landing-page`,
+        callbackUrl: `/getAuth`,
       });
       console.log("Received user info:", event.data);
     };
