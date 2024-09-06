@@ -20,8 +20,13 @@ export default function GetAuthPage() {
       if (!event.origin.includes(process.env.NEXT_PUBLIC_WEBSITE_DOMAIN!)) {
         return;
       }
+      // 接收到信息，外面的button置为 loading
+      window.parent.postMessage(
+        { status: "loading" },
+        process.env.NEXT_PUBLIC_WEBSITE_DOMAIN!
+      );
 
-      // 接收并处理用户信息
+      // 接收用户信息，并且进行登录
       signIn("thirdParty", {
         ...event.data,
         callbackUrl: `/getAuth`,
