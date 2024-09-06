@@ -26,7 +26,6 @@ export default function GetAuthPage() {
         ...event.data,
         callbackUrl: `/getAuth`,
       });
-      console.log("Received user info:", event.data);
     };
     window.addEventListener("message", handleMessage);
 
