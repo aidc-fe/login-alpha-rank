@@ -1,0 +1,16 @@
+{
+  "accounts_endpoint": "/api/user",
+  "id_assertion_endpoint": "/api/user",
+  "disconnect_endpoint": "/api/user",
+  "login_url": "/",
+  "branding": {
+    "background_color": "#7a3aec",
+    "color": "#ffffff",
+    "icons": [
+      {
+        "url": "./favicon.ico",
+        "size": 25
+      }
+    ]
+  }
+}

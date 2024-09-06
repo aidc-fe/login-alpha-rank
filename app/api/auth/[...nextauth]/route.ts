@@ -3,15 +3,40 @@ import GoogleProvider from "next-auth/providers/google";
 import EmailProvider from "next-auth/providers/email";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { PrismaClient } from "@prisma/client";
 import jwt from "jsonwebtoken";
+import { prisma } from "@/lib/database";
 
-const prisma = new PrismaClient();
 const authOptions: NextAuthOptions = {
   // debug: true,
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt",
+  },
+  cookies: {
+    sessionToken: {
+      name: "next-auth.session-token",
+      options: {
+        sameSite: "none",
+        path: "/",
+        secure: true,
+      },
+    },
+    callbackUrl: {
+      name: "next-auth.callback-url",
+      options: {
+        sameSite: "none",
+        path: "/",
+        secure: true,
+      },
+    },
+    csrfToken: {
+      name: "next-auth.csrf-token",
+      options: {
+        sameSite: "none",
+        path: "/",
+        secure: true,
+      },
+    },
   },
 
   callbacks: {
@@ -29,8 +54,8 @@ const authOptions: NextAuthOptions = {
   secret: process.env.NEXT_AUTH_SECRET!,
   providers: [
     CredentialsProvider({
-      id: "shopify",
-      name: "Shopify",
+      id: "thirdParty",
+      name: "ThirdParty",
       credentials: { id: {}, domain: {}, name: {}, email: {} },
       async authorize(credentials) {
         const name = credentials?.name || "";

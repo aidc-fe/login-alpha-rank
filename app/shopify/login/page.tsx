@@ -44,7 +44,7 @@ function PageContent() {
       );
     }
 
-    signIn("shopify", {
+    signIn("thirdParty", {
       ...userData,
       callbackUrl: `/login-landing-page?targetUrl=${
         sessionStorage.getItem("shopifyTargetUrl") ||
