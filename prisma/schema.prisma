@@ -7,6 +7,23 @@ generator client {
   provider = "prisma-client-js"
 }
 
+model User {
+  id                    String                  @id @default(cuid())
+  email                 String?                 @unique
+  emailVerified         DateTime?
+  name                  String?
+  image                 String?
+  password              String?                 // 如果需要存储密码
+  from                  String?                 // 用于记录来源（例如，OAuth 提供方）
+  
+  accounts              Account[]
+  sessions              Session[]
+  verificationTokens    VerificationToken[]
+  authorizationCodes    AuthorizationCode[]     // 反向关系
+  accessTokens          AccessToken[]           // 反向关系
+  refreshTokens         RefreshToken[]          // 反向关系
+}
+
 model Account {
   id                 String  @id @default(cuid())
   userId             String
@@ -20,6 +37,9 @@ model Account {
   scope              String?
   id_token           String?  @db.Text
   session_state      String?
+  shopDomain         String?
+  shopDisplayName    String?
+  userName           String?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -35,20 +55,70 @@ model Session {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  accounts      Account[]
-  sessions      Session[]
-}
-
 model VerificationToken {
   identifier String
   token      String   @unique
   expires    DateTime
+  password   String?  // 如果需要存储密码
+  name       String?
+  type       String?
 
+  user User @relation(fields: [identifier], references: [id]) // 反向关系
   @@unique([identifier, token])
+}
+
+model Client {
+  id           String @id @default(cuid())
+  client_id    String @unique
+  client_secret String
+  redirect_uris String
+  grant_types   String
+  scope         String
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+  active        Boolean
+  name          String?
+  description   String?
+
+  authorizationCodes AuthorizationCode[]
+  accessTokens      AccessToken[]
+  refreshTokens     RefreshToken[]
+}
+
+model AuthorizationCode {
+  code          String @id
+  client_id     String
+  userId        String
+  redirect_uri  String
+  expires_at    DateTime
+  created_at    DateTime @default(now())
+  used          Boolean
+
+  client Client @relation(fields: [client_id], references: [client_id])
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([code])
+}
+
+model AccessToken {
+  token      String @id
+  client_id  String
+  userId     String
+  expires_at DateTime
+  created_at DateTime @default(now())
+  refresh_token String? // 用于关联的刷新令牌
+
+  client Client @relation(fields: [client_id], references: [client_id])
+  user User @relation(fields: [userId], references: [id])
+}
+
+model RefreshToken {
+  token      String @id
+  client_id  String
+  userId     String
+  expires_at DateTime
+  created_at DateTime @default(now())
+
+  client Client @relation(fields: [client_id], references: [client_id])
+  user User @relation(fields: [userId], references: [id])
 }
