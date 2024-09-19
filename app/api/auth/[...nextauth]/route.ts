@@ -56,11 +56,19 @@ const authOptions: NextAuthOptions = {
     CredentialsProvider({
       id: "thirdParty",
       name: "ThirdParty",
-      credentials: { id: {}, domain: {}, name: {}, email: {}, from: {} },
+      credentials: {
+        id: {},
+        domain: {},
+        name: {},
+        email: {},
+        from: {},
+        image: {},
+      },
       async authorize(credentials) {
         const name = credentials?.name || "";
         const email = credentials?.email || "";
         const from = credentials?.from || "";
+        const image = credentials?.image || "";
 
         // 在数据库中查找用户
         let user = await prisma.user.findUnique({
@@ -74,6 +82,7 @@ const authOptions: NextAuthOptions = {
               name,
               email,
               from,
+              image,
             },
           });
         }
