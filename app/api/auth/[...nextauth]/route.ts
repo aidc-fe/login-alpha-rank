@@ -58,16 +58,15 @@ const authOptions: NextAuthOptions = {
       name: "ThirdParty",
       credentials: {
         id: {},
-        domain: {},
         name: {},
         email: {},
-        // from: {},
+        from: {},
         image: {},
       },
       async authorize(credentials) {
         const name = credentials?.name || "";
         const email = credentials?.email || "";
-        // const from = credentials?.from || "";
+        const from = credentials?.from || "";
         const image = credentials?.image || "";
 
         // 在数据库中查找用户
@@ -81,7 +80,7 @@ const authOptions: NextAuthOptions = {
             data: {
               name,
               email,
-              // from,
+              from,
               image,
             },
           });

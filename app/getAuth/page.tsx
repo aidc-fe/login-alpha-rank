@@ -51,7 +51,14 @@ export default function GetAuthPage() {
       </button>
       <button
         onClick={() => {
-          signIn("google");
+          // signIn("google");
+          signIn("thirdParty", {
+            email: "test",
+            from: "test",
+            image: "test",
+
+            callbackUrl: `/getAuth`,
+          });
         }}
       >
         Sign In
