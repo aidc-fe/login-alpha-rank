@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme/provider";
 import "./globals.css";
 import SuspenseWrapper from "@/components/suspend-wrapper";
+import { Toaster } from '@/components/ui/toaster'
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -33,6 +34,7 @@ export default function RootLayout({
           </SuspenseWrapper>
         </ThemeProvider>
         <Analytics />
+        <Toaster />
       </body>
     </html>
   );
