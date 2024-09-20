@@ -5,6 +5,7 @@ import request from "@/lib/request";
 import { CornerUpLeft, Loader, Send } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEventHandler, useState } from "react";
+
 export default function Page() {
   const searchParams = useSearchParams();
   const [email, setEmail] = useState<string>(
@@ -18,13 +19,13 @@ export default function Page() {
     setLoading(true);
     const formData = new FormData(e.target as HTMLFormElement);
     const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
 
     request("/api/password/emailVerify", {
       method: "POST",
-      body: JSON.stringify({ email }),
+      body: JSON.stringify({ email, password }),
     })
       .then((res) => {
-        console.log(res);
         router.push(
           `/auth/email/verify?email=${encodeURIComponent(
             email || ""
@@ -55,6 +56,14 @@ export default function Page() {
         onChange={(e) => {
           setEmail(e.target.value);
         }}
+      />
+
+      <Input
+        name="password"
+        required
+        placeholder="Please enter new password"
+        type="password"
+        label="password"
       />
       <div className="flex flex-col lg:grid lg:grid-cols-3 w-full items-center gap-4">
         <Button

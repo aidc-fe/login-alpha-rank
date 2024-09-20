@@ -2,7 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ERROR_CONFIG } from "@/constants/errors";
 import request from "@/lib/request";
 import { CornerUpLeft, Loader } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -22,14 +21,13 @@ export default function SignUpPage() {
     const formData = new FormData(e.target as HTMLFormElement);
     const name = formData.get("name");
     const email = formData.get("email") as string;
-    const password = formData.get("password");
+    const password = formData.get("password") as string;
 
     request("/api/signUp/email/send", {
       method: "POST",
       body: JSON.stringify({ name, email, password }),
     })
-      .then((res) => {
-        console.log(res);
+      .then(() => {
         router.push(
           `/auth/email/verify?email=${encodeURIComponent(
             email || ""

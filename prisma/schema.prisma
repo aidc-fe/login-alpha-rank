@@ -52,6 +52,7 @@ model VerificationToken {
   name       String?
   password   String?
   type       String?
+  used       DateTime?
 
   @@unique([identifier, token])
 }

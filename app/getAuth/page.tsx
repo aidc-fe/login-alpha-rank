@@ -52,10 +52,16 @@ export default function GetAuthPage() {
       </button>
       <button
         onClick={() => {
-          signIn("thirdParty", {
-            name: "shabi",
-            email: "text@163.com",
-            id: "123123",
+          // signIn("thirdParty", {
+          //   name: "shabi",
+          //   email: "text@163.com",
+          //   id: "123123",
+          //   callbackUrl: `/getAuth`,
+          // });
+          signIn("password", {
+            name: "sha",
+            email: "text11@163.com",
+            password: "11111",
             callbackUrl: `/getAuth`,
           });
         }}

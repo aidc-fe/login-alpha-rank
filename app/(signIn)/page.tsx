@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import request from "@/lib/request";
 // import {
 //   Select,
 //   SelectContent,
@@ -68,6 +69,18 @@ export default function Home() {
                   setLoading(true);
                   const formData = new FormData(e.target as HTMLFormElement);
                   const email = formData.get("email");
+                  const password = formData.get("password");
+
+                  request("/api/signIn", {
+                    method: "POST",
+                    body: JSON.stringify({ email, password }),
+                  })
+                    .then(() => {
+                      signIn("password", { callbackUrl });
+                    })
+                    .finally(() => {
+                      setLoading(false);
+                    });
                   // email验证页面展示
                   // signIn("email", { email, callbackUrl });
                 }}
@@ -120,9 +133,7 @@ export default function Home() {
                     type="submit"
                     disabled={loading}
                   >
-                    {loading && (
-                      <Loader className="text-primary animate-spin" />
-                    )}
+                    {loading && <Loader className="animate-spin" />}
                     Sign in
                   </Button>
                   <Button
