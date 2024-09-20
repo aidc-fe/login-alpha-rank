@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
@@ -36,7 +37,9 @@ export default function LoginCarousel({ className }: { className?: string }) {
             >
               <Image src={img} width={550} height={380} alt={title} />
               <div className="text-3xl font-semibold">{title}</div>
-              <div className="mt-4 text-center max-w-3/5">{desc}</div>
+              <div className="mt-4 text-center text-muted-foreground max-w-3/5">
+                {desc}
+              </div>
             </div>
           );
         })}

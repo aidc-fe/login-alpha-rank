@@ -93,6 +93,38 @@ const authOptions: NextAuthOptions = {
         }
       },
     }),
+    CredentialsProvider({
+      id: "password",
+      name: "Password",
+      credentials: { id: {}, password: {}, name: {}, email: {} },
+      async authorize(credentials) {
+        const name = credentials?.name || "";
+        const email = credentials?.email || "";
+        const password = credentials?.password || "";
+
+        // 在数据库中查找用户
+        let user = await prisma.user.findUnique({
+          where: { email },
+        });
+
+        // 如果用户不存在，创建新用户
+        if (!user) {
+          user = await prisma.user.create({
+            data: {
+              name,
+              email,
+              password,
+            },
+          });
+        }
+
+        if (user) {
+          return user;
+        } else {
+          return null;
+        }
+      },
+    }),
     GoogleProvider({
       clientId: process.env.AUTH_GOOGLE_ID!,
       clientSecret: process.env.AUTH_GOOGLE_SECRET!,

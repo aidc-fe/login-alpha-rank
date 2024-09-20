@@ -4,7 +4,7 @@ import { signIn, signOut, useSession } from "next-auth/react";
 import { useEffect } from "react";
 
 export default function GetAuthPage() {
-  const { status } = useSession();
+  const { status, data } = useSession();
 
   useEffect(() => {
     // 向父页面发送 status
@@ -42,6 +42,7 @@ export default function GetAuthPage() {
   return (
     <div className="flex items-center flex-col gap-2">
       {status}
+      <div>{JSON.stringify(data?.user)}</div>
       <button
         onClick={() => {
           signOut();
@@ -51,12 +52,16 @@ export default function GetAuthPage() {
       </button>
       <button
         onClick={() => {
-          // signIn("google");
-          signIn("thirdParty", {
-            email: "test",
-            from: "test",
-            image: "test",
-
+          // signIn("thirdParty", {
+          //   name: "shabi",
+          //   email: "text@163.com",
+          //   id: "123123",
+          //   callbackUrl: `/getAuth`,
+          // });
+          signIn("password", {
+            name: "sha",
+            email: "text11@163.com",
+            password: "11111",
             callbackUrl: `/getAuth`,
           });
         }}
