@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import LoginCarousel from "@/components/login-carousel";
-import SuspenseWrapper from "@/components/suspend-wrapper";
 
 export const metadata: Metadata = {
   title: "Alpha Rank Login",
@@ -13,11 +12,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <SuspenseWrapper>
-      <main className="grid h-full items-center bg-circle-gradient px-4 md:grid-cols-2">
-        <LoginCarousel className="justify-center items-center hidden md:flex" />
-        {children}
-      </main>
-    </SuspenseWrapper>
+    <main className="grid h-full items-center bg-circle-gradient px-4 md:grid-cols-2">
+      <LoginCarousel className="justify-center items-center hidden md:flex" />
+      {children}
+    </main>
   );
 }

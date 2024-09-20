@@ -5,6 +5,7 @@ import SessionProvider from "@/providers/session-provider";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "@/components/theme/provider";
 import "./globals.css";
+import SuspenseWrapper from "@/components/suspend-wrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,7 +28,9 @@ export default function RootLayout({
           // enableSystem
           disableTransitionOnChange
         >
-          <SessionProvider>{children}</SessionProvider>
+          <SuspenseWrapper>
+            <SessionProvider>{children}</SessionProvider>
+          </SuspenseWrapper>
         </ThemeProvider>
         <Analytics />
       </body>
