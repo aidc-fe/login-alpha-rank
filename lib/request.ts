@@ -1,3 +1,5 @@
+import { toast } from "@/components/ui/toaster";
+
 export default function request(
   input: string | URL | globalThis.Request,
   init?: RequestInit
@@ -8,8 +10,14 @@ export default function request(
     })
     .then((res) => {
       if (res.success) {
+        if (res.message) {
+          toast.success(res.message);
+        }
         return res.data;
       } else {
+        if (res.message) {
+          toast.error(res.message);
+        }
         throw res;
       }
     });

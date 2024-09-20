@@ -18,6 +18,8 @@
     --muted-foreground: 220 8.9% 46.1%;
     --accent: 220 14.3% 95.9%;
     --accent-foreground: 220.9 39.3% 11%;
+    --constructive: 130, 100%, 39%;
+    --constructive-foreground: 162, 80%, 39%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 20% 98%;
     --border: 220 13% 91%;
