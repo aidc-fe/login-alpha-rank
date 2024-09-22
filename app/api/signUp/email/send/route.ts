@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
         password: userInfo?.password, // 可选
         type: "signUp", // 可选
       });
-      const verificationLink = `${process.env.NEXT_AUTH_URL}/api/signUp/email/verify?token=${newToken.token}`;
+      const verificationLink = `${process.env.NEXT_AUTH_URL}/api/signUp/email/sent?token=${newToken.token}`;
 
       // 发送验证邮件
       await sendVerificationEmail(

@@ -29,9 +29,7 @@ export default function SignUpPage() {
     })
       .then(() => {
         router.push(
-          `/auth/email/verify?email=${encodeURIComponent(
-            email || ""
-          )}&type=sign_up`
+          `/email/sent?email=${encodeURIComponent(email || "")}&type=sign_up`
         );
       })
       .catch((err) => {
@@ -73,7 +71,7 @@ export default function SignUpPage() {
         required
       ></Input>
 
-      <div className="flex flex-col mt-2 lg:grid lg:grid-cols-3 w-full items-center gap-4">
+      <div className="flex flex-col mt-8 lg:grid lg:grid-cols-3 w-full items-center gap-4">
         <Button
           className="col-span-2 group"
           variant={"default"}
