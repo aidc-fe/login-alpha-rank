@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { isGmail } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
 
-export default function EmailVerify() {
+export default function EmailSent() {
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const type = searchParams.get("type") || "login";

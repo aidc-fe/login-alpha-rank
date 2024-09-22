@@ -5,12 +5,25 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/database";
+import { JWTEncodeParams } from "next-auth/jwt";
 
 const authOptions: NextAuthOptions = {
   // debug: true,
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt",
+  },
+  jwt: {
+    async encode({ token, secret }) {
+      return jwt.sign(token, secret, { expiresIn: "30d" });
+    },
+    async decode({ token, secret }) {
+      try {
+        return jwt.verify(token, secret);
+      } catch (error) {
+        return null;
+      }
+    },
   },
   cookies: {
     sessionToken: {
@@ -144,7 +157,7 @@ const authOptions: NextAuthOptions = {
   ],
   pages: {
     signIn: `/`,
-    verifyRequest: `/auth/email/verify`,
+    verifyRequest: `/email/sent`,
     error: "/", // Error code passed in query string as ?error=
   },
 };

@@ -27,7 +27,7 @@ export default function Page() {
     })
       .then((res) => {
         router.push(
-          `/auth/email/verify?email=${encodeURIComponent(
+          `/email/sent?email=${encodeURIComponent(
             email || ""
           )}&type=reset_password`
         );
