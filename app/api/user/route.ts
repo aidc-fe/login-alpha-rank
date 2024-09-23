@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export function GET(request: NextRequest) {
-  console.log(111, request);
   return NextResponse.json([
     {
       id: "",
@@ -13,6 +12,5 @@ export function GET(request: NextRequest) {
 }
 
 export function POST(request: NextRequest) {
-  console.log(222, request);
   return NextResponse.json({});
 }

@@ -1,5 +1,7 @@
 import bcrypt from "bcryptjs";
 import { createHash, randomUUID } from "crypto";
+import jwt from "jsonwebtoken";
+import { JWTEncodeParams } from "next-auth/jwt";
 
 // 生成密码哈希
 export const encodePassword = (password: string) => {
@@ -18,4 +20,13 @@ export const isPasswordMatch = (
 // 生成hashToken
 export function hashToken(token: string = randomUUID()) {
   return createHash("sha256").update(`${token}anything`).digest("hex");
+}
+
+// 生成JWT
+export async function encodeJwt({ token = {}, secret }: JWTEncodeParams) {
+  delete token?.exp;
+  delete token?.jwtToken;
+  return jwt.sign(token as string | object | Buffer, secret, {
+    expiresIn: "30d",
+  });
 }

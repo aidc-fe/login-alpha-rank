@@ -23,6 +23,7 @@ export default function SignUpPage() {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
+    // 发送验证邮件
     request("/api/signUp/email/send", {
       method: "POST",
       body: JSON.stringify({ name, email, password }),
@@ -33,7 +34,7 @@ export default function SignUpPage() {
         );
       })
       .catch((err) => {
-        console.log(11, { err });
+        console.log({ err });
       })
       .finally(() => {
         setLoading(false);
