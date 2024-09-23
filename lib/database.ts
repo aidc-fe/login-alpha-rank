@@ -60,6 +60,7 @@ export const createVerificationToken = async (info: {
   identifier: string; //email
   name?: string;
   password?: string;
+  targetUrl?: string;
   type: "signUp" | "signIn" | "passwordReset";
 }) => {
   try {

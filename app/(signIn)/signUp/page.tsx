@@ -26,7 +26,12 @@ export default function SignUpPage() {
     // 发送验证邮件
     request("/api/signUp/email/send", {
       method: "POST",
-      body: JSON.stringify({ name, email, password }),
+      body: JSON.stringify({
+        name,
+        email,
+        password,
+        targetUrl: searchParams.get("targetUrl"),
+      }),
     })
       .then(() => {
         router.push(
