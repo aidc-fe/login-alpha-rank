@@ -1,4 +1,4 @@
-import { toast } from "@/components/ui/toaster";
+import { toastApi } from "@/components/ui/toaster";
 
 export default function request(
   input: string | URL | globalThis.Request,
@@ -11,12 +11,12 @@ export default function request(
     .then((res) => {
       if (res.success) {
         if (res.message) {
-          toast.success(res.message);
+          toastApi.success(res.message);
         }
         return res.data;
       } else {
         if (res.message) {
-          toast.error(res.message);
+          toastApi.error(res.message);
         }
         throw res;
       }
