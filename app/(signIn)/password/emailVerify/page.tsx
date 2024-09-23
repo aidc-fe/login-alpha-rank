@@ -33,7 +33,7 @@ export default function Page() {
         );
       })
       .catch((err) => {
-        console.log(11, { err });
+        console.log({ err });
       })
       .finally(() => {
         setLoading(false);

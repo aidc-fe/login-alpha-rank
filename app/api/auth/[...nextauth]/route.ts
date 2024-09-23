@@ -5,7 +5,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/database";
-import { JWTEncodeParams } from "next-auth/jwt";
+import { encodeJwt } from "@/lib/secret";
 
 const authOptions: NextAuthOptions = {
   // debug: true,
@@ -14,12 +14,11 @@ const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   jwt: {
-    async encode({ token, secret }) {
-      return jwt.sign(token, secret, { expiresIn: "30d" });
-    },
-    async decode({ token, secret }) {
+    encode: encodeJwt,
+    async decode({ token = "", secret }) {
       try {
-        return jwt.verify(token, secret);
+        const info = (jwt.verify(token, secret) as jwt.JwtPayload) || {};
+        return { ...info, jwtToken: token };
       } catch (error) {
         return null;
       }
@@ -54,14 +53,7 @@ const authOptions: NextAuthOptions = {
 
   callbacks: {
     async session({ session, token }) {
-      const jwtToken = jwt.sign(
-        { ...session.user, expires: session.expires, id: token.sub } || {},
-        process.env.NEXT_AUTH_SECRET!,
-        {
-          expiresIn: (token.exp as number) - Math.floor(Date.now() / 1000),
-        }
-      );
-      return { ...session, jwtToken };
+      return { ...session, jwtToken: token?.jwtToken };
     },
   },
   secret: process.env.NEXT_AUTH_SECRET!,

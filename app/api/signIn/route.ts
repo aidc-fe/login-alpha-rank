@@ -10,9 +10,9 @@ export async function POST(request: NextRequest) {
   const user = await getUserByEmail(params.email);
 
   if (!user) {
-    return NextResponse.json(formateError(ERROR_CONFIG.AUTH.USER_NOT_EXIST));
+    return NextResponse.json(formateError(ERROR_CONFIG.SIGNIN));
   } else if (!isPasswordMatch(params.password, user?.password || "")) {
-    return NextResponse.json(formateError(ERROR_CONFIG.PASSWORD.ERROR));
+    return NextResponse.json(formateError(ERROR_CONFIG.SIGNIN));
   } else {
     return NextResponse.json(formatSuccess({ data: true }));
   }

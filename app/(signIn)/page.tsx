@@ -5,13 +5,6 @@ import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import request from "@/lib/request";
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from "@/components/ui/select";
 import { ArrowUpRight, Loader } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
@@ -30,9 +23,6 @@ export default function Home() {
   const callbackUrl = `/login-landing-page?${
     targetUrl ? "targetUrl=" + targetUrl : ""
   }`;
-  // const signedStoreList = JSON.parse(
-  //   localStorage.getItem("signedStoreList") || "[]"
-  // );
 
   // 如果用户已经登录，则进行续登
   useEffect(() => {
@@ -71,6 +61,7 @@ export default function Home() {
                   const email = formData.get("email");
                   const password = formData.get("password");
 
+                  // 登录
                   request("/api/signIn", {
                     method: "POST",
                     body: JSON.stringify({ email, password }),
@@ -81,8 +72,6 @@ export default function Home() {
                     .finally(() => {
                       setLoading(false);
                     });
-                  // email验证页面展示
-                  // signIn("email", { email, callbackUrl });
                 }}
               >
                 <Input
@@ -213,81 +202,7 @@ export default function Home() {
             Google
           </Button>
 
-          {/* {signedStoreList?.length > 0 ? (
-              <>
-                <div className="bg-gradient-to-r from-transparent via-primary/40 dark:via-neutral-700 to-transparent my-8 h-[1px] w-full" />
-
-                <form
-                  className="space-y-4 w-full"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    const formData = new FormData(e.target as HTMLFormElement);
-                    const shopDomain = formData.get("shopDomain");
-                    if (!shopDomain) {
-                      return;
-                    }
-                    window.location.href = `${process.env.NEXT_PUBLIC_NEXT_AUTH_URL}/shopify/auth?shopDomain=${shopDomain}&targetUrl=${targetUrl}`;
-                  }}
-                >
-                  <Select required name="shopDomain">
-                    <SelectTrigger className="h-12 border-primary/50 hover:border-primary">
-                      <SelectValue placeholder="Please select your shop domain" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-white">
-                      {signedStoreList.map(
-                        (item: {
-                          shopDomain: string;
-                          shopName: string;
-                          displayDomain: string;
-                        }) => {
-                          return (
-                            <SelectItem
-                              key={item.shopDomain}
-                              value={item.shopDomain}
-                              className="cursor-pointer"
-                            >
-                              <Store
-                                className="inline text-primary mr-3"
-                                size={20}
-                              />{" "}
-                              <strong>{item.shopName}</strong>
-                              {"    "}
-                              <span className="italic">
-                                （https://{item.displayDomain}）
-                              </span>
-                            </SelectItem>
-                          );
-                        }
-                      )}
-                    </SelectContent>
-                  </Select>
-
-                  <Button
-                    variant={"outline"}
-                    size={"lg"}
-                    type="submit"
-                  >
-                    <Image
-                      src={
-                        "https://img.icons8.com/?size=100&id=uSHYbs6PJfMT&format=png&color=000000"
-                      }
-                      width={28}
-                      height={28}
-                      alt="shopify login logo"
-                    ></Image>
-                    <span className="text-neutral-700 text-lg font-medium dark:text-neutral-300">
-                      Shopify
-                    </span>
-                    <BottomGradient />
-                  </Button>
-                </form>
-              </>
-            ) : (
-              <></>
-            )} */}
-
           <div className="inline w-full italic text-accent-foreground">
-            {/* <Checkbox className="mr-2" /> */}
             By signing in, you are agreeing to our{" "}
             <Button
               onClick={() => {

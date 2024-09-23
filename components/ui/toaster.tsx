@@ -13,7 +13,7 @@ import { eventBus } from "@/lib/eventBus";
 import { CircleAlert, CircleCheckBig } from "lucide-react";
 import { useEffect } from "react";
 
-export const toast = {
+export const toastApi = {
   /**
    * 成功提示
    * @param description message消息

@@ -58,10 +58,11 @@ export default function GetAuthPage() {
           //   id: "123123",
           //   callbackUrl: `/getAuth`,
           // });
-          signIn("password", {
-            name: "sha",
-            email: "text11@163.com",
-            password: "11111",
+          signIn("thirdParty", {
+            name: "xushi.zt@alibaba-inc.com",
+            email: "xushi.zt@alibaba-inc.com",
+            domain: "alpharank.myshoplaza.com",
+            from: "shoplazza",
             callbackUrl: `/getAuth`,
           });
         }}

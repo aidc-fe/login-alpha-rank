@@ -53,6 +53,7 @@ model VerificationToken {
   password   String?
   type       String?
   used       DateTime?
+  targetUrl  String?
 
   @@unique([identifier, token])
 }
