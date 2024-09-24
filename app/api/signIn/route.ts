@@ -14,6 +14,10 @@ export async function POST(request: NextRequest) {
   } else if (!isPasswordMatch(params.password, user?.password || "")) {
     return NextResponse.json(formateError(ERROR_CONFIG.SIGNIN));
   } else {
-    return NextResponse.json(formatSuccess({ data: true }));
+    return NextResponse.json(
+      formatSuccess({
+        data: { email: user.email, image: user.image, name: user.name },
+      })
+    );
   }
 }
