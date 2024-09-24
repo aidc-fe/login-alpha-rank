@@ -29,7 +29,7 @@ export async function sendVerificationEmail(
       <h1 style="color: rgb(32, 33, 35); font-size: 32px; line-height: 40px; margin: 0px 0px 20px;"> ${displayContent.title}</h1>
       <p style="font-size: 16px; line-height: 24px;"> ${displayContent.description}</p>
 <p style="margin: 24px 0px 0px; text-align: left;"> 
-<a href=${verificationLink}
+<a href=${process.env.NEXT_AUTH_URL}${verificationLink}
  style="display: inline-block; text-decoration: none; background: #7c3aed; border-radius: 6px; color: white;  font-size: 16px; line-height: 24px; font-weight: 500; padding: 12px 20px 11px; margin: 0px;" target="_blank">${displayContent.btnContent}</a> 
 </p>
     `,
