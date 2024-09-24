@@ -45,11 +45,16 @@ export async function POST(request: NextRequest) {
       //   return NextResponse.json(formateError({}));
       // }
 
-      return NextResponse.json(
-        formatSuccess({
-          data: { access_token: accessToken, refresh_token: accessToken },
-        })
-      );
+      // return NextResponse.json(
+      //   formatSuccess({
+      //     data: { access_token: accessToken, refresh_token: accessToken },
+      //   })
+      // );
+
+      return NextResponse.json({
+        access_token: accessToken,
+        refresh_token: accessToken,
+      });
     } catch {
       return NextResponse.json(formateError({}));
     }
