@@ -1,5 +1,5 @@
 import { setSessionTokenCookie } from "@/lib/auth";
-import { createUser, validateMagicLink } from "@/lib/database";
+import { createOrUpdateUser, validateMagicLink } from "@/lib/database";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
       email: info.identifier,
       name: info.name!,
     };
-    await createUser(userInfo);
+    await createOrUpdateUser(userInfo);
 
     console.log(info);
     const response = NextResponse.redirect(

@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { createHash, randomUUID } from "crypto";
+import { createHash, randomUUID, randomBytes } from "crypto";
 import jwt from "jsonwebtoken";
 import { JWTEncodeParams } from "next-auth/jwt";
 
@@ -29,4 +29,31 @@ export function encodeJwt({ token = {}, secret }: JWTEncodeParams) {
   return jwt.sign(token as string | object | Buffer, secret, {
     expiresIn: "30d",
   });
+}
+
+// 生成长度为 32 字符的安全随机字符串作为 code
+export function generateAuthorizationCode() {
+  return randomBytes(16).toString("hex");
+}
+
+// 生成 accessToken 和 refreshToken
+export function generateTokens(client_id: string) {
+  // 生成 accessToken，通常包含用户信息和权限（scope）
+  const accessToken = jwt.sign(
+    {
+      client_id,
+    },
+    process.env.NEXT_AUTH_SECRET!
+  );
+
+  // 生成 refreshToken，通常是随机字符串或 JWT，也可以选择加密用户信息
+  const refreshToken = jwt.sign(
+    {
+      client_id,
+    },
+    process.env.NEXT_AUTH_SECRET!
+  );
+
+  // 返回生成的 accessToken 和 refreshToken
+  return { accessToken, refreshToken };
 }

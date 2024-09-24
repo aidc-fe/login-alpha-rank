@@ -32,6 +32,9 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
+  shop              String?
+  shopDisplayName   String?
+  userName          String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
@@ -56,4 +59,44 @@ model VerificationToken {
   targetUrl  String?
 
   @@unique([identifier, token])
+}
+
+
+model Client {
+  id            String   @id @default(cuid())
+  client_id     String   @unique
+  client_secret String
+  redirect_uris String
+  grant_types   String
+  scope         String
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+  active        Boolean
+  name          String
+  description   String
+}
+
+model AuthorizationCode {
+  code         String   @id
+  client_id    String   // 假设为外键
+  redirect_uri String
+  expires_at   DateTime
+  created_at   DateTime @default(now())
+  used         DateTime?
+}
+
+
+model AccessToken {
+  token         String   @id
+  client_id     String   // 假设为外键
+  expires_at    DateTime
+  created_at    DateTime @default(now())
+  refresh_token String
+}
+
+model RefreshToken {
+  token       String   @id
+  client_id   String   // 假设为外键
+  expires_at  DateTime
+  created_at  DateTime @default(now())
 }
