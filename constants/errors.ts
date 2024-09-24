@@ -1,4 +1,5 @@
 export const ERROR_CONFIG = {
+  OAUTH: {},
   SIGNIN: {
     code: "SIGNIN_ERROR",
     message: "错误的邮箱或密码",
@@ -15,6 +16,12 @@ export const ERROR_CONFIG = {
     USER_NOT_EXIST: {
       code: "AUTH_USER_NOT_EXIST",
       message: "User does not exist, please sign up.",
+    },
+    SHOPLAZZA: {
+      HMAC: {
+        code: "SHOPLAZZA_HMAC",
+        message: "HMAC validation failed",
+      },
     },
   },
   PASSWORD: {
@@ -42,6 +49,12 @@ export const ERROR_CONFIG = {
         code: "TOKEN_HAS_USED",
         message: "link was used, please try again",
       },
+    },
+  },
+  SERVER: {
+    ERROR_500: {
+      code: "Internal Server Error",
+      message: "Internal Server Error",
     },
   },
 };
