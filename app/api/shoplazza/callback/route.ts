@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
         client_secret: process.env.SHOPLAZZA_CLIENT_SECRET,
         code,
         grant_type: "authorization_code",
-        redirect_uri: `https://${process.env.BASE_DOMAIN}/api/auth/shoplazza/callback`,
+        redirect_uri: `${process.env.NEXT_PUBLIC_NEXT_AUTH_URL}/api/shoplazza/callback`,
       }),
     });
 
@@ -71,13 +71,13 @@ export async function GET(request: NextRequest) {
         domain: shopInfo.domain,
         userName: shopInfo.name,
       };
-      // 创建或更新用户信息
+      // // 创建或更新用户信息
       const user = await createOrUpdateUser({ ...userInfo, from: "shoplazza" });
-      // 创建或更新oAuth账号信息
-      const account = await createOrUpdateAccount({
-        ...accountInfo,
-        userId: user.id,
-      });
+      // // 创建或更新oAuth账号信息
+      // const account = await createOrUpdateAccount({
+      //   ...accountInfo,
+      //   userId: user.id,
+      // });
 
       const response = NextResponse.redirect(
         `${process.env.DEFAULT_TARGET_URL}/web/api/auth/callback/login?userId=${user.id}&systemDomain=${shopInfo.system_domain}`,

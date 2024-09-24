@@ -1,6 +1,6 @@
 import { createAuthorizationCode, findClientByClientId } from "@/lib/database";
 import { formateError } from "@/lib/request";
-import { generateAuthorizationCode } from "@/lib/secret";
+import { generateAuthorizationCode, generateHmac } from "@/lib/secret";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -9,7 +9,6 @@ export async function GET(request: NextRequest) {
   const state = request.nextUrl.searchParams.get("state") || "";
   const userId = request.nextUrl.searchParams.get("userId") || "";
   const systemDomain = request.nextUrl.searchParams.get("systemDomain") || "";
-
   // if (!client_id) {
   //   return NextResponse.json(formateError({}));
   // }
@@ -30,19 +29,22 @@ export async function GET(request: NextRequest) {
 
     // 生成授权码
     const code = generateAuthorizationCode();
+    // 生成hmac
+    const hmac = generateHmac(
+      { code, state, userId, systemDomain, jumpFrom: "shoplazza" },
+      ""
+    );
 
     // 创建一条授权码数据
     try {
-      const authorizationCode = await createAuthorizationCode({
-        code,
-        client_id,
-        redirect_uri,
-      });
+      // const authorizationCode = await createAuthorizationCode({
+      //   code,
+      //   client_id,
+      //   redirect_uri,
+      // });
       return NextResponse.redirect(
         // 带上request search
-        `${redirect_uri}?hmac=${""}&code=${
-          authorizationCode.code
-        }&state=${state}&userId=${userId}&systemDomain=${systemDomain}&jumpFrom=shoplazza`,
+        `${redirect_uri}?hmac=${hmac}&code=${code}&state=${state}&userId=${userId}&systemDomain=${systemDomain}&jumpFrom=shoplazza`,
         302
       );
     } catch {
