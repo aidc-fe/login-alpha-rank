@@ -66,8 +66,8 @@ export default function Home() {
                     method: "POST",
                     body: JSON.stringify({ email, password }),
                   })
-                    .then(() => {
-                      signIn("password", { callbackUrl });
+                    .then((user) => {
+                      signIn("password", { ...user, callbackUrl });
                     })
                     .finally(() => {
                       setLoading(false);
