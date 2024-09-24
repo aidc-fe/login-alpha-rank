@@ -35,9 +35,9 @@ const scopes = [
 
 export function GET(request: NextRequest) {
   // Validate HMAC
-  if (!hmacValidator(request)) {
-    return NextResponse.json(formateError(ERROR_CONFIG.AUTH.SHOPLAZZA.HMAC));
-  }
+  // if (!hmacValidator(request)) {
+  //   return NextResponse.json(formateError(ERROR_CONFIG.AUTH.SHOPLAZZA.HMAC));
+  // }
 
   const shop = request.nextUrl.searchParams.get("shop");
 
