@@ -18,11 +18,11 @@ export async function POST(request: NextRequest) {
     }) || {};
 
   try {
-    const client = await findClientByClientId(client_id);
+    // const client = await findClientByClientId(client_id);
 
-    if (client.client_secret !== client_secret) {
-      return NextResponse.json(formateError({}));
-    }
+    // if (client.client_secret !== client_secret) {
+    //   return NextResponse.json(formateError({}));
+    // }
 
     // 查找并校验code的准确性
     try {
