@@ -26,23 +26,24 @@ export async function POST(request: NextRequest) {
 
     // 查找并校验code的准确性
     try {
-      const authorizationCode = await findAndUseAuthorizationCode(code);
-      if (authorizationCode.client_id !== client_id) {
-        return NextResponse.json(formateError({}));
-      }
+      // const authorizationCode = await findAndUseAuthorizationCode(code);
+      // if (authorizationCode.client_id !== client_id) {
+      //   return NextResponse.json(formateError({}));
+      // }
+
       const { accessToken, refreshToken } = generateTokens(client_id);
 
-      try {
-        // 数据库中插入 accessToken, refreshToken
-        await createAccessToken({
-          token: accessToken,
-          client_id,
-          refresh_token: refreshToken,
-        });
-        await createRefreshToken({ token: refreshToken, client_id });
-      } catch (e) {
-        return NextResponse.json(formateError({}));
-      }
+      // try {
+      //   // 数据库中插入 accessToken, refreshToken
+      //   await createAccessToken({
+      //     token: accessToken,
+      //     client_id,
+      //     refresh_token: refreshToken,
+      //   });
+      //   await createRefreshToken({ token: refreshToken, client_id });
+      // } catch (e) {
+      //   return NextResponse.json(formateError({}));
+      // }
 
       return NextResponse.json(formatSuccess({ data: { accessToken } }));
     } catch {

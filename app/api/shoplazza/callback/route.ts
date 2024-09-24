@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
       });
 
       const response = NextResponse.redirect(
-        `https://${process.env.BASE_DOMAIN}`,
+        `${process.env.DEFAULT_TARGET_URL}/web/api/auth/callback/login?userId=${user.id}&systemDomain=${shopInfo.system_domain}`,
         302
       );
       setSessionTokenCookie(userInfo, response);
