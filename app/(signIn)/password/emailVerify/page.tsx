@@ -1,6 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { toastApi } from "@/components/ui/toaster";
 import request from "@/lib/request";
 import { CornerUpLeft, Loader, Send } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -16,11 +17,18 @@ export default function Page() {
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
-    setLoading(true);
     const formData = new FormData(e.target as HTMLFormElement);
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
+    const checkPassword = formData.get("check_password") as string;
 
+    // 校验新旧密码
+    if (checkPassword !== password) {
+      toastApi.error("两次输入密码不一致");
+      return;
+    }
+
+    setLoading(true);
     request("/api/password/emailVerify", {
       method: "POST",
       body: JSON.stringify({ email, password }),
@@ -42,10 +50,10 @@ export default function Page() {
 
   return (
     <form
-      className="flex flex-col items-center gap-12 h-96 px-8"
+      className="flex flex-col items-center gap-4 px-8"
       onSubmit={handleSubmit}
     >
-      <h1 className="font-bold text-3xl mb-12">Reset password</h1>
+      <h1 className="font-bold text-3xl mb-2">Reset password</h1>
       <Input
         name="email"
         required
@@ -65,7 +73,15 @@ export default function Page() {
         type="password"
         label="password"
       />
-      <div className="flex flex-col lg:grid lg:grid-cols-3 w-full items-center gap-4">
+
+      <Input
+        name="check_password"
+        label="Check password"
+        required
+        type="password"
+        placeholder="Please enter new password"
+      />
+      <div className="flex flex-col mt-8 lg:grid lg:grid-cols-3 w-full items-center gap-4">
         <Button
           className="col-span-2 group"
           variant={"default"}

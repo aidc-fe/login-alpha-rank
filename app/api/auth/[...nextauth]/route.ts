@@ -6,6 +6,7 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/database";
 import { encodeJwt } from "@/lib/secret";
+import { sendVerificationEmail } from "@/lib/email";
 
 const authOptions: NextAuthOptions = {
   // debug: true,
@@ -145,6 +146,18 @@ const authOptions: NextAuthOptions = {
         secure: true, // 使用SSL/TLS
       },
       from: process.env.EMAIL_FROM,
+      sendVerificationRequest({
+        identifier: email,
+        url,
+        provider: { server, from },
+      }) {
+        /* your function */
+        sendVerificationEmail(email, url, "AlphaRank - Login", {
+          title: "Login to AlphaRank",
+          description: `You can login to AlphaRank by click the button below. Or you can login by password after <a style='color:#7c3aed' href='${process.env.NEXT_PUBLIC_NEXT_AUTH_URL}/password/emailVerify?email=${email}'>setting your password.</a>`,
+          btnContent: "Reset Password",
+        });
+      },
     }),
   ],
   pages: {
