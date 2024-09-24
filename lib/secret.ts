@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { createHash, randomUUID, randomBytes } from "crypto";
+import { createHash, randomUUID, randomBytes, createHmac } from "crypto";
 import jwt from "jsonwebtoken";
 import { JWTEncodeParams } from "next-auth/jwt";
 
@@ -56,4 +56,23 @@ export function generateTokens(client_id: string) {
 
   // 返回生成的 accessToken 和 refreshToken
   return { accessToken, refreshToken };
+}
+
+// 生成 HMAC 的函数
+export function generateHmac(
+  parameters: { [key: string]: string },
+  clientSecret: string
+) {
+  // 1. 根据字典顺序对参数进行排序
+  const sortedParams = Object.keys(parameters)
+    .sort()
+    .map((key) => `${key}=${parameters[key]}`)
+    .join("&");
+
+  // 2. 使用 HMAC-SHA256 哈希函数生成哈希值
+  const hmac = createHmac("sha256", clientSecret)
+    .update(sortedParams)
+    .digest("base64"); // 转换为 Base64 编码
+
+  return hmac;
 }

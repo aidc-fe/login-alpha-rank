@@ -54,9 +54,9 @@ export function GET(request: NextRequest) {
 
   return NextResponse.redirect(
     `https://${shop}/admin/oauth/authorize?client_id=${process.env
-      .SHOPLAZZA_CLIENT_ID!}&scope=${scopes.join("+")}&redirect_uri=https://${
-      process.env.BASE_DOMAIN
-    }/api/auth/shoplazza/callback&response_type=code&state=${state}`,
+      .SHOPLAZZA_CLIENT_ID!}&scope=${scopes.join("+")}&redirect_uri=${encodeURI(
+      `${process.env.NEXT_PUBLIC_NEXT_AUTH_URL}/api/shoplazza/callback`
+    )}&response_type=code&state=${state}`,
     302
   );
 }
