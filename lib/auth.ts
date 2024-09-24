@@ -9,7 +9,7 @@ export async function setSessionTokenCookie(
   response: NextResponse
 ): Promise<NextResponse> {
   // 生成 JWT
-  const sessionToken = await encodeJwt({
+  const sessionToken = encodeJwt({
     token: tokenPayload,
     secret: process.env.NEXT_AUTH_SECRET!,
   });

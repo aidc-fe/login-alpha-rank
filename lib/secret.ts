@@ -23,7 +23,7 @@ export function hashToken(token: string = randomUUID()) {
 }
 
 // 生成JWT
-export async function encodeJwt({ token = {}, secret }: JWTEncodeParams) {
+export function encodeJwt({ token = {}, secret }: JWTEncodeParams) {
   delete token?.exp;
   delete token?.jwtToken;
   return jwt.sign(token as string | object | Buffer, secret, {
