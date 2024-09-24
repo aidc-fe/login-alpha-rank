@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
         targetUrl: userInfo?.targetUrl,
         type: "signUp", // 可选
       });
-      const verificationLink = `/api/signUp/email/verify?token=${newToken.token}`;
+      const verificationLink = `${process.env.NEXT_AUTH_URL}/api/signUp/email/verify?token=${newToken.token}`;
 
       // 发送验证邮件
       await sendVerificationEmail(

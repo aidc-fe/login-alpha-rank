@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
       password,
       type: "passwordReset", // 可选
     });
-    const verificationLink = `/api/password/reset?token=${newToken.token}`;
+    const verificationLink = `${process.env.NEXT_AUTH_URL}/api/password/reset?token=${newToken.token}`;
 
     // 发送验证邮件
     await sendVerificationEmail(
