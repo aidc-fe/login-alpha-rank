@@ -56,7 +56,8 @@ export function thirdPartySignOut() {
     return fetch(`${url}`, {
       method: "POST",
       credentials: "include", // 确保 cookie 被发送
-      body: "",
+      // 为了配合问己
+      body: "{}",
       headers: {
         "Content-Type": "application/json",
         // 仅仅是为了blog产品，没有让问己新增接口，所以先保留这个
