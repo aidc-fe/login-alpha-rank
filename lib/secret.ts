@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { createHash, randomUUID } from "crypto";
+import { createHash, randomUUID, randomBytes, createHmac } from "crypto";
 import jwt from "jsonwebtoken";
 import { JWTEncodeParams } from "next-auth/jwt";
 
@@ -23,10 +23,56 @@ export function hashToken(token: string = randomUUID()) {
 }
 
 // 生成JWT
-export async function encodeJwt({ token = {}, secret }: JWTEncodeParams) {
+export function encodeJwt({ token = {}, secret }: JWTEncodeParams) {
   delete token?.exp;
   delete token?.jwtToken;
   return jwt.sign(token as string | object | Buffer, secret, {
     expiresIn: "30d",
   });
+}
+
+// 生成长度为 32 字符的安全随机字符串作为 code
+export function generateAuthorizationCode() {
+  return randomBytes(16).toString("hex");
+}
+
+// 生成 accessToken 和 refreshToken
+export function generateTokens(client_id: string) {
+  // 生成 accessToken，通常包含用户信息和权限（scope）
+  const accessToken = jwt.sign(
+    {
+      client_id,
+    },
+    process.env.NEXT_AUTH_SECRET!
+  );
+
+  // 生成 refreshToken，通常是随机字符串或 JWT，也可以选择加密用户信息
+  const refreshToken = jwt.sign(
+    {
+      client_id,
+    },
+    process.env.NEXT_AUTH_SECRET!
+  );
+
+  // 返回生成的 accessToken 和 refreshToken
+  return { accessToken, refreshToken };
+}
+
+// 生成 HMAC 的函数
+export function generateHmac(
+  parameters: { [key: string]: string },
+  clientSecret: string
+) {
+  // 1. 根据字典顺序对参数进行排序
+  const sortedParams = Object.keys(parameters)
+    .sort()
+    .map((key) => `${key}=${parameters[key]}`)
+    .join("&");
+
+  // 2. 使用 HMAC-SHA256 哈希函数生成哈希值
+  const hmac = createHmac("sha256", clientSecret)
+    .update(sortedParams)
+    .digest("base64"); // 转换为 Base64 编码
+
+  return hmac;
 }

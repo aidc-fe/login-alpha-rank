@@ -1,4 +1,5 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
+import { createHmac, timingSafeEqual } from "crypto";
 import { encodeJwt } from "./secret";
 
 // 用用户信息生成 JWT，并存入 cookie
@@ -68,4 +69,26 @@ export function thirdPartySignOut() {
 
   // 等待所有请求完成
   return Promise.all(fetchPromises);
+}
+
+// shoplazza HMAC Validator Middleware
+export function hmacValidator(request: NextRequest): boolean {
+  const url = new URL(request.url);
+  const hmac = url.searchParams.get("hmac");
+  const queryParams = new URLSearchParams(url.searchParams);
+  queryParams.delete("hmac");
+
+  const sortedKeys = Array.from(queryParams.keys()).sort();
+  const message = sortedKeys
+    .map((key) => `${key}=${queryParams.get(key)}`)
+    .join("&");
+
+  const generatedHash = createHmac(
+    "sha256",
+    process.env.SHOPLAZZA_CLIENT_SECRET!
+  )
+    .update(message)
+    .digest("hex");
+
+  return timingSafeEqual(Buffer.from(generatedHash), Buffer.from(hmac!));
 }

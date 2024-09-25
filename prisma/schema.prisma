@@ -32,6 +32,9 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
+  shop              String?
+  shopDisplayName   String?
+  userName          String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
@@ -56,4 +59,47 @@ model VerificationToken {
   targetUrl  String?
 
   @@unique([identifier, token])
+}
+
+model AuthorizationCode {
+  code         String   @id
+  client_id    String   // 假设为外键
+  redirect_uri String
+  expires_at   DateTime
+  created_at   DateTime @default(now())
+  used         DateTime?
+}
+
+model Client {
+  client_id     String         @id @unique
+  client_secret String
+  redirect_uris String
+  grant_types   String
+  scope         String
+  created_at    DateTime        @default(now())
+  updated_at    DateTime        @updatedAt
+  active        Boolean
+  name          String
+  description   String
+  accessTokens  AccessToken[]   // Relation field for AccessToken
+  refreshTokens RefreshToken[]  // Relation field for RefreshToken
+}
+
+model AccessToken {
+  token          String        @id
+  client_id      String
+  expires_at     DateTime      @default(dbgenerated("now() + interval '1 year'"))  // PostgreSQL-specific syntax
+  created_at     DateTime      @default(now())
+  refresh_token  String        // Foreign key to refresh token
+  refreshToken   RefreshToken  @relation(fields: [refresh_token], references: [token], onDelete: Cascade) // One-to-many relation
+  client         Client        @relation(fields: [client_id], references: [client_id], onDelete: Cascade)
+}
+
+model RefreshToken {
+  token         String        @id
+  client_id     String  
+  expires_at    DateTime      @default(dbgenerated("now() + interval '2 year'"))  // PostgreSQL-specific syntax
+  created_at    DateTime      @default(now())
+  accessTokens  AccessToken[] // One-to-many relation to AccessToken
+  client        Client        @relation(fields: [client_id], references: [client_id], onDelete: Cascade)
 }
