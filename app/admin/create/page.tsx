@@ -9,6 +9,14 @@ import { useRouter } from "next/navigation";
 import { FormEventHandler, useState } from "react";
 import * as Switch from '@radix-ui/react-switch';
 import { cn } from "@/lib/utils";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 const scopeOptions = ['email', 'openid', 'profile', 'shopify', 'shoplazza']; //允许的权限范围。
 
@@ -29,40 +37,21 @@ export default function Admin() {
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
     console.log('sdp--info', info)
-    // setLoading(true);
-    // const formData = new FormData(e.target as HTMLFormElement);
-    // const name = formData.get("name");
-    // const scope = formData.get("scope");
-    // const active = formData.get("active");
-
-    // const email = formData.get("email") as string;
-    // const password = formData.get("password") as string;
-
-    // 发送验证邮件
-    // request("/api/signUp/email/send", {
-    //   method: "POST",
-    //   body: JSON.stringify({
-    //     name,
-    //     email,
-    //     password,
-    //     targetUrl: searchParams.get("targetUrl"),
-    //   }),
-    // })
-    //   .then(() => {
-    //     router.push(
-    //       `/email/sent?email=${encodeURIComponent(email || "")}&type=sign_up`
-    //     );
-    //   })
-    //   .catch((err) => {
-    //     console.log({ err });
-    //   })
-    //   .finally(() => {
-    //     setLoading(false);
-    //   });
   };
+
   return (
-    <div>
-      <h1 className="font-bold text-3xl mb-2 w-full text-center">OAuth登录</h1>
+    <div className="h-screen py-8">
+      <Breadcrumb className="pb-12">
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/">Home</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>List</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
       <form
         className="grid grid-cols-1 items-center gap-4 px-8 w-full"
         onSubmit={handleSubmit}
