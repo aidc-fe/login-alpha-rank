@@ -9,16 +9,31 @@ import { ERROR_CONFIG } from "@/constants/errors";
 
 export const prisma = new PrismaClient();
 
-// 用户是否已经存在
-export const getUserByEmail = async (email: string) => {
+// 查询用户信息
+export const getUser = async (search: { email?: string; id?: string }) => {
+  // Validate input: ensure either email or id is provided
+  if (!search.email && !search.id) {
+    throw new Error(
+      "You must provide either an email or id to search for a user."
+    );
+  }
+
   try {
-    // 查找用户
+    // Find user by either email or id
     const user = await prisma.user.findFirst({
-      where: { email },
+      where: {
+        OR: [
+          { email: search.email ?? undefined }, // Only include if email is defined
+          { id: search.id ?? undefined }, // Only include if id is defined
+        ],
+      },
     });
-    return user;
+
+    // Return user if found, otherwise return null
+    return user || null;
   } catch (error) {
-    throw error;
+    console.error("Error fetching user:", error);
+    throw new Error("Failed to fetch user. Please try again later.");
   }
 };
 
@@ -41,6 +56,24 @@ export const createOrUpdateUser = async (data: {
     return user;
   } catch (error) {
     console.error("Error creating or updating user:", error);
+    throw error;
+  }
+};
+
+// 通过邮箱查找用户，更新用户信息
+export const updateUserByEmail = async (
+  email: string,
+  data: { password?: string }
+) => {
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { email },
+      data,
+    });
+
+    return updatedUser;
+  } catch (error) {
+    console.error("Error updated user:", error);
     throw error;
   }
 };
@@ -80,22 +113,21 @@ export const createOrUpdateAccount = async (data: {
   }
 };
 
-// 通过邮箱查找用户，更新用户信息
-export const updateUserByEmail = async (
-  email: string,
-  data: { password?: string }
+//  查询指定用户的特定provide的account的数据
+export const getAccountsByUserIdAndProviders = async (
+  userId: string,
+  providers: string[]
 ) => {
-  try {
-    const updatedUser = await prisma.user.update({
-      where: { email },
-      data,
-    });
+  const accounts = await prisma.account.findMany({
+    where: {
+      userId: userId,
+      provider: {
+        in: providers, // provider 值在传入的数组中
+      },
+    },
+  });
 
-    return updatedUser;
-  } catch (error) {
-    console.error("Error updated user:", error);
-    throw error;
-  }
+  return accounts;
 };
 
 // 发送邮件前存入一条verificationToken
@@ -222,7 +254,11 @@ export const findClientByClientId = async (clientId: string) => {
       throw new Error(`Client with client_id: ${clientId} not found`);
     }
 
-    return client;
+    return {
+      ...client,
+      redirect_uris: client.redirect_uris?.split(","),
+      scope: client.scope?.split(","),
+    };
   } catch (error) {
     console.error("Error finding client by client_id:", error);
     throw error;
@@ -311,9 +347,7 @@ export const createAccessToken = async (data: {
 
     const accessToken = await prisma.accessToken.create({
       data: {
-        token: data.token,
-        client_id: data.client_id,
-        refresh_token: data.refresh_token,
+        ...data,
         expires_at: expiresAt,
         created_at: now,
       },

@@ -1,5 +1,5 @@
 import { ERROR_CONFIG } from "@/constants/errors";
-import { createVerificationToken, getUserByEmail } from "@/lib/database";
+import { createVerificationToken, getUser } from "@/lib/database";
 import { sendVerificationEmail } from "@/lib/email";
 import { formateError, formatSuccess } from "@/lib/request";
 import { NextRequest, NextResponse } from "next/server";
@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
 
   if (!email) {
     return NextResponse.json(formateError(ERROR_CONFIG.AUTH.NEED_EMAIL));
-  } else if (!(await getUserByEmail(email))) {
+  } else if (!(await getUser({ email }))) {
     return NextResponse.json(formateError(ERROR_CONFIG.AUTH.USER_NOT_EXIST));
   } else {
     const newToken = await createVerificationToken({
