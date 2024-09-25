@@ -86,3 +86,13 @@ export function generateHmac(
 
   return hmac;
 }
+
+// 生成client_id
+export function generateClientId() {
+  return randomBytes(16).toString("hex"); // 生成16字节的client_id
+}
+
+// 生成client_secret
+export function generateClientSecret() {
+  return randomBytes(32).toString("hex"); // 生成32字节的client_secret
+}
