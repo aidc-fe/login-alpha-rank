@@ -1,5 +1,10 @@
 import { PrismaClient } from "@prisma/client";
-import { encodePassword, hashToken } from "./secret";
+import {
+  encodePassword,
+  generateClientId,
+  generateClientSecret,
+  hashToken,
+} from "./secret";
 import { ERROR_CONFIG } from "@/constants/errors";
 
 export const prisma = new PrismaClient();
@@ -160,6 +165,49 @@ export const validateMagicLink = async (token?: string) => {
     throw error; // 抛出异常信息
   }
 };
+
+// 插入一条client数据
+export async function createClient(data: {
+  redirect_uris: string[]; // 数组
+  scope: string[]; // 数组
+  name: string;
+  description: string;
+  signout_uri: string;
+  owner_email: string; // 用户的email
+}) {
+  const {
+    redirect_uris, // 数组
+    scope, // 数组
+  } = data;
+
+  // 生成 client_id 和 client_secret
+  const client_id = generateClientId();
+  const client_secret = generateClientSecret();
+
+  console.log(1111, {
+    ...data,
+    client_id,
+    client_secret,
+    redirect_uris: redirect_uris.join(","), // 使用逗号连接数组
+    scope: scope.join(","), // 使用逗号连接数组
+    active: true, // 默认为active
+    grant_types: "authorization_code",
+  });
+  // 插入数据到 Client 表
+  const newClient = await prisma.client.create({
+    data: {
+      ...data,
+      client_id,
+      client_secret,
+      redirect_uris: redirect_uris.join(","), // 使用逗号连接数组
+      scope: scope.join(","), // 使用逗号连接数组
+      active: true, // 默认为active
+      grant_types: "authorization_code",
+    },
+  });
+
+  return newClient;
+}
 
 // 根据client_id查询client信息
 export const findClientByClientId = async (clientId: string) => {

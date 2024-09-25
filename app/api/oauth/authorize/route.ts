@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
         systemDomain: decodeURIComponent(systemDomain),
         jumpFrom: "shoplazza",
       },
-      process.env.NEXT_AUTH_SECRET!
+      "6f41aac90097b5055d0b3f1d898a10fa14ed5acb955702f63c4f53f58f4b1093"
     );
 
     // 创建一条授权码数据

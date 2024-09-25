@@ -39,140 +39,138 @@ export default function Admin() {
   };
 
   return (
-    <div className="py-8 w-full">
-      <form
-        className="grid grid-cols-1 items-center gap-4 px-8 w-full"
-        onSubmit={handleSubmit}
-      >
-        <Input
-          name="name"
-          label="name"
-          placeholder="Please enter your name"
-          required
-          onChange={(e) => {
-            setInfo({ ...info, name: e.target.value });
-          }}
-        />
+    <form
+      className="flex flex-col items-center  gap-4 p-8 w-full"
+      onSubmit={handleSubmit}
+    >
+      <h1 className="font-bold text-3xl mb-4">Create Client</h1>
 
-        <Input
-          label="signout url"
-          name="signout_url"
-          placeholder="Please enter your signout url"
-          required
-          type="url"
-          pattern="^(https?|ftp)://.+"
-          onChange={(e) => {
-            setInfo({ ...info, signout_url: e.target.value });
-          }}
-        />
+      <Input
+        name="name"
+        label="name"
+        placeholder="Please enter name"
+        required
+        onChange={(e) => {
+          setInfo({ ...info, name: e.target.value });
+        }}
+      />
 
-        {info.redirect_uris.map((item, index) => (
-          <div
-            key={`redirect_uri${index}`}
-            className={cn("grid grid-cols-[1fr_auto] gap-2 items-center", {
-              "grid-cols-1": !index,
-            })}
-          >
-            <Input
-              className="h-10"
-              label={index === 0 ? "Redirect URL" : undefined}
-              placeholder="Please enter your Redirect URL"
-              value={item}
-              type="url"
-              pattern="^(https?|ftp)://.+"
-              onChange={(e) => {
+      <Input
+        label="signout url"
+        name="signout_url"
+        placeholder="Please enter signout url"
+        required
+        type="url"
+        pattern="^(https?|ftp)://.+"
+        onChange={(e) => {
+          setInfo({ ...info, signout_url: e.target.value });
+        }}
+      />
+
+      {info.redirect_uris.map((item, index) => (
+        <div
+          key={`redirect_uri${index}`}
+          className={cn("grid grid-cols-[1fr_auto] gap-2 items-center", {
+            "grid-cols-1": !index,
+          })}
+        >
+          <Input
+            className="h-10"
+            label={index === 0 ? "Redirect URL" : undefined}
+            placeholder="Please enter your Redirect URL"
+            value={item}
+            type="url"
+            pattern="^(https?|ftp)://.+"
+            onChange={(e) => {
+              const new_redirect_uris = [...info.redirect_uris];
+              new_redirect_uris[index] = e.target.value;
+              setInfo({ ...info, redirect_uris: new_redirect_uris });
+            }}
+            required
+          />
+          <Button size={"icon"} variant={"secondary"}>
+            <Trash2
+              className={cn({ hidden: !index })}
+              onClick={() => {
                 const new_redirect_uris = [...info.redirect_uris];
-                new_redirect_uris[index] = e.target.value;
+                new_redirect_uris.splice(index, 1);
                 setInfo({ ...info, redirect_uris: new_redirect_uris });
               }}
-              required
             />
-            <Button size={"icon"} variant={"secondary"}>
-              <Trash2
-                className={cn({ hidden: !index })}
-                onClick={() => {
-                  const new_redirect_uris = [...info.redirect_uris];
-                  new_redirect_uris.splice(index, 1);
-                  setInfo({ ...info, redirect_uris: new_redirect_uris });
-                }}
-              />
-            </Button>
-          </div>
-        ))}
-        <Button
-          variant={"outline"}
-          type="button"
-          className="border-dashed border border-gray-400 w-72 inline-flex items-center gap-1"
-          onClick={() =>
-            setInfo({ ...info, redirect_uris: [...info.redirect_uris, ""] })
-          }
-        >
-          <Plus size={20} />
-          Add Redirect URL
-        </Button>
-
-        <div>
-          <label className="flex gap-2 items-center text-muted-foreground">
-            Scope:
-            <Checkbox
-              id="all"
-              className="ml-2"
-              checked={info.scope.length === scopeOptions.length}
-              onClick={() => {
-                if (info.scope.length === scopeOptions.length) {
-                  setInfo({ ...info, scope: [] });
-                } else {
-                  setInfo({ ...info, scope: scopeOptions });
-                }
-              }}
-            />
-            <label className="text-black">All</label>
-          </label>
-          <div className="flex items-center gap-4 mt-1">
-            {scopeOptions.map((key) => (
-              <div className="inline-flex items-center gap-2" key={key}>
-                <Checkbox
-                  id={key}
-                  checked={info.scope.includes(key)}
-                  onClick={() => {
-                    if (info.scope.includes(key)) {
-                      const new_scope = info.scope.filter(
-                        (item) => item !== key
-                      );
-                      setInfo({ ...info, scope: new_scope });
-                    } else {
-                      const new_scope = [...info.scope, key];
-                      setInfo({ ...info, scope: new_scope });
-                    }
-                  }}
-                />
-                <label>{key}</label>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <Textarea
-          name="description"
-          label="description"
-          placeholder="Please enter your description"
-          onChange={(e) => {
-            setInfo({ ...info, description: e.target.value });
-          }}
-        />
-
-        <div className="flex flex-col mt-8 w-full items-center gap-4">
-          <Button
-            variant={"default"}
-            size={"lg"}
-            type="submit"
-            disabled={loading}
-          >
-            {loading && <Loader className="animate-spin" />}
-            Create Client
           </Button>
         </div>
-      </form>
-    </div>
+      ))}
+      <Button
+        variant={"outline"}
+        type="button"
+        className="border-dashed border border-gray-400 w-72 inline-flex items-center gap-1"
+        onClick={() =>
+          setInfo({ ...info, redirect_uris: [...info.redirect_uris, ""] })
+        }
+      >
+        <Plus size={20} />
+        Add Redirect URL
+      </Button>
+
+      <div>
+        <label className="flex gap-2 items-center text-muted-foreground">
+          Scope:
+          <Checkbox
+            id="all"
+            className="ml-2"
+            checked={info.scope.length === scopeOptions.length}
+            onClick={() => {
+              if (info.scope.length === scopeOptions.length) {
+                setInfo({ ...info, scope: [] });
+              } else {
+                setInfo({ ...info, scope: scopeOptions });
+              }
+            }}
+          />
+          <label className="text-black">All</label>
+        </label>
+        <div className="flex items-center gap-4 mt-1">
+          {scopeOptions.map((key) => (
+            <div className="inline-flex items-center gap-2" key={key}>
+              <Checkbox
+                id={key}
+                checked={info.scope.includes(key)}
+                onClick={() => {
+                  if (info.scope.includes(key)) {
+                    const new_scope = info.scope.filter((item) => item !== key);
+                    setInfo({ ...info, scope: new_scope });
+                  } else {
+                    const new_scope = [...info.scope, key];
+                    setInfo({ ...info, scope: new_scope });
+                  }
+                }}
+              />
+              <label>{key}</label>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <Textarea
+        name="description"
+        label="description"
+        placeholder="Please enter your description"
+        onChange={(e) => {
+          setInfo({ ...info, description: e.target.value });
+        }}
+      />
+
+      <div className="flex flex-col mt-8 w-full items-center gap-4">
+        <Button
+          variant={"default"}
+          size={"lg"}
+          type="submit"
+          disabled={loading}
+        >
+          {loading && <Loader className="animate-spin" />}
+          Create Client
+        </Button>
+      </div>
+    </form>
   );
 }

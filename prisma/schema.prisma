@@ -83,6 +83,7 @@ model Client {
   name          String
   description   String
   owner_email   String // Foreign key to User's email
+  signout_uri   String
   user          User           @relation(fields: [owner_email], references: [email], onDelete: Cascade) // Defines relationship with User model
   accessTokens  AccessToken[]
   refreshTokens RefreshToken[]
