@@ -108,7 +108,7 @@ export default function Admin() {
           <label className="text-muted-foreground">Scope:</label>
           <div className="flex items-center gap-4 mt-1">
             {scopeOptions.map(key => (
-              <div className="inline-flex items-center gap-2">
+              <div key={key} className="inline-flex items-center gap-2">
                 <Checkbox id={key} checked={info.scope.includes(key)}
                   onClick={() => {
                     if (info.scope.includes(key)) {
