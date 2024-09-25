@@ -49,14 +49,14 @@ export async function GET(
       openid?: {
         id_token: string;
       };
-      shoplazza?: {
+      shoplazza?: Partial<{
         access_token: string | null;
         refresh_token: string | null;
         expires_at: number | null;
         shop_domain: string | null;
         shop_domain_display: string | null;
         user_name: string | null;
-      }[];
+      }>[];
     };
 
     if (scope.includes("email")) {

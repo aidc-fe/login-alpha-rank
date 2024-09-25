@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { decodeJwt } from "@/lib/secret";
-import { formatSuccess } from "@/lib/request";
+import { formateError, formatSuccess } from "@/lib/request";
 import { createClient } from "@/lib/database";
+import { User } from "@prisma/client";
 
 // 新建client
 export async function POST(request: NextRequest) {
@@ -11,6 +12,11 @@ export async function POST(request: NextRequest) {
     token: cookieStore.get("next-auth.session-token")?.value,
     secret: process.env.NEXT_AUTH_SECRET!,
   });
+
+  if (!user?.email) {
+    return NextResponse.json(formateError({}));
+  }
+
   const data = await createClient({
     redirect_uris: [
       "https://pre-blog.alpha-rank.com/web/api/auth/callback/authorize",
