@@ -17,6 +17,7 @@ model User {
   password      String?
   accounts      Account[]
   sessions      Session[]
+  Client        Client[]
 }
 
 model Account {
@@ -32,9 +33,9 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-  shop              String?
-  shopDisplayName   String?
-  userName          String?
+  shop_domain              String?
+  shop_domain_display   String?
+  user_name          String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
@@ -50,7 +51,7 @@ model Session {
 
 model VerificationToken {
   identifier String
-  token      String   @unique
+  token      String    @unique
   expires    DateTime
   name       String?
   password   String?
@@ -61,42 +62,48 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+model AuthorizationCode {
+  code         String    @id
+  client_id    String
+  redirect_uri String
+  expires_at   DateTime
+  created_at   DateTime  @default(now())
+  used         DateTime?
+}
 
 model Client {
-  id            String   @id @default(cuid())
-  client_id     String   @unique
+  client_id     String         @id @unique
   client_secret String
   redirect_uris String
   grant_types   String
   scope         String
-  created_at    DateTime @default(now())
-  updated_at    DateTime @updatedAt
+  created_at    DateTime       @default(now())
+  updated_at    DateTime       @updatedAt
   active        Boolean
   name          String
   description   String
+  owner_email   String // Foreign key to User's email
+  signout_uri   String
+  user          User           @relation(fields: [owner_email], references: [email], onDelete: Cascade) // Defines relationship with User model
+  accessTokens  AccessToken[]
+  refreshTokens RefreshToken[]
 }
-
-model AuthorizationCode {
-  code         String   @id
-  client_id    String   // 假设为外键
-  redirect_uri String
-  expires_at   DateTime
-  created_at   DateTime @default(now())
-  used         DateTime?
-}
-
 
 model AccessToken {
-  token         String   @id
-  client_id     String   // 假设为外键
-  expires_at    DateTime
-  created_at    DateTime @default(now())
+  token         String       @id
+  client_id     String
+  expires_at    DateTime     @default(dbgenerated("(now() + '1 year'::interval)"))
+  created_at    DateTime     @default(now())
   refresh_token String
+  client        Client       @relation(fields: [client_id], references: [client_id], onDelete: Cascade)
+  refreshToken  RefreshToken @relation(fields: [refresh_token], references: [token], onDelete: Cascade)
 }
 
 model RefreshToken {
-  token       String   @id
-  client_id   String   // 假设为外键
-  expires_at  DateTime
-  created_at  DateTime @default(now())
+  token        String        @id
+  client_id    String
+  expires_at   DateTime      @default(dbgenerated("(now() + '2 years'::interval)"))
+  created_at   DateTime      @default(now())
+  accessTokens AccessToken[]
+  client       Client        @relation(fields: [client_id], references: [client_id], onDelete: Cascade)
 }

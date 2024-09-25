@@ -5,7 +5,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/database";
-import { encodeJwt } from "@/lib/secret";
+import { decodeJwt, encodeJwt } from "@/lib/secret";
 import { sendVerificationEmail } from "@/lib/email";
 
 const authOptions: NextAuthOptions = {
@@ -16,14 +16,7 @@ const authOptions: NextAuthOptions = {
   },
   jwt: {
     encode: encodeJwt,
-    async decode({ token = "", secret }) {
-      try {
-        const info = (jwt.verify(token, secret) as jwt.JwtPayload) || {};
-        return { ...info, jwtToken: token };
-      } catch (error) {
-        return null;
-      }
-    },
+    decode: decodeJwt,
   },
   cookies: {
     sessionToken: {

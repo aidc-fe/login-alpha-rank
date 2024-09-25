@@ -1,17 +1,24 @@
 import { ERROR_CONFIG } from "@/constants/errors";
 import { setSessionTokenCookie } from "@/lib/auth";
 import { createOrUpdateAccount, createOrUpdateUser } from "@/lib/database";
+import { formateError } from "@/lib/request";
+import { decryptState } from "@/lib/secret";
 import { NextRequest, NextResponse } from "next/server";
 import fetch from "node-fetch";
 
 export async function GET(request: NextRequest) {
   try {
+    const hmac = request.nextUrl.searchParams.get("hmac");
     const code = request.nextUrl.searchParams.get("code");
-    // todo:用这个做一下对称加密
-    const state = request.nextUrl.searchParams.get("state");
+    const state = request.nextUrl.searchParams.get("state") || "";
     const shop = request.nextUrl.searchParams.get("shop");
 
-    const hmac = request.nextUrl.searchParams.get("hmac");
+    // 对称加密检验
+    const stateData = decryptState(state);
+
+    if (shop !== stateData?.shop) {
+      return NextResponse.json(formateError({}));
+    }
 
     const authResponse = await fetch(`https://${shop}/admin/oauth/token`, {
       method: "POST",
@@ -36,8 +43,6 @@ export async function GET(request: NextRequest) {
     console.log("Auth Response:", authData);
 
     if (authResponse.ok) {
-      // Successful response, handle accordingly
-
       // 获取店铺信息
       const shopRsp = await fetch(`https://${shop}/openapi/2022-01/shop`, {
         headers: {
@@ -67,17 +72,19 @@ export async function GET(request: NextRequest) {
         access_token: authData.access_token,
         expires_at: authData.expires_at,
         token_type: authData.token_type,
-        shop: shopInfo.system_domain,
-        domain: shopInfo.domain,
-        userName: shopInfo.name,
+        shop_domain: shopInfo.system_domain,
+        shop_domain_display: shopInfo.domain,
+        user_name: shopInfo.name,
       };
       // // 创建或更新用户信息
       const user = await createOrUpdateUser({ ...userInfo, from: "shoplazza" });
+      console.log("new user", user);
       // // 创建或更新oAuth账号信息
-      // const account = await createOrUpdateAccount({
-      //   ...accountInfo,
-      //   userId: user.id,
-      // });
+      const account = await createOrUpdateAccount({
+        ...accountInfo,
+        userId: user.id,
+      });
+      console.log("new account", account);
 
       const response = NextResponse.redirect(
         `${process.env.DEFAULT_TARGET_URL}/web/api/auth/callback/login?userId=${user.id}&systemDomain=${shopInfo.system_domain}`,

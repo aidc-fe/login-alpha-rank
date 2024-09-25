@@ -1,8 +1,28 @@
 import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import { decodeJwt } from "@/lib/secret";
+import { formatSuccess } from "@/lib/request";
+import { createClient } from "@/lib/database";
 
 // 新建client
-export function POST(request: NextRequest) {
-  return NextResponse.json({});
+export async function POST(request: NextRequest) {
+  const cookieStore = cookies();
+  const user = decodeJwt({
+    token: cookieStore.get("next-auth.session-token")?.value,
+    secret: process.env.NEXT_AUTH_SECRET!,
+  });
+  const data = await createClient({
+    redirect_uris: [
+      "https://pre-blog.alpha-rank.com/web/api/auth/callback/authorize",
+    ], // 数组
+    scope: ["email", "openid", "profile", "shopify", "shoplazza"], // 数组
+    name: "app.alpha-rank",
+    description: "app.alpha-rank",
+    signout_uri: "https://pre-blog.alpha-rank.com/web/api/auth/callback/logout",
+    owner_email: user.email, // 用户的email
+  });
+  console.log(data);
+  return NextResponse.json(formatSuccess({ data }));
 }
 
 // 修改client

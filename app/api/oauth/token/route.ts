@@ -4,7 +4,7 @@ import {
   findAndUseAuthorizationCode,
   findClientByClientId,
 } from "@/lib/database";
-import { formateError, formatSuccess } from "@/lib/request";
+import { formateError } from "@/lib/request";
 import { generateTokens } from "@/lib/secret";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -18,43 +18,42 @@ export async function POST(request: NextRequest) {
     }) || {};
 
   try {
-    // const client = await findClientByClientId(client_id);
+    const client = await findClientByClientId(client_id);
 
-    // if (client.client_secret !== client_secret) {
-    //   return NextResponse.json(formateError({}));
-    // }
+    console.log("client", client);
+    if (client.client_secret !== client_secret) {
+      return NextResponse.json(formateError({}));
+    }
 
     // 查找并校验code的准确性
     try {
-      // const authorizationCode = await findAndUseAuthorizationCode(code);
-      // if (authorizationCode.client_id !== client_id) {
-      //   return NextResponse.json(formateError({}));
-      // }
+      const authorizationCode = await findAndUseAuthorizationCode(code);
+      console.log("authorizationCode", authorizationCode);
+      if (authorizationCode.client_id !== client_id) {
+        return NextResponse.json(formateError({}));
+      }
 
-      const { accessToken, refreshToken } = generateTokens(client_id);
+      const { access_token, refresh_token } = generateTokens(client_id);
 
-      // try {
-      //   // 数据库中插入 accessToken, refreshToken
-      //   await createAccessToken({
-      //     token: accessToken,
-      //     client_id,
-      //     refresh_token: refreshToken,
-      //   });
-      //   await createRefreshToken({ token: refreshToken, client_id });
-      // } catch (e) {
-      //   return NextResponse.json(formateError({}));
-      // }
+      console.log({ access_token, refresh_token });
+      try {
+        const refreshToken = await createRefreshToken({
+          token: refresh_token,
+          client_id,
+        });
 
-      // return NextResponse.json(
-      //   formatSuccess({
-      //     data: { access_token: accessToken, refresh_token: accessToken },
-      //   })
-      // );
+        // 数据库中插入 accessToken, refreshToken
+        const accessToken = await createAccessToken({
+          token: access_token,
+          client_id,
+          refresh_token,
+        });
 
-      return NextResponse.json({
-        access_token: accessToken,
-        refresh_token: accessToken,
-      });
+        console.log({ refreshToken, accessToken });
+        return NextResponse.json({ access_token, refresh_token });
+      } catch (e) {
+        return NextResponse.json(formateError({}));
+      }
     } catch {
       return NextResponse.json(formateError({}));
     }
