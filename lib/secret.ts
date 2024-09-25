@@ -1,7 +1,7 @@
 import bcrypt from "bcryptjs";
 import { createHash, randomUUID, randomBytes, createHmac } from "crypto";
 import jwt from "jsonwebtoken";
-import { JWTEncodeParams } from "next-auth/jwt";
+import { JWTDecodeParams, JWTEncodeParams } from "next-auth/jwt";
 
 // 生成密码哈希
 export const encodePassword = (password: string) => {
@@ -29,6 +29,16 @@ export function encodeJwt({ token = {}, secret }: JWTEncodeParams) {
   return jwt.sign(token as string | object | Buffer, secret, {
     expiresIn: "30d",
   });
+}
+
+// 解析JWT
+export function decodeJwt({ token = "", secret }: JWTDecodeParams) {
+  try {
+    const info = (jwt.verify(token, secret) as jwt.JwtPayload) || {};
+    return { ...info, jwtToken: token };
+  } catch (error) {
+    return null;
+  }
 }
 
 // 生成长度为 32 字符的安全随机字符串作为 code

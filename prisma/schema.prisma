@@ -17,6 +17,7 @@ model User {
   password      String?
   accounts      Account[]
   sessions      Session[]
+  Client        Client[]
 }
 
 model Account {
@@ -50,7 +51,7 @@ model Session {
 
 model VerificationToken {
   identifier String
-  token      String   @unique
+  token      String    @unique
   expires    DateTime
   name       String?
   password   String?
@@ -62,11 +63,11 @@ model VerificationToken {
 }
 
 model AuthorizationCode {
-  code         String   @id
-  client_id    String   // 假设为外键
+  code         String    @id
+  client_id    String
   redirect_uri String
   expires_at   DateTime
-  created_at   DateTime @default(now())
+  created_at   DateTime  @default(now())
   used         DateTime?
 }
 
@@ -76,30 +77,32 @@ model Client {
   redirect_uris String
   grant_types   String
   scope         String
-  created_at    DateTime        @default(now())
-  updated_at    DateTime        @updatedAt
+  created_at    DateTime       @default(now())
+  updated_at    DateTime       @updatedAt
   active        Boolean
   name          String
   description   String
-  accessTokens  AccessToken[]   // Relation field for AccessToken
-  refreshTokens RefreshToken[]  // Relation field for RefreshToken
+  owner_email   String // Foreign key to User's email
+  user          User           @relation(fields: [owner_email], references: [email], onDelete: Cascade) // Defines relationship with User model
+  accessTokens  AccessToken[]
+  refreshTokens RefreshToken[]
 }
 
 model AccessToken {
-  token          String        @id
-  client_id      String
-  expires_at     DateTime      @default(dbgenerated("now() + interval '1 year'"))  // PostgreSQL-specific syntax
-  created_at     DateTime      @default(now())
-  refresh_token  String        // Foreign key to refresh token
-  refreshToken   RefreshToken  @relation(fields: [refresh_token], references: [token], onDelete: Cascade) // One-to-many relation
-  client         Client        @relation(fields: [client_id], references: [client_id], onDelete: Cascade)
+  token         String       @id
+  client_id     String
+  expires_at    DateTime     @default(dbgenerated("(now() + '1 year'::interval)"))
+  created_at    DateTime     @default(now())
+  refresh_token String
+  client        Client       @relation(fields: [client_id], references: [client_id], onDelete: Cascade)
+  refreshToken  RefreshToken @relation(fields: [refresh_token], references: [token], onDelete: Cascade)
 }
 
 model RefreshToken {
-  token         String        @id
-  client_id     String  
-  expires_at    DateTime      @default(dbgenerated("now() + interval '2 year'"))  // PostgreSQL-specific syntax
-  created_at    DateTime      @default(now())
-  accessTokens  AccessToken[] // One-to-many relation to AccessToken
-  client        Client        @relation(fields: [client_id], references: [client_id], onDelete: Cascade)
+  token        String        @id
+  client_id    String
+  expires_at   DateTime      @default(dbgenerated("(now() + '2 years'::interval)"))
+  created_at   DateTime      @default(now())
+  accessTokens AccessToken[]
+  client       Client        @relation(fields: [client_id], references: [client_id], onDelete: Cascade)
 }
