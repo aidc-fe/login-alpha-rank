@@ -1,3 +1,4 @@
+import { User } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import {
   createHash,
@@ -41,7 +42,8 @@ export function encodeJwt({ token = {}, secret }: JWTEncodeParams) {
 // 解析JWT
 export function decodeJwt({ token = "", secret }: JWTDecodeParams) {
   try {
-    const info = (jwt.verify(token, secret) as jwt.JwtPayload) || {};
+    const info =
+      (jwt.verify(token, secret) as jwt.JwtPayload & Partial<User>) || {};
     return { ...info, jwtToken: token };
   } catch (error) {
     return null;

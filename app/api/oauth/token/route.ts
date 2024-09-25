@@ -4,7 +4,7 @@ import {
   findAndUseAuthorizationCode,
   findClientByClientId,
 } from "@/lib/database";
-import { formateError, formatSuccess } from "@/lib/request";
+import { formateError } from "@/lib/request";
 import { generateTokens } from "@/lib/secret";
 import { NextRequest, NextResponse } from "next/server";
 
