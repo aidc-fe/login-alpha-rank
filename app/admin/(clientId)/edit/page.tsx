@@ -21,7 +21,7 @@ import {
 const scopeOptions = ['email', 'openid', 'profile', 'shopify', 'shoplazza']; //允许的权限范围。
 
 type Info = {
-  redirect_urls: string[],
+  redirect_uris: string[],
   scope: string[],
   active: boolean,
   name: string,
@@ -31,7 +31,7 @@ type Info = {
 export default function Admin() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [info, setInfo] = useState<Info>({ redirect_urls: [''], scope: [], active: false, name: '', signout_url: '' })
+  const [info, setInfo] = useState<Info>({ redirect_uris: [''], scope: [], active: false, name: '', signout_url: '' })
 
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
@@ -56,7 +56,7 @@ export default function Admin() {
         className="grid grid-cols-1 items-center gap-4 px-8 w-full"
         onSubmit={handleSubmit}
       >
-        {info.redirect_urls.map((item, index) => (
+        {info.redirect_uris.map((item, index) => (
           <div className={cn("grid grid-cols-[1fr_auto] gap-2 items-center", { 'grid-cols-1': !index })}>
             <Input
               className='h-10'
@@ -66,18 +66,18 @@ export default function Admin() {
               type="url"
               pattern="^(https?|ftp)://.+"
               onChange={(e) => {
-                const new_redirect_urls = [...info.redirect_urls];
-                new_redirect_urls[index] = e.target.value;
-                setInfo({ ...info, redirect_urls: new_redirect_urls });
+                const new_redirect_uris = [...info.redirect_uris];
+                new_redirect_uris[index] = e.target.value;
+                setInfo({ ...info, redirect_uris: new_redirect_uris });
               }}
               required
             />
             <Trash2
               className={cn('cursor-pointer', { hidden: !index })}
               onClick={() => {
-                const new_redirect_urls = [...info.redirect_urls];
-                new_redirect_urls.splice(index, 1);
-                setInfo({ ...info, redirect_urls: new_redirect_urls });
+                const new_redirect_uris = [...info.redirect_uris];
+                new_redirect_uris.splice(index, 1);
+                setInfo({ ...info, redirect_uris: new_redirect_uris });
               }}
             />
           </div>
@@ -87,7 +87,7 @@ export default function Admin() {
           size={"default"}
           type="button"
           className="border-dashed border border-gray-400 w-72 inline-flex items-center gap-1"
-          onClick={() => setInfo({ ...info, redirect_urls: [...info.redirect_urls, ''] })}
+          onClick={() => setInfo({ ...info, redirect_uris: [...info.redirect_uris, ''] })}
         >
           <Plus size={20} />
           Add Redirect URL

@@ -11,8 +11,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main className="grid h-full items-center bg-circle-gradient px-4 ">
-      {/* <div className="w-80">Tab</div>  grid-cols-[auto_1fr]*/}
+    <main className="flex h-full items-center bg-circle-gradient px-4 ">
       <div className="m-auto w-full max-w-7xl">
         {children}
       </div>

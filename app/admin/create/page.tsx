@@ -7,23 +7,13 @@ import request from "@/lib/request";
 import { Loader, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { FormEventHandler, useState } from "react";
-import * as Switch from '@radix-ui/react-switch';
 import { cn } from "@/lib/utils";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 
 const scopeOptions = ['email', 'openid', 'profile', 'shopify', 'shoplazza']; //允许的权限范围。
 
 type Info = {
-  redirect_urls: string[],
+  redirect_uris: string[],
   scope: string[],
-  active: boolean,
   name: string,
   description?: string,
   signout_url: string
@@ -31,33 +21,49 @@ type Info = {
 export default function Admin() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [info, setInfo] = useState<Info>({ redirect_urls: [''], scope: [], active: false, name: '', signout_url: '' })
+  const [info, setInfo] = useState<Info>({ redirect_uris: [''], scope: [], name: '', signout_url: '' })
 
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
-    console.log('sdp--info', info)
+    const params = {
+      ...info,
+      redirect_uris: info.redirect_uris.join(','),
+      scope: info.scope.join(','),
+    }
+    console.log('sdp--params', params)
   };
 
   return (
     <div className="h-screen py-8">
-      <Breadcrumb className="pb-12">
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/">Home</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>Create</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
       <form
         className="grid grid-cols-1 items-center gap-4 px-8 w-full"
         onSubmit={handleSubmit}
       >
-        {info.redirect_urls.map((item, index) => (
-          <div className={cn("grid grid-cols-[1fr_auto] gap-2 items-center", { 'grid-cols-1': !index })}>
+        <Input
+          name="name"
+          label="name"
+          placeholder="Please enter your name"
+          required
+          onChange={(e) => {
+            setInfo({ ...info, name: e.target.value });
+          }}
+        />
+
+        <Input
+          label="signout url"
+          name="signout_url"
+          placeholder="Please enter your signout url"
+          required
+          type="url"
+          pattern="^(https?|ftp)://.+"
+          onChange={(e) => {
+            setInfo({ ...info, signout_url: e.target.value });
+          }}
+        />
+
+        {info.redirect_uris.map((item, index) => (
+          <div key={`redirect_uri${index}`} className={cn("grid grid-cols-[1fr_auto] gap-2 items-center", { 'grid-cols-1': !index })}>
             <Input
               className='h-10'
               label={index === 0 ? "Redirect URL" : undefined}
@@ -66,18 +72,18 @@ export default function Admin() {
               type="url"
               pattern="^(https?|ftp)://.+"
               onChange={(e) => {
-                const new_redirect_urls = [...info.redirect_urls];
-                new_redirect_urls[index] = e.target.value;
-                setInfo({ ...info, redirect_urls: new_redirect_urls });
+                const new_redirect_uris = [...info.redirect_uris];
+                new_redirect_uris[index] = e.target.value;
+                setInfo({ ...info, redirect_uris: new_redirect_uris });
               }}
               required
             />
             <Trash2
               className={cn('cursor-pointer', { hidden: !index })}
               onClick={() => {
-                const new_redirect_urls = [...info.redirect_urls];
-                new_redirect_urls.splice(index, 1);
-                setInfo({ ...info, redirect_urls: new_redirect_urls });
+                const new_redirect_uris = [...info.redirect_uris];
+                new_redirect_uris.splice(index, 1);
+                setInfo({ ...info, redirect_uris: new_redirect_uris });
               }}
             />
           </div>
@@ -87,17 +93,31 @@ export default function Admin() {
           size={"default"}
           type="button"
           className="border-dashed border border-gray-400 w-72 inline-flex items-center gap-1"
-          onClick={() => setInfo({ ...info, redirect_urls: [...info.redirect_urls, ''] })}
+          onClick={() => setInfo({ ...info, redirect_uris: [...info.redirect_uris, ''] })}
         >
           <Plus size={20} />
           Add Redirect URL
         </Button>
 
         <div>
-          <label className="text-muted-foreground">Scope:</label>
+          <label className="flex gap-2 items-center text-muted-foreground">
+            Scope:
+            <Checkbox
+              id='all'
+              className="ml-2"
+              checked={info.scope.length === scopeOptions.length}
+              onClick={() => {
+                if (info.scope.length === scopeOptions.length) {
+                  setInfo({ ...info, scope: [] });
+                } else {
+                  setInfo({ ...info, scope: scopeOptions });
+                }
+              }} />
+            <label className="text-black">All</label>
+          </label>
           <div className="flex items-center gap-4 mt-1">
             {scopeOptions.map(key => (
-              <div className="inline-flex items-center gap-2">
+              <div className="inline-flex items-center gap-2" key={key}>
                 <Checkbox id={key} checked={info.scope.includes(key)}
                   onClick={() => {
                     if (info.scope.includes(key)) {
@@ -115,45 +135,12 @@ export default function Admin() {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 ">
-          <Switch.Root
-            className="w-11 h-6 rounded-full relative bg-gray-400 data-[state=checked]:bg-primary cursor-pointer" id="active"
-            checked={info.active}
-            onCheckedChange={(v) => {
-              setInfo({ ...info, active: v })
-            }}
-          >
-            <Switch.Thumb className="block w-5 h-5 bg-white rounded-full data-[state=checked]:translate-x-6" />
-          </Switch.Root>
-          <label className="text-muted-foreground">Whether it is activated</label>
-        </div>
-
-        <Input
-          name="name"
-          label="name"
-          placeholder="Please enter your name"
-          required
-          onChange={(e) => {
-            setInfo({ ...info, name: e.target.value });
-          }}
-        />
         <Textarea
           name="description"
           label="description"
           placeholder="Please enter your description"
           onChange={(e) => {
             setInfo({ ...info, description: e.target.value });
-          }}
-        />
-        <Input
-          label="signout url"
-          name="signout_url"
-          placeholder="Please enter your signout url"
-          required
-          type="url"
-          pattern="^(https?|ftp)://.+"
-          onChange={(e) => {
-            setInfo({ ...info, signout_url: e.target.value });
           }}
         />
 
@@ -165,7 +152,7 @@ export default function Admin() {
             disabled={loading}
           >
             {loading && <Loader className="animate-spin" />}
-            Log in
+            Create Client
           </Button>
         </div>
       </form>
