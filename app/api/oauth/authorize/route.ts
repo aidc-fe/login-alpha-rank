@@ -32,7 +32,7 @@ export async function GET(request: NextRequest) {
     // 生成hmac
     const hmac = generateHmac(
       { code, state, userId, systemDomain, jumpFrom: "shoplazza" },
-      ""
+      process.env.NEXT_AUTH_SECRET!
     );
 
     // 创建一条授权码数据
