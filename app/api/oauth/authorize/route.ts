@@ -31,7 +31,13 @@ export async function GET(request: NextRequest) {
     const code = generateAuthorizationCode();
     // 生成hmac
     const hmac = generateHmac(
-      { code, state, userId, systemDomain, jumpFrom: "shoplazza" },
+      {
+        code,
+        state: decodeURIComponent(state),
+        userId,
+        systemDomain: decodeURIComponent(systemDomain),
+        jumpFrom: "shoplazza",
+      },
       process.env.NEXT_AUTH_SECRET!
     );
 
