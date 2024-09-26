@@ -23,12 +23,12 @@ export async function POST(request: NextRequest) {
     await sendVerificationEmail(
       email,
       verificationLink,
-      "Changing AlphaRank's password ",
+      "Set AlphaRank's password ",
       {
-        title: "Reset Password",
+        title: "Set Password",
         description:
-          "A password change has been requested for your account. If this was requested by you, please use the link below to reset your password.",
-        btnContent: "Reset Password",
+          "We've received your new password seting requirment. If you did not request it, please just ignore it. Otherwise, finish setting your new password by the link below.",
+        btnContent: "Set Password",
       }
     );
     return NextResponse.json(

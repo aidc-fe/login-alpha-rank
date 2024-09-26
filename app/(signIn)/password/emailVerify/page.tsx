@@ -24,7 +24,7 @@ export default function Page() {
 
     // 校验新旧密码
     if (checkPassword !== password) {
-      toastApi.error("两次输入密码不一致");
+      toastApi.error("Password does not match.");
       return;
     }
 
@@ -33,7 +33,7 @@ export default function Page() {
       method: "POST",
       body: JSON.stringify({ email, password }),
     })
-      .then((res) => {
+      .then(() => {
         router.push(
           `/email/sent?email=${encodeURIComponent(
             email || ""
@@ -53,7 +53,7 @@ export default function Page() {
       className="flex flex-col items-center gap-4 px-8"
       onSubmit={handleSubmit}
     >
-      <h1 className="font-bold text-3xl mb-2">Reset password</h1>
+      <h1 className="font-bold text-3xl mb-2">Set Password</h1>
       <Input
         name="email"
         required
@@ -76,10 +76,10 @@ export default function Page() {
 
       <Input
         name="check_password"
-        label="Check password"
+        label="Re-enter password"
         required
         type="password"
-        placeholder="Please enter new password"
+        placeholder="Please re-enter new password"
       />
       <div className="flex flex-col mt-8 lg:grid lg:grid-cols-3 w-full items-center gap-4">
         <Button
