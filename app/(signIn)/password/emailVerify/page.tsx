@@ -94,7 +94,7 @@ export default function Page() {
           ) : (
             <Send size={20} className="group-hover:rotate-45 duration-150" />
           )}
-          Send reset instructions
+          Send set instructions
         </Button>
         <Button
           variant={"link"}

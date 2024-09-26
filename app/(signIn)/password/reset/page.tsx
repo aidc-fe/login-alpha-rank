@@ -52,7 +52,7 @@ export default function Page() {
           onClick={() => {}}
         >
           {loading && <Loader className="text-primary animate-spin" />}
-          Reset Password
+          Set Password
         </Button>
         <Button
           variant={"link"}
