@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
         {
           title: "Verify your email address",
           description:
-            "To continue setting up your AlphaRank account, please verify that this is your email address.",
+            "To continue setting up your AlphaRank account, please verify your email address.",
           btnContent: "Verify Email Address",
         }
       );

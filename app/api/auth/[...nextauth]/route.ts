@@ -146,7 +146,11 @@ const authOptions: NextAuthOptions = {
         /* your function */
         sendVerificationEmail(email, url, "AlphaRank - Login", {
           title: "Login to AlphaRank",
-          description: `You can login to AlphaRank by click the button below. Or you can login by password after <a style='color:#7c3aed' href='${process.env.NEXT_PUBLIC_NEXT_AUTH_URL}/password/emailVerify?email=${email}'>setting your password.</a>`,
+          description: `<p>You can login to AlphaRank by clicking the button below.</p> 
+          <p>
+          Good news!  You and your team can use username/password to login your Alpha-Rank account now. Just set your password with the following link: <a style='color:#7c3aed' href='${process.env.NEXT_PUBLIC_NEXT_AUTH_URL}/password/emailVerify?email=${email}'>setting your password.</a>.
+          </p>
+          `,
           btnContent: "Login",
         });
       },

@@ -2,7 +2,7 @@ export const ERROR_CONFIG = {
   OAUTH: {},
   SIGNIN: {
     code: "SIGNIN_ERROR",
-    message: "错误的邮箱或密码",
+    message: "Incorrect email or password. Please try again.",
   },
   AUTH: {
     NEED_EMAIL: {

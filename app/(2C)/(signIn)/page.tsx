@@ -48,7 +48,7 @@ export default function Home() {
             <TabsList className="mb-2">
               <TabsTrigger value="password">Password</TabsTrigger>
               <Separator className="h-6 bg-purple-300" orientation="vertical" />
-              <TabsTrigger value="magicLink">Email</TabsTrigger>
+              <TabsTrigger value="magicLink">Email Verification</TabsTrigger>
             </TabsList>
 
             <TabsContent value="password" className="w-full flex-grow">
