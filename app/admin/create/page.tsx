@@ -40,7 +40,7 @@ export default function Admin() {
 
   return (
     <form
-      className="flex flex-col items-center  gap-4 p-8 w-full"
+      className="flex flex-col items-center gap-4 p-8 w-full max-w-7xl m-auto"
       onSubmit={handleSubmit}
     >
       <h1 className="font-bold text-3xl mb-4">Create Client</h1>
@@ -67,53 +67,55 @@ export default function Admin() {
         }}
       />
 
-      {info.redirect_uris.map((item, index) => (
-        <div
-          key={`redirect_uri${index}`}
-          className={cn("grid grid-cols-[1fr_auto] gap-2 items-center", {
-            "grid-cols-1": !index,
-          })}
-        >
-          <Input
-            className="h-10"
-            label={index === 0 ? "Redirect URL" : undefined}
-            placeholder="Please enter your Redirect URL"
-            value={item}
-            type="url"
-            pattern="^(https?|ftp)://.+"
-            onChange={(e) => {
-              const new_redirect_uris = [...info.redirect_uris];
-              new_redirect_uris[index] = e.target.value;
-              setInfo({ ...info, redirect_uris: new_redirect_uris });
-            }}
-            required
-          />
-          <Button size={"icon"} variant={"secondary"}>
-            <Trash2
-              className={cn({ hidden: !index })}
+      <div className="w-full text-left">
+        {info.redirect_uris.map((item, index) => (
+          <div
+            key={`redirect_uri${index}`}
+            className={cn("w-full grid grid-cols-[1fr_auto] gap-2 items-center mb-4", {
+              "grid-cols-1": !index,
+            })}
+          >
+            <Input
+              className="h-10"
+              label={index === 0 ? "Redirect URL" : undefined}
+              placeholder="Please enter your Redirect URL"
+              value={item}
+              type="url"
+              pattern="^(https?|ftp)://.+"
+              onChange={(e) => {
+                const new_redirect_uris = [...info.redirect_uris];
+                new_redirect_uris[index] = e.target.value;
+                setInfo({ ...info, redirect_uris: new_redirect_uris });
+              }}
+              required
+            />
+            <Button size={"icon"} variant={"secondary"} className={cn({ hidden: !index })}
               onClick={() => {
                 const new_redirect_uris = [...info.redirect_uris];
                 new_redirect_uris.splice(index, 1);
                 setInfo({ ...info, redirect_uris: new_redirect_uris });
               }}
-            />
-          </Button>
-        </div>
-      ))}
-      <Button
-        variant={"outline"}
-        type="button"
-        className="border-dashed border border-gray-400 w-72 inline-flex items-center gap-1"
-        onClick={() =>
-          setInfo({ ...info, redirect_uris: [...info.redirect_uris, ""] })
-        }
-      >
-        <Plus size={20} />
-        Add Redirect URL
-      </Button>
+            >
+              <Trash2 />
+            </Button>
+          </div>
+        ))}
+        <Button
+          variant={"outline"}
+          type="button"
+          className="border-dashed border border-gray-400 w-72 inline-flex items-center gap-1"
+          onClick={() =>
+            setInfo({ ...info, redirect_uris: [...info.redirect_uris, ""] })
+          }
+        >
+          <Plus size={20} />
+          Add Redirect URL
+        </Button>
+      </div>
 
-      <div>
-        <label className="flex gap-2 items-center text-muted-foreground">
+
+      <div className="w-full text-left">
+        <label className="inline-flex gap-2 items-center text-muted-foreground">
           Scope:
           <Checkbox
             id="all"
