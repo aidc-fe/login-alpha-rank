@@ -16,7 +16,12 @@ export async function POST(request: NextRequest) {
   } else {
     return NextResponse.json(
       formatSuccess({
-        data: { email: user.email, image: user.image, name: user.name },
+        data: {
+          email: user.email,
+          image: user.image,
+          name: user.name,
+          sub: user.id,
+        },
       })
     );
   }
