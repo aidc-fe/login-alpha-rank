@@ -37,7 +37,7 @@ export default function Page() {
         router.push(
           `/email/sent?email=${encodeURIComponent(
             email || ""
-          )}&type=reset_password`
+          )}&type=set_password`
         );
       })
       .catch((err) => {

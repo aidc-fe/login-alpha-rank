@@ -61,7 +61,7 @@ export const createVerificationToken = async (info: {
   name?: string;
   password?: string;
   targetUrl?: string;
-  type: "signUp" | "signIn" | "passwordReset";
+  type: "signUp" | "signIn" | "passwordSet";
 }) => {
   try {
     // 查找用户
