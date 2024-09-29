@@ -12,7 +12,7 @@ export default function PasswordResetSuccess() {
     <Alert className="w-4/5 mx-auto">
       <RocketIcon />
       <AlertTitle className="font-semibold text-2xl ml-2 flex flex-col gap-2 lg:flex-row items-center justify-between">
-        Succeed Reset your Password !{" "}
+        Succeed set your Password !{" "}
         <Button
           onClick={() => {
             router.push("/");

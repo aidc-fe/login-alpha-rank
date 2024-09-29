@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
   const params = await request.json();
 
   const user = await getUserByEmail(params.email);
-
+  console.log(5565677, user);
   if (!user) {
     return NextResponse.json(formateError(ERROR_CONFIG.SIGNIN));
   } else if (!isPasswordMatch(params.password, user?.password || "")) {
@@ -16,7 +16,12 @@ export async function POST(request: NextRequest) {
   } else {
     return NextResponse.json(
       formatSuccess({
-        data: { email: user.email, image: user.image, name: user.name },
+        data: {
+          email: user.email,
+          image: user.image,
+          name: user.name,
+          sub: user.id,
+        },
       })
     );
   }

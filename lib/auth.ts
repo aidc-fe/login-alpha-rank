@@ -4,7 +4,7 @@ import { encodeJwt } from "./secret";
 // 用用户信息生成 JWT，并存入 cookie
 export async function setSessionTokenCookie(
   tokenPayload: {
-    [key: string]: string; // 根据需要定义具体的字段类型
+    [key: string]: string | Date | null; // 根据需要定义具体的字段类型
   },
   response: NextResponse
 ): Promise<NextResponse> {

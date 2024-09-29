@@ -22,7 +22,7 @@ export default function Page() {
         const email = formData.get("email");
       }}
     >
-      <h1 className="font-bold text-3xl mb-6">Reset password</h1>
+      <h1 className="font-bold text-3xl mb-6">Set password</h1>
       <div className="w-full flex items-center gap-2">
         <strong>Email:</strong>
         {email}
