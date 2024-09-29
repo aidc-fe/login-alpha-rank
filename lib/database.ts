@@ -242,16 +242,16 @@ export async function createClient(data: {
 }
 
 // 根据client_id查询client信息
-export const findClientByClientId = async (clientId: string) => {
+export const findClientByClientId = async (client_id: string) => {
   try {
     const client = await prisma.client.findUnique({
       where: {
-        client_id: clientId,
+        client_id,
       },
     });
 
     if (!client) {
-      throw new Error(`Client with client_id: ${clientId} not found`);
+      throw new Error(`Client with client_id: ${client_id} not found`);
     }
 
     return {
