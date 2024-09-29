@@ -15,9 +15,9 @@ export async function POST(request: NextRequest) {
     const newToken = await createVerificationToken({
       identifier: email, // 你需要的 identifier
       password,
-      type: "passwordReset", // 可选
+      type: "passwordSet", // 可选
     });
-    const verificationLink = `${process.env.NEXT_AUTH_URL}/api/password/reset?token=${newToken.token}`;
+    const verificationLink = `${process.env.NEXT_AUTH_URL}/api/password/set?token=${newToken.token}`;
 
     // 发送验证邮件
     await sendVerificationEmail(
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
       {
         title: "Set Password",
         description:
-          "We've received your new password seting requirment. If you did not request it, please just ignore it. Otherwise, finish setting your new password by the link below.",
+          "We've received your new password setting requirement. If you did not request it, please just ignore it. Otherwise, finish setting your new password by the link below.",
         btnContent: "Set Password",
       }
     );

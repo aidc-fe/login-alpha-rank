@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { RocketIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-export default function PasswordResetSuccess() {
+export default function PasswordSetSuccess() {
   const router = useRouter();
 
   return (
