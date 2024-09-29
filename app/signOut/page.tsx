@@ -3,8 +3,8 @@
 import { signOut, useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { thirdPartySignOut } from "@/lib/auth";
 import { Loader } from "lucide-react";
+import { thirdPartySignOut } from "@/lib/auth";
 
 export default function SignOutPage() {
   const { status } = useSession();

@@ -5,12 +5,25 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/database";
+import { encodeJwt } from "@/lib/secret";
+import { sendVerificationEmail } from "@/lib/email";
 
 const authOptions: NextAuthOptions = {
   // debug: true,
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt",
+  },
+  jwt: {
+    encode: encodeJwt,
+    async decode({ token = "", secret }) {
+      try {
+        const info = (jwt.verify(token, secret) as jwt.JwtPayload) || {};
+        return { ...info, jwtToken: token };
+      } catch (error) {
+        return null;
+      }
+    },
   },
   cookies: {
     sessionToken: {
@@ -41,14 +54,7 @@ const authOptions: NextAuthOptions = {
 
   callbacks: {
     async session({ session, token }) {
-      const jwtToken = jwt.sign(
-        { ...session.user, expires: session.expires, id: token.sub } || {},
-        process.env.NEXT_AUTH_SECRET!,
-        {
-          expiresIn: (token.exp as number) - Math.floor(Date.now() / 1000),
-        }
-      );
-      return { ...session, jwtToken };
+      return { ...session, jwtToken: token?.jwtToken };
     },
   },
   secret: process.env.NEXT_AUTH_SECRET!,
@@ -93,6 +99,38 @@ const authOptions: NextAuthOptions = {
         }
       },
     }),
+    CredentialsProvider({
+      id: "password",
+      name: "Password",
+      credentials: { id: {}, password: {}, name: {}, email: {} },
+      async authorize(credentials) {
+        const name = credentials?.name || "";
+        const email = credentials?.email || "";
+        const password = credentials?.password || "";
+
+        // 在数据库中查找用户
+        let user = await prisma.user.findUnique({
+          where: { email },
+        });
+
+        // 如果用户不存在，创建新用户
+        if (!user) {
+          user = await prisma.user.create({
+            data: {
+              name,
+              email,
+              password,
+            },
+          });
+        }
+
+        if (user) {
+          return user;
+        } else {
+          return null;
+        }
+      },
+    }),
     GoogleProvider({
       clientId: process.env.AUTH_GOOGLE_ID!,
       clientSecret: process.env.AUTH_GOOGLE_SECRET!,
@@ -108,11 +146,31 @@ const authOptions: NextAuthOptions = {
         secure: true, // 使用SSL/TLS
       },
       from: process.env.EMAIL_FROM,
+      sendVerificationRequest({
+        identifier: email,
+        url,
+        provider: { server, from },
+      }) {
+        /* your function */
+        sendVerificationEmail(email, url, "AlphaRank - Login", {
+          title: "Login to AlphaRank",
+          description: `<p>You can login to AlphaRank by clicking the button below.</p> 
+          <p>
+          Good news!  You and your team can use username/password to login your Alpha-Rank account now. Just set your password with the following link: <a style='color:#7c3aed' href='${
+            process.env.NEXT_PUBLIC_NEXT_AUTH_URL
+          }/password/emailVerify?email=${encodeURIComponent(
+            email
+          )}'>setting your password.</a>.
+          </p>
+          `,
+          btnContent: "Login",
+        });
+      },
     }),
   ],
   pages: {
     signIn: `/`,
-    verifyRequest: `/auth/email/verify`,
+    verifyRequest: `/email/sent`,
     error: "/", // Error code passed in query string as ?error=
   },
 };
