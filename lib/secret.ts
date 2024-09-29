@@ -27,7 +27,11 @@ export function encodeJwt({ token = {}, secret }: JWTEncodeParams) {
   delete token?.exp;
   delete token?.jwtToken;
   delete token?.password;
-  return jwt.sign(token as string | object | Buffer, secret, {
-    expiresIn: "30d",
-  });
+  return jwt.sign(
+    { ...token, id: token.sub } as string | object | Buffer,
+    secret,
+    {
+      expiresIn: "30d",
+    }
+  );
 }
