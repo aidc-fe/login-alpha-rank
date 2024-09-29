@@ -6,7 +6,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   const params = await request.json();
-
   const user = await getUser({ email: params.email });
 
   if (!user) {
@@ -14,6 +13,15 @@ export async function POST(request: NextRequest) {
   } else if (!isPasswordMatch(params.password, user?.password || "")) {
     return NextResponse.json(formateError(ERROR_CONFIG.SIGNIN));
   } else {
-    return NextResponse.json(formatSuccess({ data: true }));
+    return NextResponse.json(
+      formatSuccess({
+        data: {
+          email: user.email,
+          image: user.image,
+          name: user.name,
+          sub: user.id,
+        },
+      })
+    );
   }
 }

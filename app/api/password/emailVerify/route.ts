@@ -15,20 +15,20 @@ export async function POST(request: NextRequest) {
     const newToken = await createVerificationToken({
       identifier: email, // 你需要的 identifier
       password,
-      type: "passwordReset", // 可选
+      type: "passwordSet", // 可选
     });
-    const verificationLink = `${process.env.NEXT_AUTH_URL}/api/password/reset?token=${newToken.token}`;
+    const verificationLink = `${process.env.NEXT_AUTH_URL}/api/password/set?token=${newToken.token}`;
 
     // 发送验证邮件
     await sendVerificationEmail(
       email,
       verificationLink,
-      "Changing AlphaRank's password ",
+      "Set AlphaRank's password ",
       {
-        title: "Reset Password",
+        title: "Set Password",
         description:
-          "A password change has been requested for your account. If this was requested by you, please use the link below to reset your password.",
-        btnContent: "Reset Password",
+          "We've received your new password setting requirement. If you did not request it, please just ignore it. Otherwise, finish setting your new password by the link below.",
+        btnContent: "Set Password",
       }
     );
     return NextResponse.json(

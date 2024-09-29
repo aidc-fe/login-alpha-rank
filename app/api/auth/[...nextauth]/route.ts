@@ -5,6 +5,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/lib/database";
 import { decodeJwt, encodeJwt } from "@/lib/secret";
+import { sendVerificationEmail } from "@/lib/email";
 
 const authOptions: NextAuthOptions = {
   // debug: true,
@@ -137,6 +138,26 @@ const authOptions: NextAuthOptions = {
         secure: true, // 使用SSL/TLS
       },
       from: process.env.EMAIL_FROM,
+      sendVerificationRequest({
+        identifier: email,
+        url,
+        provider: { server, from },
+      }) {
+        /* your function */
+        sendVerificationEmail(email, url, "AlphaRank - Login", {
+          title: "Login to AlphaRank",
+          description: `<p>You can login to AlphaRank by clicking the button below.</p> 
+          <p>
+          Good news!  You and your team can use username/password to login your Alpha-Rank account now. Just set your password with the following link: <a style='color:#7c3aed' href='${
+            process.env.NEXT_PUBLIC_NEXT_AUTH_URL
+          }/password/emailVerify?email=${encodeURIComponent(
+            email
+          )}'>setting your password.</a>.
+          </p>
+          `,
+          btnContent: "Login",
+        });
+      },
     }),
   ],
   pages: {

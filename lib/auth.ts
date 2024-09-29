@@ -5,12 +5,12 @@ import { encodeJwt } from "./secret";
 // 用用户信息生成 JWT，并存入 cookie
 export async function setSessionTokenCookie(
   tokenPayload: {
-    [key: string]: string; // 根据需要定义具体的字段类型
+    [key: string]: string | Date | null; // 根据需要定义具体的字段类型
   },
   response: NextResponse
 ): Promise<NextResponse> {
   // 生成 JWT
-  const sessionToken = await encodeJwt({
+  const sessionToken = encodeJwt({
     token: tokenPayload,
     secret: process.env.NEXT_AUTH_SECRET!,
   });
@@ -57,7 +57,8 @@ export function thirdPartySignOut() {
     return fetch(`${url}`, {
       method: "POST",
       credentials: "include", // 确保 cookie 被发送
-      body: "",
+      // 为了配合问己
+      body: "{}",
       headers: {
         "Content-Type": "application/json",
         // 仅仅是为了blog产品，没有让问己新增接口，所以先保留这个

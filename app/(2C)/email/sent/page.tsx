@@ -14,7 +14,7 @@ export default function EmailSent() {
     setEmail(
       searchParams.get("email") || sessionStorage.getItem("verifyEmail") || ""
     );
-  }, []);
+  }, [searchParams]);
 
   return (
     <div className="bg-muted h-screen w-screen flex items-center justify-center">
