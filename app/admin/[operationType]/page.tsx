@@ -6,10 +6,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import request from "@/lib/request";
 import { Loader, Plus, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { FormEventHandler, useState } from "react";
+import { FormEventHandler, useEffect, useState } from "react";
+import { OPERATION_TYPE, scopeOptions, defaultClientInfo } from "@/constants/admin";
+import { upperFirst } from 'lodash';
 import { cn } from "@/lib/utils";
-
-const scopeOptions = ["email", "openid", "profile", "shopify", "shoplazza"]; //允许的权限范围。
 
 type Info = {
   redirect_uris: string[];
@@ -18,15 +18,36 @@ type Info = {
   description?: string;
   signout_url: string;
 };
-export default function Admin() {
+
+const mock = { redirect_uris: 'https://122,https://122999', scope: 'email,openid,profile,shopify,shoplazza', name: '山月', signout_url: 'https://33', description: 'ddd' };
+
+export default function EditClient({ params, searchParams }: { params: { operationType: OPERATION_TYPE }, searchParams: { [key: string]: string | string[] | undefined } }) {
+  const operationType = params.operationType;
+  const clientId = searchParams.clientId as string;
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [info, setInfo] = useState<Info>({
-    redirect_uris: [""],
-    scope: [],
-    name: "",
-    signout_url: "",
-  });
+  const [info, setInfo] = useState<Info>(defaultClientInfo);
+
+  useEffect(() => {
+    if (operationType === OPERATION_TYPE.EDIT && clientId) {
+      setInfo({
+        ...mock,
+        redirect_uris: mock.redirect_uris.split(","),
+        scope: mock.scope.split(","),
+      });
+      // setLoading(true);
+      // request
+      //   .get(`/admin/clients/${clientId}`)
+      //   .then((res) => {
+      //     setLoading(false);
+      //     setInfo(res.data);
+      //   })
+      //   .catch((err) => {
+      //     setLoading(false);
+      //     console.error(err);
+      //   });
+    }
+  }, [clientId]);
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
@@ -38,18 +59,20 @@ export default function Admin() {
     console.log("sdp--params", params);
   };
 
+
   return (
     <form
       className="flex flex-col items-center gap-4 p-8 w-full max-w-7xl m-auto"
       onSubmit={handleSubmit}
     >
-      <h1 className="font-bold text-3xl mb-4">Create Client</h1>
+      <h1 className="font-bold text-3xl mb-4">{`${upperFirst(operationType)} Client`}</h1>
 
       <Input
         name="name"
         label="name"
         placeholder="Please enter name"
         required
+        value={info.name}
         onChange={(e) => {
           setInfo({ ...info, name: e.target.value });
         }}
@@ -62,6 +85,7 @@ export default function Admin() {
         required
         type="url"
         pattern="^(https?|ftp)://.+"
+        value={info.signout_url}
         onChange={(e) => {
           setInfo({ ...info, signout_url: e.target.value });
         }}
@@ -157,6 +181,7 @@ export default function Admin() {
         name="description"
         label="description"
         placeholder="Please enter your description"
+        value={info.description}
         onChange={(e) => {
           setInfo({ ...info, description: e.target.value });
         }}
@@ -170,7 +195,7 @@ export default function Admin() {
           disabled={loading}
         >
           {loading && <Loader className="animate-spin" />}
-          Create Client
+          {`${upperFirst(operationType)} Client`}
         </Button>
       </div>
     </form>

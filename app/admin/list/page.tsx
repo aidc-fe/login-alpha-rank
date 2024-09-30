@@ -11,7 +11,6 @@ import {
   TableCaption,
 } from "@/components/ui/table";
 import { randomBytes } from 'crypto';
-import { join } from 'lodash';
 import dayjs from "dayjs";
 import {
   Breadcrumb,
@@ -107,7 +106,7 @@ export default function List() {
 
 
   return (
-    <div className="h-screen py-8">
+    <div className="h-screen py-8 max-w-7xl m-auto">
       <Breadcrumb className="pb-12">
         <BreadcrumbList>
           <BreadcrumbItem>
@@ -157,7 +156,7 @@ export default function List() {
               <TableCell>{item.description}</TableCell>
               <TableCell>{item.redirect_uris}</TableCell>
               <TableCell>{item.grant_types}</TableCell>
-              <TableCell>{join(item.scope, ', ')}</TableCell>
+              <TableCell>{item.scope.join(', ')}</TableCell>
               <TableCell>{dayjs(item.created_at).format("MMM DD, YYYY")}</TableCell>
               <TableCell>{dayjs(item.updated_at).format("MMM DD, YYYY")}</TableCell>
               <TableCell>{item.active ? '已激活' : '未激活'}</TableCell>
@@ -167,9 +166,9 @@ export default function List() {
                   variant={"ghost"}
                   size={"default"}
                   type="button"
-                  className="p-0 text-sky-500"
+                  className="p-1 text-sky-500"
                   onClick={() => {
-                    router.push(`/admin/${item.id}/edit`)
+                    router.push(`/admin/edit?clientId=${item.id}`)
                   }}
                 >
                   Edit
@@ -180,7 +179,7 @@ export default function List() {
                       variant={"ghost"}
                       size={"default"}
                       type="button"
-                      className="p-0 ml-2 text-sky-500 hover:text-sky-700"
+                      className="p-1 text-sky-500 hover:text-sky-700"
                     >
                       Delete
                     </Button>
