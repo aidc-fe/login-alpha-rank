@@ -68,7 +68,7 @@ export async function GET(
 
     if (scope.includes("openid")) {
       userInfo.openid = {
-        id_token: encodeJwt({
+        id_token: await encodeJwt({
           token: {
             email: user.email,
             name: user.name,

@@ -9,20 +9,39 @@ export function GET(request: NextRequest) {
     shoplazzaHmacValidator(request);
 
     // 获取店铺
-    const shop = request.nextUrl.searchParams.get("shop") || "";
-    // 用shop生成一个随机state，用于防治crsf攻击
+    const shop = request.nextUrl.searchParams.get("shop");
+    if (!shop) {
+      return NextResponse.json(
+        { message: "Invalid shop parameter" },
+        { status: 400 }
+      );
+    }
+
+    // 确保环境变量已定义
+    const clientId = process.env.SHOPLAZZA_CLIENT_ID;
+    const redirectUriBase = process.env.NEXT_PUBLIC_NEXT_AUTH_URL;
+    if (!clientId || !redirectUriBase) {
+      return NextResponse.json(
+        { message: "Missing environment variables" },
+        { status: 500 }
+      );
+    }
+
+    // 用shop生成一个随机state，用于防止csrf攻击
     const state = generateEncryptedState({ shop });
 
-    return NextResponse.redirect(
-      `https://${shop}/admin/oauth/authorize?client_id=${process.env
-        .SHOPLAZZA_CLIENT_ID!}&scope=${SHOPLAZZA_SCOPES.join(
-        "+"
-      )}&redirect_uri=${encodeURI(
-        `${process.env.NEXT_PUBLIC_NEXT_AUTH_URL}/api/shoplazza/callback`
-      )}&response_type=code&state=${state}`,
-      302
-    );
-  } catch (e) {
-    return NextResponse.json(e, { status: 401 });
+    // 构建重定向的URL并返回
+    const redirectUri = `${redirectUriBase}/api/shoplazza/callback`;
+    const authUrl = `https://${shop}/admin/oauth/authorize?client_id=${clientId}&scope=${encodeURIComponent(
+      SHOPLAZZA_SCOPES.join("+")
+    )}&redirect_uri=${encodeURIComponent(
+      redirectUri
+    )}&response_type=code&state=${state}`;
+
+    return NextResponse.redirect(authUrl, 302);
+  } catch (e: any) {
+    console.error("Error in GET /shoplazza/auth:", e);
+    const errorMessage = e.message || "Unauthorized request";
+    return NextResponse.json({ message: errorMessage }, { status: 401 });
   }
 }
