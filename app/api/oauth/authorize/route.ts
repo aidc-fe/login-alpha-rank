@@ -54,17 +54,11 @@ export async function GET(request: NextRequest) {
 
     // 构建重定向 URL
     const redirectUrl = new URL(redirect_uri);
-    redirectUrl.searchParams.set("hmac", encodeURIComponent(hmac));
-    redirectUrl.searchParams.set(
-      "code",
-      encodeURIComponent(authorizationCode.code)
-    );
-    redirectUrl.searchParams.set("state", encodeURIComponent(state));
-    redirectUrl.searchParams.set("userId", encodeURIComponent(userId));
-    redirectUrl.searchParams.set(
-      "systemDomain",
-      encodeURIComponent(systemDomain)
-    );
+    redirectUrl.searchParams.set("hmac", hmac);
+    redirectUrl.searchParams.set("code", authorizationCode.code);
+    redirectUrl.searchParams.set("state", state);
+    redirectUrl.searchParams.set("userId", userId);
+    redirectUrl.searchParams.set("systemDomain", systemDomain);
     redirectUrl.searchParams.set("jumpFrom", "shoplazza");
 
     // 重定向到 redirect_uri
