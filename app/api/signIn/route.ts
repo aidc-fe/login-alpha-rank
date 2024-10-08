@@ -1,4 +1,4 @@
-import { ERROR_CONFIG } from "@/constants/errors";
+import { ERROR_CONFIG } from "@/lib/errors";
 import { getUser } from "@/lib/database";
 import { isPasswordMatch } from "@/lib/secret";
 import { formateError, formatSuccess } from "@/lib/request";
@@ -6,7 +6,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   const params = await request.json();
-
   const user = await getUser({ email: params.email });
 
   if (!user) {

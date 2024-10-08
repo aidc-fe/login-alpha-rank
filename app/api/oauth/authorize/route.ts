@@ -1,34 +1,44 @@
 import { createAuthorizationCode, findClientByClientId } from "@/lib/database";
-import { formateError } from "@/lib/request";
 import { generateAuthorizationCode, generateHmac } from "@/lib/secret";
 import { NextRequest, NextResponse } from "next/server";
 
+// 定义查询参数的类型
+interface QueryParams {
+  client_id: string;
+  redirect_uri: string;
+  state: string;
+  userId: string;
+  systemDomain: string;
+}
+
 export async function GET(request: NextRequest) {
-  const client_id = request.nextUrl.searchParams.get("client_id") || "";
-  const redirect_uri = request.nextUrl.searchParams.get("redirect_uri") || "";
-  const state = request.nextUrl.searchParams.get("state") || "";
-  const userId = request.nextUrl.searchParams.get("userId") || "";
-  const systemDomain = request.nextUrl.searchParams.get("systemDomain") || "";
-
-  if (!client_id) {
-    return NextResponse.json(formateError({}));
-  }
   try {
-    // 查询client_id对应的client信息
+    // 解构查询参数
+    const {
+      client_id = "",
+      redirect_uri = "",
+      state = "",
+      userId = "",
+      systemDomain = "",
+    }: QueryParams = Object.fromEntries(
+      request.nextUrl.searchParams.entries()
+    ) as unknown as QueryParams;
+
+    if (!client_id) {
+      throw new Error("Client id missing");
+    }
+
+    // 查询 client_id 对应的 client 信息
     const client = await findClientByClientId(client_id);
-    console.log("client", client);
 
-    let redirect_uris = [];
-    redirect_uris = client.redirect_uris;
-
-    // 如果redirect_uri不在配置的url中，则抛出异常或跳转到错误兜底页面
-    if (!redirect_uris?.includes(redirect_uri)) {
-      return NextResponse.json(formateError({}));
+    // 验证 redirect_uri 是否有效
+    if (!redirect_uri || !client?.redirect_uris?.includes(redirect_uri)) {
+      throw new Error("Invalid redirect_uri");
     }
 
     // 生成授权码
     const code = generateAuthorizationCode();
-    // 生成hmac
+    // 生成 HMAC
     const hmac = generateHmac(
       {
         code,
@@ -40,24 +50,28 @@ export async function GET(request: NextRequest) {
       client.client_secret
     );
 
-    // 创建一条授权码数据
-    try {
-      const authorizationCode = await createAuthorizationCode({
-        code,
-        client_id,
-        redirect_uri,
-      });
+    // 创建授权码记录
+    const authorizationCode = await createAuthorizationCode({
+      code,
+      client_id,
+      redirect_uri,
+    });
 
-      console.log("authorizationCode", authorizationCode);
-      return NextResponse.redirect(
-        // 带上request search
-        `${redirect_uri}?hmac=${hmac}&code=${authorizationCode.code}&state=${state}&userId=${userId}&systemDomain=${systemDomain}&jumpFrom=shoplazza`,
-        302
-      );
-    } catch {
-      return NextResponse.json(formateError({}));
-    }
-  } catch {
-    return NextResponse.json(formateError({}));
+    // 构建重定向 URL
+    const redirectUrl = new URL(redirect_uri);
+    redirectUrl.searchParams.set("hmac", hmac);
+    redirectUrl.searchParams.set("code", authorizationCode.code);
+    redirectUrl.searchParams.set("state", state);
+    redirectUrl.searchParams.set("userId", userId);
+    redirectUrl.searchParams.set("systemDomain", systemDomain);
+    redirectUrl.searchParams.set("jumpFrom", "shoplazza");
+
+    // 重定向到 redirect_uri
+    return NextResponse.redirect(redirectUrl.toString(), 302);
+  } catch (e: any) {
+    return NextResponse.json(
+      { message: e.message || "AlphaRank Login Authorize failed" },
+      { status: 401 }
+    );
   }
 }

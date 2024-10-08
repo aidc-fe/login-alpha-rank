@@ -5,7 +5,7 @@ import {
   generateClientSecret,
   hashToken,
 } from "./secret";
-import { ERROR_CONFIG } from "@/constants/errors";
+import { ERROR_CONFIG } from "@/lib/errors";
 
 export const prisma = new PrismaClient();
 
@@ -30,7 +30,7 @@ export const getUser = async (search: { email?: string; id?: string }) => {
     });
 
     // Return user if found, otherwise return null
-    return user || null;
+    return user;
   } catch (error) {
     console.error("Error fetching user:", error);
     throw new Error("Failed to fetch user. Please try again later.");
@@ -193,7 +193,6 @@ export const validateMagicLink = async (token?: string) => {
 
     return updatedToken; // 返回更新后的数据
   } catch (error) {
-    console.log(error);
     throw error; // 抛出异常信息
   }
 };
@@ -216,15 +215,6 @@ export async function createClient(data: {
   const client_id = generateClientId();
   const client_secret = generateClientSecret();
 
-  console.log(1111, {
-    ...data,
-    client_id,
-    client_secret,
-    redirect_uris: redirect_uris.join(","), // 使用逗号连接数组
-    scope: scope.join(","), // 使用逗号连接数组
-    active: true, // 默认为active
-    grant_types: "authorization_code",
-  });
   // 插入数据到 Client 表
   const newClient = await prisma.client.create({
     data: {
@@ -242,27 +232,22 @@ export async function createClient(data: {
 }
 
 // 根据client_id查询client信息
-export const findClientByClientId = async (clientId: string) => {
-  try {
-    const client = await prisma.client.findUnique({
-      where: {
-        client_id: clientId,
-      },
-    });
+export const findClientByClientId = async (client_id: string) => {
+  const client = await prisma.client.findUnique({
+    where: {
+      client_id,
+    },
+  });
 
-    if (!client) {
-      throw new Error(`Client with client_id: ${clientId} not found`);
-    }
-
-    return {
-      ...client,
-      redirect_uris: client.redirect_uris?.split(","),
-      scope: client.scope?.split(","),
-    };
-  } catch (error) {
-    console.error("Error finding client by client_id:", error);
-    throw error;
+  if (!client) {
+    throw new Error(`Client with client_id: ${client_id} not found`);
   }
+
+  return {
+    ...client,
+    redirect_uris: client.redirect_uris?.split(","),
+    scope: client.scope?.split(","),
+  };
 };
 
 // 创建一条AuthorizationCode数据
@@ -271,28 +256,23 @@ export const createAuthorizationCode = async (data: {
   client_id: string;
   redirect_uri: string;
 }) => {
-  try {
-    // 计算 10 分钟后的时间作为 expires_at
-    const now = new Date();
-    const expiresAt = new Date(now.getTime() + 10 * 60 * 1000); // 当前时间加10分钟
+  // 计算 10 分钟后的时间作为 expires_at
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + 10 * 60 * 1000); // 当前时间加10分钟
 
-    // 创建新的 AuthorizationCode 记录
-    const authorizationCode = await prisma.authorizationCode.create({
-      data: {
-        code: data.code,
-        client_id: data.client_id,
-        redirect_uri: data.redirect_uri,
-        expires_at: expiresAt,
-        created_at: now,
-        used: null, // 初始为空
-      },
-    });
+  // 创建新的 AuthorizationCode 记录
+  const authorizationCode = await prisma.authorizationCode.create({
+    data: {
+      code: data.code,
+      client_id: data.client_id,
+      redirect_uri: data.redirect_uri,
+      expires_at: expiresAt,
+      created_at: now,
+      used: null, // 初始为空
+    },
+  });
 
-    return authorizationCode;
-  } catch (error) {
-    console.error("Error creating authorization code:", error);
-    throw error;
-  }
+  return authorizationCode;
 };
 
 // 根据code查找code信息，并将code置为已经使用
@@ -330,7 +310,6 @@ export const findAndUseAuthorizationCode = async (code: string) => {
 
     return updatedAuthorizationCode;
   } catch (error) {
-    console.error("Error finding or using authorization code:", error);
     throw error;
   }
 };
@@ -376,7 +355,6 @@ export const findAccessToken = async (token: string) => {
 
     return accessToken;
   } catch (error) {
-    console.error("Error finding access token:", error);
     throw error;
   }
 };

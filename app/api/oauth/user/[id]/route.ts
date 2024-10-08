@@ -4,63 +4,66 @@ import {
   getAccountsByUserIdAndProviders,
   getUser,
 } from "@/lib/database";
-import { formateError, formatSuccess } from "@/lib/request";
 import { encodeJwt } from "@/lib/secret";
+import { User } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
+
+type UserInfoType = {
+  email?: { email: string };
+  profile?: {
+    name?: string | null;
+    image: string | null;
+    sub: string;
+    from?: string | null;
+  };
+  openid?: {
+    id_token: string;
+  };
+  shoplazza?: Partial<{
+    access_token: string | null;
+    refresh_token: string | null;
+    expires_at: number | null;
+    shop_domain: string | null;
+    shop_domain_display: string | null;
+    user_name: string | null;
+  }>[];
+};
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const { id } = params;
-  const access_token = request.headers.get("access-token");
-
-  console.log({ id, access_token });
-  // 如果没有id或access_token则报错
-  if (!access_token) {
-    return NextResponse.json(formateError({}));
-  }
-  if (!id) {
-    return NextResponse.json(formateError({ message: "没有id" }));
-  }
-
-  const user = await getUser({ id });
-
-  console.log({ user });
-
-  if (!user) {
-    return NextResponse.json(formateError({}));
-  }
-
-  // 验证accessToken;并拿到scope
   try {
+    const { id } = params;
+    const access_token = request.headers.get("access-token");
+
+    // 参数校验
+    if (!access_token) {
+      return NextResponse.json(
+        { message: "access_token missing" },
+        { status: 400 }
+      );
+    }
+    if (!id) {
+      return NextResponse.json({ message: "user id missing" }, { status: 400 });
+    }
+
+    // 获取用户信息
+    const user = ((await getUser({ id })) as User) || null;
+    if (!user) {
+      return NextResponse.json({ message: "user not exist" }, { status: 404 });
+    }
+
+    // 验证 Access Token 并获取 scope
     const token = await findAccessToken(access_token);
     const client = await findClientByClientId(token.client_id);
     const scope = client.scope;
 
-    const userInfo = {} as {
-      email?: { email: string };
-      profile?: {
-        name?: string | null;
-        image: string | null;
-        sub: string;
-        from?: string | null;
-      };
-      openid?: {
-        id_token: string;
-      };
-      shoplazza?: Partial<{
-        access_token: string | null;
-        refresh_token: string | null;
-        expires_at: number | null;
-        shop_domain: string | null;
-        shop_domain_display: string | null;
-        user_name: string | null;
-      }>[];
-    };
+    const userInfo: UserInfoType = {};
 
+    // 处理不同的 scope
     if (scope.includes("email")) {
-      userInfo.email = { email: user?.email! };
+      userInfo.email = { email: user.email };
     }
 
     if (scope.includes("openid")) {
@@ -85,25 +88,25 @@ export async function GET(
         sub: user.id,
         from: user.from,
       };
-      console.log({ userInfo });
     }
 
     if (scope.includes("shoplazza")) {
       const accounts = await getAccountsByUserIdAndProviders(id, ["shoplazza"]);
-      userInfo.shoplazza = accounts.map((item) => {
-        return {
-          access_token: item.access_token,
-          refresh_token: item.refresh_token,
-          expires_at: item.expires_at,
-          shop_domain: item.shop_domain,
-          shop_domain_display: item.shop_domain_display,
-          user_name: item.user_name,
-        };
-      });
+      userInfo.shoplazza = accounts.map((item) => ({
+        access_token: item.access_token,
+        refresh_token: item.refresh_token,
+        expires_at: item.expires_at,
+        shop_domain: item.shop_domain,
+        shop_domain_display: item.shop_domain_display,
+        user_name: item.user_name,
+      }));
     }
 
     return NextResponse.json(userInfo);
-  } catch {
-    return NextResponse.json(formateError({}));
+  } catch (e: any) {
+    return NextResponse.json(
+      { message: e.message || "Error fetching user info" },
+      { status: 500 }
+    );
   }
 }
