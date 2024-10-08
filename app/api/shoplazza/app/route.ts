@@ -32,11 +32,9 @@ export function GET(request: NextRequest) {
 
     // 构建重定向的URL并返回
     const redirectUri = `${redirectUriBase}/api/shoplazza/callback`;
-    const authUrl = `https://${shop}/admin/oauth/authorize?client_id=${clientId}&scope=${encodeURIComponent(
-      SHOPLAZZA_SCOPES.join("+")
-    )}&redirect_uri=${encodeURIComponent(
-      redirectUri
-    )}&response_type=code&state=${state}`;
+    const authUrl = `https://${shop}/admin/oauth/authorize?client_id=${clientId}&scope=${SHOPLAZZA_SCOPES.join(
+      "+"
+    )}&redirect_uri=${redirectUri}&response_type=code&state=${state}`;
 
     return NextResponse.redirect(authUrl, 302);
   } catch (e: any) {
