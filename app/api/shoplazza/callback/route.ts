@@ -73,9 +73,16 @@ export async function GET(request: NextRequest) {
     const state = request.nextUrl.searchParams.get("state") || "";
     const shop = request.nextUrl.searchParams.get("shop");
 
-    if (!code || !shop) {
+    if (!code) {
       return NextResponse.json(
-        { message: "Invalid request parameters" },
+        { message: "Missing or invalid 'code' parameter" },
+        { status: 400 }
+      );
+    }
+
+    if (!shop) {
+      return NextResponse.json(
+        { message: "Missing or invalid 'shop' parameter" },
         { status: 400 }
       );
     }

@@ -17,21 +17,38 @@ interface OAuthRequestBody {
 // 返回 accessToken
 export async function POST(request: NextRequest) {
   try {
+    // 尝试解析请求体，避免 undefined 默认值
     const { client_id, client_secret, code }: OAuthRequestBody =
-      (await request.json()) || {};
+      await request.json();
 
-    const client = await findClientByClientId(client_id);
-
-    if (!client || client.client_secret !== client_secret) {
+    // 如果没有提供 client_id 或 client_secret，则立即返回错误
+    if (!client_id) {
       return NextResponse.json(
-        { message: "client_secret not match or client not found" },
+        { message: "Client id missing" },
+        { status: 400 }
+      );
+    }
+
+    if (!client_secret) {
+      return NextResponse.json(
+        { message: "Client Secret missing" },
+        { status: 400 }
+      );
+    }
+
+    // 查询 client 信息
+    const client = await findClientByClientId(client_id);
+    // 验证 client_secret 是否匹配
+    if (client.client_secret !== client_secret) {
+      return NextResponse.json(
+        { message: "Invalid client credentials" },
         { status: 401 }
       );
     }
 
     // 查找并校验 code 的准确性
     const authorizationCode = await findAndUseAuthorizationCode(code);
-    if (!authorizationCode || authorizationCode.client_id !== client_id) {
+    if (authorizationCode.client_id !== client_id) {
       return NextResponse.json(
         { message: "Invalid authorization code" },
         { status: 401 }

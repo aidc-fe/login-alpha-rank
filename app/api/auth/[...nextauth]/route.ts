@@ -6,6 +6,7 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/lib/database";
 import { decodeJwt, encodeJwt } from "@/lib/secret";
 import { sendVerificationEmail } from "@/lib/email";
+import { CookieOpt } from "@/lib/auth";
 
 const authOptions: NextAuthOptions = {
   // debug: true,
@@ -20,27 +21,15 @@ const authOptions: NextAuthOptions = {
   cookies: {
     sessionToken: {
       name: "next-auth.session-token",
-      options: {
-        sameSite: "none",
-        path: "/",
-        secure: true,
-      },
+      options: CookieOpt,
     },
     callbackUrl: {
       name: "next-auth.callback-url",
-      options: {
-        sameSite: "none",
-        path: "/",
-        secure: true,
-      },
+      options: CookieOpt,
     },
     csrfToken: {
       name: "next-auth.csrf-token",
-      options: {
-        sameSite: "none",
-        path: "/",
-        secure: true,
-      },
+      options: CookieOpt,
     },
   },
 
