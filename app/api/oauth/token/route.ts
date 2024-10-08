@@ -1,6 +1,3 @@
-/**
- * 提供接口供接入方查询accessToken
- */
 import {
   createAccessToken,
   createRefreshToken,
@@ -25,33 +22,43 @@ export async function POST(request: NextRequest) {
 
     const client = await findClientByClientId(client_id);
 
-    if (client.client_secret !== client_secret) {
-      throw { message: "client_secret not match" };
+    if (!client || client.client_secret !== client_secret) {
+      return NextResponse.json(
+        { message: "client_secret not match or client not found" },
+        { status: 401 }
+      );
     }
 
     // 查找并校验 code 的准确性
     const authorizationCode = await findAndUseAuthorizationCode(code);
-    if (authorizationCode.client_id !== client_id) {
-      throw { message: "client_id not match" };
+    if (!authorizationCode || authorizationCode.client_id !== client_id) {
+      return NextResponse.json(
+        { message: "Invalid authorization code" },
+        { status: 401 }
+      );
     }
 
+    // 生成 tokens
     const { access_token, refresh_token } = generateTokens(client_id);
 
-    // 并发创建 refresh_token 和 access_token
-    await Promise.all([
-      createRefreshToken({
-        token: refresh_token,
-        client_id,
-      }),
-      createAccessToken({
-        token: access_token,
-        client_id,
-        refresh_token,
-      }),
-    ]);
+    // 按顺序创建 refresh_token 和 access_token
+    const createdRefreshToken = await createRefreshToken({
+      token: refresh_token,
+      client_id,
+    });
+
+    await createAccessToken({
+      token: access_token,
+      client_id,
+      refresh_token: createdRefreshToken.token,
+    });
 
     return NextResponse.json({ access_token, refresh_token });
-  } catch (e) {
-    return NextResponse.json(e, { status: 401 });
+  } catch (e: any) {
+    console.error("Error creating tokens:", e);
+    return NextResponse.json(
+      { message: e.message || "Failed to create tokens" },
+      { status: 500 }
+    );
   }
 }
