@@ -8,7 +8,7 @@ import { User } from "@prisma/client";
 // 新建client
 export async function POST(request: NextRequest) {
   const cookieStore = cookies();
-  const user = decodeJwt({
+  const user = await decodeJwt({
     token: cookieStore.get("next-auth.session-token")?.value,
     secret: process.env.NEXT_AUTH_SECRET!,
   });

@@ -31,7 +31,7 @@ export function hashToken(token: string = randomUUID()) {
 }
 
 // 生成JWT
-export function encodeJwt({ token = {}, secret }: JWTEncodeParams) {
+export async function encodeJwt({ token = {}, secret }: JWTEncodeParams) {
   delete token?.exp;
   delete token?.jwtToken;
   delete token?.password;
@@ -45,7 +45,7 @@ export function encodeJwt({ token = {}, secret }: JWTEncodeParams) {
 }
 
 // 解析JWT
-export function decodeJwt({ token = "", secret }: JWTDecodeParams) {
+export async function decodeJwt({ token = "", secret }: JWTDecodeParams) {
   try {
     const info =
       (jwt.verify(token, secret) as jwt.JwtPayload & Partial<User>) || {};
