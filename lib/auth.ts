@@ -1,31 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "crypto";
-import { encodeJwt } from "./secret";
+import { decodeJwt, encodeJwt } from "./secret";
 import { ERROR_CONFIG } from "./errors";
+import nodeFetch from "node-fetch";
 
-// 用用户信息生成 JWT，并存入 cookie
-export async function setSessionTokenCookie(
-  tokenPayload: {
-    [key: string]: string | Date | null; // 根据需要定义具体的字段类型
-  },
-  response: NextResponse
-): Promise<NextResponse> {
-  // 生成 JWT
-  const sessionToken = await encodeJwt({
-    token: tokenPayload,
-    secret: process.env.NEXT_AUTH_SECRET!,
-  });
-
-  // 设置 cookie
-  response.cookies.set("next-auth.session-token", sessionToken, {
-    httpOnly: true, // 防止前端 JavaScript 访问
-    secure: true, // 确保 cookie 仅在 HTTPS 上发送
-    path: "/", // 在整个网站有效
-    sameSite: "none",
-  });
-
-  return response;
-}
+// 种植cookie的options
+export const CookieOpt = {
+  httpOnly: true, // 防止前端 JavaScript 访问
+  secure: true, // 确保 cookie 仅在 HTTPS 上发送
+  path: "/", // 在整个网站有效
+  sameSite: "none" as "none",
+};
 
 // 往所有端种登录态cookie
 export function thirdPartySignIn(jwt: string, shopDomain?: string | null) {
@@ -50,12 +35,12 @@ export function thirdPartySignIn(jwt: string, shopDomain?: string | null) {
 }
 
 // 往所有端种登录态cookie
-export function thirdPartySignOut() {
+export function thirdPartySignOut(isServer?: boolean) {
   const urls =
     process.env.NEXT_PUBLIC_THIRD_PARTY_SIGNOUT_API?.split(",") || [];
 
   const fetchPromises = urls.map((url) => {
-    return fetch(`${url}`, {
+    return (isServer ? nodeFetch : fetch)(`${url}`, {
       method: "POST",
       credentials: "include", // 确保 cookie 被发送
       // 为了配合问己
@@ -105,4 +90,35 @@ export function shoplazzaHmacValidator(request: NextRequest): boolean {
   } catch {
     throw ERROR_CONFIG.SHOPLAZZA.HMAC;
   }
+}
+
+// 用用户信息生成 JWT，并存入 cookie
+export async function setSessionTokenCookie(
+  tokenPayload: {
+    [key: string]: string | Date | null; // 根据需要定义具体的字段类型
+  },
+  response: NextResponse
+): Promise<NextResponse> {
+  // 生成 JWT
+  const sessionToken = await encodeJwt({
+    token: tokenPayload,
+    secret: process.env.NEXT_AUTH_SECRET!,
+  });
+
+  // 如果当前已经有登录态，并且登录的用户不是当前准备登录的用户，则先进行登出
+  if (response.cookies.get("next-auth.session-token")) {
+    const userInfo = await decodeJwt({
+      token: response.cookies.get("next-auth.session-token")?.value as string,
+      secret: process.env.NEXT_AUTH_SECRET!,
+    });
+
+    if (userInfo?.email === tokenPayload.email) {
+      thirdPartySignOut(true);
+    }
+  }
+
+  // 设置 cookie
+  response.cookies.set("next-auth.session-token", sessionToken, CookieOpt);
+
+  return response;
 }

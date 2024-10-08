@@ -49,7 +49,7 @@ export async function GET(
     }
 
     // 获取用户信息
-    const user = ((await getUser({ id })) as User) || null;
+    const user = (await getUser({ id })) as User;
     if (!user) {
       return NextResponse.json({ message: "user not exist" }, { status: 404 });
     }
