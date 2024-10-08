@@ -59,11 +59,11 @@ export const ERROR_CONFIG = {
       code: "AUTH_USER_NOT_EXIST",
       message: "User does not exist, please sign up.",
     },
-    SHOPLAZZA: {
-      HMAC: {
-        code: "SHOPLAZZA_HMAC",
-        message: "HMAC validation failed",
-      },
+  },
+  SHOPLAZZA: {
+    HMAC: {
+      code: "SHOPLAZZA_HMAC",
+      message: "Shoplazza Hmac validate error",
     },
   },
   PASSWORD: {

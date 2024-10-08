@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "crypto";
 import { encodeJwt } from "./secret";
+import { ERROR_CONFIG } from "./errors";
 
 // 用用户信息生成 JWT，并存入 cookie
 export async function setSessionTokenCookie(
@@ -72,23 +73,36 @@ export function thirdPartySignOut() {
 }
 
 // shoplazza HMAC Validator Middleware
-export function hmacValidator(request: NextRequest): boolean {
-  const url = new URL(request.url);
-  const hmac = url.searchParams.get("hmac");
-  const queryParams = new URLSearchParams(url.searchParams);
-  queryParams.delete("hmac");
+export function shoplazzaHmacValidator(request: NextRequest): boolean {
+  try {
+    const url = new URL(request.url);
+    const hmac = url.searchParams.get("hmac");
+    const queryParams = new URLSearchParams(url.searchParams);
+    queryParams.delete("hmac");
 
-  const sortedKeys = Array.from(queryParams.keys()).sort();
-  const message = sortedKeys
-    .map((key) => `${key}=${queryParams.get(key)}`)
-    .join("&");
+    const sortedKeys = Array.from(queryParams.keys()).sort();
+    const message = sortedKeys
+      .map((key) => `${key}=${queryParams.get(key)}`)
+      .join("&");
 
-  const generatedHash = createHmac(
-    "sha256",
-    process.env.SHOPLAZZA_CLIENT_SECRET!
-  )
-    .update(message)
-    .digest("hex");
+    const generatedHash = createHmac(
+      "sha256",
+      process.env.SHOPLAZZA_CLIENT_SECRET!
+    )
+      .update(message)
+      .digest("hex");
 
-  return timingSafeEqual(Buffer.from(generatedHash), Buffer.from(hmac!));
+    const validate = timingSafeEqual(
+      Buffer.from(generatedHash),
+      Buffer.from(hmac!)
+    );
+
+    if (validate) {
+      return true;
+    } else {
+      throw new Error();
+    }
+  } catch {
+    throw ERROR_CONFIG.SHOPLAZZA.HMAC;
+  }
 }

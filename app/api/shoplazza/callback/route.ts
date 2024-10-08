@@ -1,14 +1,29 @@
-import { ERROR_CONFIG } from "@/lib/errors";
 import { setSessionTokenCookie } from "@/lib/auth";
 import { createOrUpdateAccount, createOrUpdateUser } from "@/lib/database";
-import { formateError } from "@/lib/request";
 import { decryptState } from "@/lib/secret";
 import { NextRequest, NextResponse } from "next/server";
 import fetch from "node-fetch";
 
+type AuthDataType = {
+  access_token: string;
+  refresh_token: string;
+  expires_at: number;
+  token_type: string;
+};
+
+type RawShopDataType = {
+  shop: {
+    account: string;
+    name: string;
+    email: string;
+    id: number;
+    domain: string;
+    system_domain: string;
+  };
+};
+
 export async function GET(request: NextRequest) {
   try {
-    const hmac = request.nextUrl.searchParams.get("hmac");
     const code = request.nextUrl.searchParams.get("code");
     const state = request.nextUrl.searchParams.get("state") || "";
     const shop = request.nextUrl.searchParams.get("shop");
@@ -17,9 +32,10 @@ export async function GET(request: NextRequest) {
     const stateData = decryptState(state);
 
     if (shop !== stateData?.shop) {
-      return NextResponse.json(formateError({}));
+      throw { message: "State validate failed" };
     }
 
+    // 获取shoplazza的accessToken
     const authResponse = await fetch(`https://${shop}/admin/oauth/token`, {
       method: "POST",
       headers: {
@@ -34,13 +50,7 @@ export async function GET(request: NextRequest) {
       }),
     });
 
-    const authData = (await authResponse.json()) as {
-      access_token: string;
-      refresh_token: string;
-      expires_at: number;
-      token_type: string;
-    };
-    console.log("Auth Response:", authData);
+    const authData = (await authResponse.json()) as AuthDataType;
 
     if (authResponse.ok) {
       // 获取店铺信息
@@ -50,16 +60,7 @@ export async function GET(request: NextRequest) {
           "access-token": authData.access_token,
         },
       });
-      const shopData = (await shopRsp.json()) as {
-        shop: {
-          account: string;
-          name: string;
-          email: string;
-          id: number;
-          domain: string;
-          system_domain: string;
-        };
-      };
+      const shopData = (await shopRsp.json()) as RawShopDataType;
       const shopInfo = shopData?.shop;
 
       // 提取用户信息
@@ -78,32 +79,29 @@ export async function GET(request: NextRequest) {
       };
       // // 创建或更新用户信息
       const user = await createOrUpdateUser({ ...userInfo, from: "shoplazza" });
-      console.log("new user", user);
+
       // // 创建或更新oAuth账号信息
-      const account = await createOrUpdateAccount({
+      await createOrUpdateAccount({
         ...accountInfo,
         userId: user.id,
       });
-      console.log("new account", account);
 
       const response = NextResponse.redirect(
         `${process.env.DEFAULT_TARGET_URL}/web/api/auth/callback/login?userId=${user.id}&systemDomain=${shopInfo.system_domain}`,
         302
       );
+      // 在登录前台种入cookie
       setSessionTokenCookie(userInfo, response);
 
-      // 302到alpharank提供的接口
+      // 302到alphaRank提供的接口
       return response;
     } else {
       // Handle error response
-      console.error("Error during authentication:", authData);
-      return NextResponse.json(
-        { error: "Authentication failed", details: authData },
-        { status: 400 }
-      );
+      throw {
+        message: "Shoplazza Authentication failed: Got accessToken failed",
+      };
     }
   } catch (error) {
-    console.error("Request failed:", error);
-    return NextResponse.json(ERROR_CONFIG.SERVER.ERROR_500);
+    return NextResponse.json(error, { status: 401 });
   }
 }
