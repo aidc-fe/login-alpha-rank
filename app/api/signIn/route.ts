@@ -1,4 +1,4 @@
-import { ERROR_CONFIG } from "@/constants/errors";
+import { ERROR_CONFIG } from "@/lib/errors";
 import { getUser } from "@/lib/database";
 import { isPasswordMatch } from "@/lib/secret";
 import { formateError, formatSuccess } from "@/lib/request";

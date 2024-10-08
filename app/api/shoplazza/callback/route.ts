@@ -1,4 +1,4 @@
-import { ERROR_CONFIG } from "@/constants/errors";
+import { ERROR_CONFIG } from "@/lib/errors";
 import { setSessionTokenCookie } from "@/lib/auth";
 import { createOrUpdateAccount, createOrUpdateUser } from "@/lib/database";
 import { formateError } from "@/lib/request";

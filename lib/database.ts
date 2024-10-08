@@ -5,7 +5,7 @@ import {
   generateClientSecret,
   hashToken,
 } from "./secret";
-import { ERROR_CONFIG } from "@/constants/errors";
+import { ERROR_CONFIG } from "@/lib/errors";
 
 export const prisma = new PrismaClient();
 

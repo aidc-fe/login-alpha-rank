@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { hmacValidator } from "@/lib/auth";
 import { formateError } from "@/lib/request";
-import { ERROR_CONFIG } from "@/constants/errors";
+import { ERROR_CONFIG } from "@/lib/errors";
 import { generateEncryptedState } from "@/lib/secret";
 import { SHOPLAZZA_SCOPES } from "@/constants/scopes";
 
