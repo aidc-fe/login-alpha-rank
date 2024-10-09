@@ -134,7 +134,7 @@ export async function GET(request: NextRequest) {
     // 302 重定向到目标URL，并设置Cookie
     const redirectUrl = `${process.env.DEFAULT_TARGET_URL}/web/api/auth/callback/login?userId=${user.id}&systemDomain=${shopInfo.system_domain}`;
     const response = NextResponse.redirect(redirectUrl, 302);
-    setSessionTokenCookie(userInfo, response);
+    setSessionTokenCookie(userInfo, response, request);
 
     return response;
   } catch (error: any) {

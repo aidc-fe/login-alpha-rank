@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
         status: 302,
       }
     );
-    await setSessionTokenCookie({ ...user, sub: user.id }, response);
+    await setSessionTokenCookie({ ...user, sub: user.id }, response, request);
 
     return response;
   } catch {

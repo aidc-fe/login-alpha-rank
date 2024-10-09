@@ -96,7 +96,8 @@ export async function setSessionTokenCookie(
   tokenPayload: {
     [key: string]: string | Date | null; // 根据需要定义具体的字段类型
   },
-  response: NextResponse
+  response: NextResponse,
+  request: NextRequest
 ): Promise<NextResponse> {
   // 生成 JWT
   const sessionToken = await encodeJwt({
@@ -104,11 +105,11 @@ export async function setSessionTokenCookie(
     secret: process.env.NEXT_AUTH_SECRET!,
   });
 
-  console.log("cookie:", response.cookies.get("next-auth.session-token"));
+  console.log("cookie:", request.cookies.get("next-auth.session-token"));
   // 如果当前已经有登录态，并且登录的用户不是当前准备登录的用户，则先进行登出
-  if (response.cookies.get("next-auth.session-token")) {
+  if (request.cookies.get("next-auth.session-token")) {
     const userInfo = await decodeJwt({
-      token: response.cookies.get("next-auth.session-token")?.value as string,
+      token: request.cookies.get("next-auth.session-token")?.value as string,
       secret: process.env.NEXT_AUTH_SECRET!,
     });
 
