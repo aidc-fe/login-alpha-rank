@@ -105,7 +105,7 @@ export async function setSessionTokenCookie(
     secret: process.env.NEXT_AUTH_SECRET!,
   });
 
-  console.log("cookie:", request.cookies.get("next-auth.session-token"));
+  console.log("cookie:", request.cookies.getAll());
   // 如果当前已经有登录态，并且登录的用户不是当前准备登录的用户，则先进行登出
   if (request.cookies.get("next-auth.session-token")) {
     const userInfo = await decodeJwt({
