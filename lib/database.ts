@@ -49,8 +49,13 @@ export const createOrUpdateUser = async (data: {
   try {
     const user = await prisma.user.upsert({
       where: { email: data.email }, // 依据 email 作为唯一字段进行查询
-      update: data,
       create: data,
+      update: {
+        name: data.name,
+        emailVerified: data.emailVerified,
+        image: data.image,
+        password: data.password,
+      },
     });
 
     return user;
