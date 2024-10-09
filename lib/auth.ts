@@ -111,6 +111,7 @@ export async function setSessionTokenCookie(
       secret: process.env.NEXT_AUTH_SECRET!,
     });
 
+    console.log({ userInfo, tokenPayload });
     if (userInfo?.email !== tokenPayload.email) {
       thirdPartySignOut();
     }
