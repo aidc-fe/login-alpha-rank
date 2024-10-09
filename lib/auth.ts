@@ -105,19 +105,16 @@ export async function setSessionTokenCookie(
     secret: process.env.NEXT_AUTH_SECRET!,
   });
 
-  console.log("cookie:", request.cookies.getAll());
   // 如果当前已经有登录态，并且登录的用户不是当前准备登录的用户，则先进行登出
-  if (request.cookies.get("next-auth.session-token")) {
-    const userInfo = await decodeJwt({
-      token: request.cookies.get("next-auth.session-token")?.value as string,
-      secret: process.env.NEXT_AUTH_SECRET!,
-    });
+  // if (request.cookies.get("next-auth.session-token")) {
+  //   const userInfo = await decodeJwt({
+  //     token: request.cookies.get("next-auth.session-token")?.value as string,
+  //     secret: process.env.NEXT_AUTH_SECRET!,
+  //   });
 
-    console.log({ userInfo, tokenPayload });
-    if (userInfo?.email !== tokenPayload.email) {
-      thirdPartySignOut();
-    }
-  }
+  //   if (userInfo?.email !== tokenPayload.email) {
+  //   }
+  // }
 
   // 设置 cookie
   response.cookies.set("next-auth.session-token", sessionToken, CookieOpt);
