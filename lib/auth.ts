@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "crypto";
 import { decodeJwt, encodeJwt } from "./secret";
 import { ERROR_CONFIG } from "./errors";
-import nodeFetch from "node-fetch";
 
 // 种植cookie的options
 export const CookieOpt = {
@@ -35,12 +34,12 @@ export function thirdPartySignIn(jwt: string, shopDomain?: string | null) {
 }
 
 // 往所有端种登录态cookie
-export function thirdPartySignOut(isServer?: boolean) {
+export function thirdPartySignOut() {
   const urls =
     process.env.NEXT_PUBLIC_THIRD_PARTY_SIGNOUT_API?.split(",") || [];
 
   const fetchPromises = urls.map((url) => {
-    return (isServer ? nodeFetch : fetch)(`${url}`, {
+    return fetch(`${url}`, {
       method: "POST",
       credentials: "include", // 确保 cookie 被发送
       // 为了配合问己
@@ -112,8 +111,8 @@ export async function setSessionTokenCookie(
       secret: process.env.NEXT_AUTH_SECRET!,
     });
 
-    if (userInfo?.email === tokenPayload.email) {
-      thirdPartySignOut(true);
+    if (userInfo?.email !== tokenPayload.email) {
+      thirdPartySignOut();
     }
   }
 
