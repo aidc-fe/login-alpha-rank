@@ -3,6 +3,7 @@
 import { signIn, useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { WEBSITE_DOMAIN } from "@/lib/url";
 
 export default function GetAuthPage() {
   const { status } = useSession();
@@ -17,10 +18,7 @@ export default function GetAuthPage() {
 
   useEffect(() => {
     // 向父页面发送 status
-    window.parent.postMessage(
-      { status },
-      process.env.NEXT_PUBLIC_WEBSITE_DOMAIN!
-    );
+    window.parent.postMessage({ status }, WEBSITE_DOMAIN);
   }, [status]);
 
   useEffect(() => {
@@ -30,14 +28,11 @@ export default function GetAuthPage() {
 
     const handleMessage = (event: MessageEvent) => {
       // 检查来源，确保安全
-      if (!event.origin.includes(process.env.NEXT_PUBLIC_WEBSITE_DOMAIN!)) {
+      if (!event.origin.includes(WEBSITE_DOMAIN)) {
         return;
       }
       // 接收到信息，外面的button置为 loading
-      window.parent.postMessage(
-        { status: "loading" },
-        process.env.NEXT_PUBLIC_WEBSITE_DOMAIN!
-      );
+      window.parent.postMessage({ status: "loading" }, WEBSITE_DOMAIN);
 
       // 接收用户信息，并且进行登录
       signIn("thirdParty", {

@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import SuspenseWrapper from "@/components/suspend-wrapper";
 import { Loader } from "lucide-react";
 import { thirdPartySignIn } from "@/lib/auth";
+import { APP_DOMAIN } from "@/lib/url";
 
 declare module "next-auth" {
   interface Session {
@@ -40,8 +41,7 @@ function PageContent() {
             ) {
               window.location.href = targetUrl;
             } else {
-              window.location.href =
-                process.env.NEXT_PUBLIC_DEFAULT_TARGET_URL!;
+              window.location.href = APP_DOMAIN;
             }
           });
         } else {

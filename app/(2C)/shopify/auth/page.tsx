@@ -1,6 +1,7 @@
 "use client";
 
 import SuspenseWrapper from "@/components/suspend-wrapper";
+import { APP_DOMAIN } from "@/lib/url";
 import { Loader } from "lucide-react";
 import { getCsrfToken } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
@@ -24,10 +25,7 @@ function PageContent() {
   const searchParams = useSearchParams();
   const shopDomain = searchParams.get("shopDomain");
   const targetUrl = searchParams.get("targetUrl");
-  sessionStorage.setItem(
-    "shopifyTargetUrl",
-    targetUrl || `https://blog.alpha-rank.com`
-  );
+  sessionStorage.setItem("shopifyTargetUrl", targetUrl || APP_DOMAIN);
 
   useEffect(() => {
     if (!shopDomain) {
