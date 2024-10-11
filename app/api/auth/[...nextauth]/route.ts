@@ -127,13 +127,13 @@ const authOptions: NextAuthOptions = {
         secure: true, // 使用SSL/TLS
       },
       from: process.env.EMAIL_FROM,
-      sendVerificationRequest({
+      async sendVerificationRequest({
         identifier: email,
         url,
         provider: { server, from },
       }) {
         /* your function */
-        sendVerificationEmail(email, url, "AlphaRank - Login", {
+        await sendVerificationEmail(email, url, "AlphaRank - Login", {
           title: "Login to AlphaRank",
           description: `<p>You can login to AlphaRank by clicking the button below.</p> 
           <p>
