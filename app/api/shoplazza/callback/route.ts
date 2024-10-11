@@ -1,6 +1,7 @@
 import { setSessionTokenCookie } from "@/lib/auth";
 import { createOrUpdateAccount, createOrUpdateUser } from "@/lib/database";
 import { decryptState } from "@/lib/secret";
+import { APP_DOMAIN } from "@/lib/url";
 import { NextRequest, NextResponse } from "next/server";
 import fetch from "node-fetch";
 
@@ -132,7 +133,7 @@ export async function GET(request: NextRequest) {
     });
 
     // 302 重定向到目标URL，并设置Cookie
-    const redirectUrl = `${process.env.DEFAULT_TARGET_URL}/web/api/auth/callback/login?userId=${user.id}&systemDomain=${shopInfo.system_domain}`;
+    const redirectUrl = `${APP_DOMAIN}/web/api/auth/callback/login?userId=${user.id}&systemDomain=${shopInfo.system_domain}`;
     const response = NextResponse.redirect(redirectUrl, 302);
     setSessionTokenCookie(userInfo, response, request);
 

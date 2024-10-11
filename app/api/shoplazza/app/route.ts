@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { shoplazzaHmacValidator } from "@/lib/auth";
 import { generateEncryptedState } from "@/lib/secret";
-import { SHOPLAZZA_SCOPES } from "@/constants/scopes";
+import { SHOPLAZZA_SCOPES } from "@/lib/auth";
 
 export function GET(request: NextRequest) {
   try {
