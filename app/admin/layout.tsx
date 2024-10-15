@@ -1,3 +1,5 @@
+import Header from "@/components/admin/Layouts/Header";
+import Sider from "@/components/admin/Layouts/Sider";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -10,5 +12,20 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return children;
+  return (
+    <div className="min-h-screen">
+      <Header />
+      <Sider
+        items={[
+          {
+            label: "Client Manage",
+            key: "/admin/list",
+          },
+        ]}
+      />
+      <main className="pt-20 ml-64">
+        <div className="p-5 h-[calc(100vh-80px)]">{children}</div>
+      </main>
+    </div>
+  );
 }

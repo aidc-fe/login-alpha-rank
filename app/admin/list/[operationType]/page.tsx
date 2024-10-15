@@ -10,6 +10,14 @@ import { FormEventHandler, useEffect, useState } from "react";
 import { OPERATION_TYPE, scopeOptions, defaultClientInfo } from "@/constants/admin";
 import { upperFirst } from 'lodash';
 import { cn } from "@/lib/utils";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 type Info = {
   redirect_uris: string[];
@@ -62,10 +70,21 @@ export default function EditClient({ params, searchParams }: { params: { operati
 
   return (
     <form
-      className="flex flex-col items-center gap-4 p-8 w-full max-w-7xl m-auto"
+      className="flex flex-col gap-4 w-full max-w-7xl m-auto"
       onSubmit={handleSubmit}
     >
-      <h1 className="font-bold text-3xl mb-4">{`${upperFirst(operationType)} Client`}</h1>
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/admin/list">My Client</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Add Client</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
+      <h1 className="font-bold text-3xl mb-4 self-start">{`${upperFirst(operationType)} Client`}</h1>
 
       <Input
         name="name"

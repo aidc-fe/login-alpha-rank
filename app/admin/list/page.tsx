@@ -1,25 +1,14 @@
 "use client";
-
+import { Switch } from "@/components/ui/switch";
 import {
   Table,
   TableHeader,
   TableBody,
-  TableFooter,
   TableHead,
   TableRow,
   TableCell,
-  TableCaption,
 } from "@/components/ui/table";
-import { randomBytes } from 'crypto';
-import dayjs from "dayjs";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
+import { randomBytes } from "crypto";
 import {
   Popover,
   PopoverContent,
@@ -36,58 +25,57 @@ import {
 } from "@/components/ui/pagination";
 
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useRequest } from 'ahooks';
+import { useRequest } from "ahooks";
 
-const clientId = randomBytes(16).toString('hex');
-const clientSecret = randomBytes(32).toString('hex');
+const clientId = randomBytes(16).toString("hex");
+const clientSecret = randomBytes(32).toString("hex");
 
 type Item = {
-  id: string,
-  client_id: string,
-  client_secret: string,
-  redirect_uris: string[],
-  grant_types: string[],
-  scope: string[],
-  created_at: number,
-  updated_at: number,
-  active: boolean,
-  default: boolean,
-  name: string,
-  description?: string
-}
+  id: string;
+  client_id: string;
+  client_secret: string;
+  redirect_uris: string[];
+  grant_types: string[];
+  scope: string[];
+  created_at: number;
+  updated_at: number;
+  active: boolean;
+  default: boolean;
+  name: string;
+  description?: string;
+};
 const list: Item[] = [
   {
-    id: '1',
+    id: "1",
     client_id: clientId,
     client_secret: clientSecret,
     redirect_uris: [],
-    grant_types: ['authorization_code'],
-    scope: ['email', 'openid'],
+    grant_types: ["authorization_code"],
+    scope: ["email", "openid"],
     created_at: Date.now(),
     updated_at: Date.now(),
     active: true,
     default: true,
-    name: 'name',
-    description: 'description'
+    name: "name",
+    description: "description",
   },
   {
-    id: '2',
+    id: "2",
     client_id: clientId,
     client_secret: clientSecret,
     redirect_uris: [],
-    grant_types: ['authorization_code'],
-    scope: ['profile', 'shopify', 'shoplazza'],
+    grant_types: ["authorization_code"],
+    scope: ["profile", "shopify", "shoplazza"],
     created_at: Date.now(),
     updated_at: Date.now(),
     active: true,
     default: false,
-    name: 'name',
-    description: 'description'
-  }
-]
+    name: "name",
+    description: "description",
+  },
+];
 
 function getList(current: number, pageSize: number): Promise<Item[]> {
   return new Promise((resolve) => {
@@ -97,115 +85,101 @@ function getList(current: number, pageSize: number): Promise<Item[]> {
   });
 }
 
-
 export default function List() {
   const router = useRouter();
-  const [page, setPage] = useState({ current: 1, pageSize: 10, total: 0 })
-  const { data, loading, run, refresh } = useRequest((current: number, pageSize: number) => getList(current, pageSize), {
-  });
-
+  const [page, setPage] = useState({ current: 1, pageSize: 10, total: 0 });
+  const { data, loading, run, refresh } = useRequest(
+    (current: number, pageSize: number) => getList(current, pageSize),
+    {}
+  );
 
   return (
-    <div className="h-screen py-8 max-w-7xl m-auto">
-      <Breadcrumb className="pb-12">
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/">Home</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>List</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
-
-      <div className="w-full text-right pb-3">
+    <div className="min-h-full max-w-7xl m-auto flex flex-col gap-6">
+      <div className="flex items-center justify-between">
+        <span className="text-2xl font-semibold">My Clients</span>
         <Button
           variant={"default"}
           size={"default"}
           type="button"
-          className="inline-flex items-center gap-1"
+          className="inline-flex items-center gap-1 bg-slate-900 hover:bg-slate-950"
           onClick={() => {
-            router.push('/admin/create')
+            router.push("/admin/list/create");
           }}
         >
-          <Plus size={20} />
-          Add Client
+          Add
         </Button>
       </div>
 
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[100px]">名称</TableHead>
-            <TableHead>描述</TableHead>
-            <TableHead>重定向 URI</TableHead>
-            <TableHead>授权类型</TableHead>
-            <TableHead>权限范围</TableHead>
-            <TableHead>创建时间</TableHead>
-            <TableHead>更新时间</TableHead>
-            <TableHead>激活状态</TableHead>
-            <TableHead>默认的client</TableHead>
-            <TableHead>操作</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {(data || []).map((item, index) => (
-            <TableRow key={index}>
-              <TableCell>{item.name}</TableCell>
-              <TableCell>{item.description}</TableCell>
-              <TableCell>{item.redirect_uris}</TableCell>
-              <TableCell>{item.grant_types}</TableCell>
-              <TableCell>{item.scope.join(', ')}</TableCell>
-              <TableCell>{dayjs(item.created_at).format("MMM DD, YYYY")}</TableCell>
-              <TableCell>{dayjs(item.updated_at).format("MMM DD, YYYY")}</TableCell>
-              <TableCell>{item.active ? '已激活' : '未激活'}</TableCell>
-              <TableCell>{item.default ? '默认' : '设为默认'}</TableCell>
-              <TableCell>
-                <Button
-                  variant={"ghost"}
-                  size={"default"}
-                  type="button"
-                  className="p-1 text-sky-500"
-                  onClick={() => {
-                    router.push(`/admin/edit?clientId=${item.id}`)
-                  }}
-                >
-                  Edit
-                </Button>
-                <Popover>
-                  <PopoverTrigger>
-                    <Button
-                      variant={"ghost"}
-                      size={"default"}
-                      type="button"
-                      className="p-1 text-sky-500 hover:text-sky-700"
-                    >
-                      Delete
-                    </Button>
-                  </PopoverTrigger>
-                  {!loading &&
-                    <PopoverContent className="w-60">
-                      Are you sure to delete this client data?
-                      <div className="flex justify-end">
-                        <Button
-                          variant={"default"}
-                          size="sm"
-                          type="button"
-                          onClick={() => { refresh() }}
-                        >
-                          OK
-                        </Button>
-                      </div>
-                    </PopoverContent>}
-                </Popover>
-              </TableCell>
+      <div className="flex-auto">
+        <Table>
+          <TableHeader>
+            <TableRow className="bg-slate-200 hover:!bg-slate-200">
+              <TableHead className="w-28">Name</TableHead>
+              <TableHead>Client Id</TableHead>
+              <TableHead>Activate</TableHead>
+              <TableHead className="w-40">Action</TableHead>
             </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+          </TableHeader>
+          <TableBody>
+            {(data || []).map((item, index) => (
+              <TableRow key={index}>
+                <TableCell>{item.name}</TableCell>
+                <TableCell>{item.client_id}</TableCell>
+                <TableCell>
+                  <Switch
+                    className="data-[state=checked]:bg-slate-900"
+                    checked={item.active}
+                  />
+                </TableCell>
+                <TableCell>
+                  <Button
+                    variant={"ghost"}
+                    size={"default"}
+                    type="button"
+                    className="p-1 text-slate-900 hover:text-slate-700"
+                    onClick={() => {
+                      router.push(`/admin/list/edit?clientId=${item.id}`);
+                    }}
+                  >
+                    Edit
+                  </Button>
+                  <Popover>
+                    <PopoverTrigger>
+                      <Button
+                        variant={"ghost"}
+                        size={"default"}
+                        type="button"
+                        className="p-1 text-slate-900 hover:text-slate-700"
+                      >
+                        Delete
+                      </Button>
+                    </PopoverTrigger>
+                    {!loading && (
+                      <PopoverContent className="w-60">
+                        Are you sure to delete this client data?
+                        <div className="flex justify-end">
+                          <Button
+                            variant={"default"}
+                            size="sm"
+                            type="button"
+                            onClick={() => {
+                              refresh();
+                            }}
+                          >
+                            OK
+                          </Button>
+                        </div>
+                      </PopoverContent>
+                    )}
+                  </Popover>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
 
-      <Pagination>
+      <Pagination className="justify-end">
         <PaginationContent>
           <PaginationItem>
             <PaginationPrevious href="#" />
@@ -228,5 +202,5 @@ export default function List() {
         </PaginationContent>
       </Pagination>
     </div>
-  )
+  );
 }
