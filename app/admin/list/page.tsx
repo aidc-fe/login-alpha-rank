@@ -94,7 +94,7 @@ export default function List() {
   );
 
   return (
-    <div className="min-h-full max-w-7xl m-auto flex flex-col gap-6">
+    <div className="w-full flex-auto max-w-7xl m-auto flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <span className="text-2xl font-semibold">My Clients</span>
         <Button
@@ -103,7 +103,7 @@ export default function List() {
           type="button"
           className="inline-flex items-center gap-1"
           onClick={() => {
-            router.push("/admin/list/create");
+            router.push("/admin/list/add");
           }}
         >
           Add
