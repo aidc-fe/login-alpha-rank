@@ -3,7 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Header = () => {
   return (
-    <header className="fixed top-0 left-0 right-0 px-6 h-20 border-b flex items-center justify-between bg-white">
+    <header className="fixed z-10 top-0 left-0 right-0 px-6 h-20 border-b flex items-center justify-between bg-white">
       <div className="flex items-center gap-6">
         <Image
           width={40}

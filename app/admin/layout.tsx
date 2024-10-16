@@ -24,7 +24,7 @@ export default function RootLayout({
         ]}
       />
       <main className="pt-20 ml-64">
-        <div className="p-5 h-[calc(100vh-80px)]">{children}</div>
+        <div className="p-5 min-h-[calc(100vh-80px)]">{children}</div>
       </main>
     </div>
   );

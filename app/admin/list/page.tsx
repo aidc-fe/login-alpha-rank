@@ -101,7 +101,7 @@ export default function List() {
           variant={"default"}
           size={"default"}
           type="button"
-          className="inline-flex items-center gap-1 bg-slate-900 hover:bg-slate-950"
+          className="inline-flex items-center gap-1"
           onClick={() => {
             router.push("/admin/list/create");
           }}
@@ -126,52 +126,20 @@ export default function List() {
                 <TableCell>{item.name}</TableCell>
                 <TableCell>{item.client_id}</TableCell>
                 <TableCell>
-                  <Switch
-                    className="data-[state=checked]:bg-slate-900"
-                    checked={item.active}
-                  />
+                  <Switch checked={item.active} />
                 </TableCell>
                 <TableCell>
                   <Button
                     variant={"ghost"}
                     size={"default"}
                     type="button"
-                    className="p-1 text-slate-900 hover:text-slate-700"
+                    className="p-1 text-primary hover:text-primary/90"
                     onClick={() => {
-                      router.push(`/admin/list/edit?clientId=${item.id}`);
+                      router.push(`/admin/list/update?clientId=${item.id}`);
                     }}
                   >
                     Edit
                   </Button>
-                  <Popover>
-                    <PopoverTrigger>
-                      <Button
-                        variant={"ghost"}
-                        size={"default"}
-                        type="button"
-                        className="p-1 text-slate-900 hover:text-slate-700"
-                      >
-                        Delete
-                      </Button>
-                    </PopoverTrigger>
-                    {!loading && (
-                      <PopoverContent className="w-60">
-                        Are you sure to delete this client data?
-                        <div className="flex justify-end">
-                          <Button
-                            variant={"default"}
-                            size="sm"
-                            type="button"
-                            onClick={() => {
-                              refresh();
-                            }}
-                          >
-                            OK
-                          </Button>
-                        </div>
-                      </PopoverContent>
-                    )}
-                  </Popover>
                 </TableCell>
               </TableRow>
             ))}
