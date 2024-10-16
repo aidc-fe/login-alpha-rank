@@ -83,7 +83,15 @@ export default function EditClient({
       redirect_uris: info.redirect_uris.join(","),
       scope: info.scope.join(","),
     };
-    console.log("sdp--params", params);
+    request('/api/client', {
+      method: 'POST',
+    })
+    .then((res) => {
+      console.log(res);
+    })
+    .catch((err) => {
+      console.log(err);
+    })
   };
 
   return (

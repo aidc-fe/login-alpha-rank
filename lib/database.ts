@@ -184,15 +184,6 @@ export async function createClient(data: {
   const client_id = generateClientId();
   const client_secret = generateClientSecret();
 
-  console.log(1111, {
-    ...data,
-    client_id,
-    client_secret,
-    redirect_uris: redirect_uris.join(","), // 使用逗号连接数组
-    scope: scope.join(","), // 使用逗号连接数组
-    active: true, // 默认为active
-    grant_types: "authorization_code",
-  });
   // 插入数据到 Client 表
   const newClient = await prisma.client.create({
     data: {
@@ -208,6 +199,29 @@ export async function createClient(data: {
 
   return newClient;
 }
+
+// 修改一条client数据
+export const updateClient = async (data: {
+  client_id: string;
+  redirect_uris: string[]; // 数组
+  scope: string[]; // 数组
+  name: string;
+  description: string;
+  signout_uri: string;
+}) => {
+  try {
+    const updatedClient = await prisma.client.update({
+      where: {
+        client_id: data.client_id,
+      },
+      data,
+    });
+    return updatedClient;
+  } catch (error) {
+    console.error("Error updating client:", error);
+    throw error;
+  }
+};
 
 // 根据client_id查询client信息
 export const findClientByClientId = async (clientId: string) => {
