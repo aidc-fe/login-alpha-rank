@@ -85,6 +85,7 @@ export default function EditClient({
     };
     request('/api/client', {
       method: 'POST',
+      body: JSON.stringify(params),
     })
     .then((res) => {
       console.log(res);

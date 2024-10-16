@@ -28,6 +28,7 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useRequest } from "ahooks";
+import request from "@/lib/request";
 
 const clientId = randomBytes(16).toString("hex");
 const clientSecret = randomBytes(32).toString("hex");
@@ -77,11 +78,17 @@ const list: Item[] = [
   },
 ];
 
-function getList(current: number, pageSize: number): Promise<Item[]> {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(list);
-    }, 1000);
+function getList(
+  current: number,
+  pageSize: number
+): Promise<{
+  list: Item[];
+  current: number;
+  pageSize: number;
+  totals: number;
+}> {
+  return request(`/api/client?current=${current}&pageSize=${pageSize}`, {
+    method: "GET",
   });
 }
 
@@ -89,7 +96,14 @@ export default function List() {
   const router = useRouter();
   const [page, setPage] = useState({ current: 1, pageSize: 10, total: 0 });
   const { data, loading, run, refresh } = useRequest(
-    (current: number, pageSize: number) => getList(current, pageSize),
+    (current: number, pageSize: number) => getList(current, pageSize).then((res) => {
+        setPage({
+          current: res.current,
+          pageSize: res.pageSize,
+          total: res.totals
+        });
+        return res.list;
+    }),
     {}
   );
 
