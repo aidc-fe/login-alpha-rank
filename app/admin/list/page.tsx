@@ -9,11 +9,7 @@ import {
   TableCell,
 } from "@/components/ui/table";
 import { randomBytes } from "crypto";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
+import { Plus } from "lucide-react";
 import {
   Pagination,
   PaginationContent,
@@ -114,6 +110,7 @@ export default function List() {
         <Button
           variant={"default"}
           size={"default"}
+          icon={<Plus size={16} />}
           type="button"
           className="inline-flex items-center gap-1"
           onClick={() => {
@@ -124,7 +121,7 @@ export default function List() {
         </Button>
       </div>
 
-      <div className="flex-auto">
+      <div className="flex-auto min-h-0 relative">
         <Table>
           <TableHeader>
             <TableRow className="bg-slate-200 hover:!bg-slate-200">
