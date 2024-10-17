@@ -46,60 +46,58 @@ export default function SignUpPage() {
       });
   };
   return (
-    <form
-      className="flex flex-col items-center gap-4 px-8"
-      onSubmit={handleSubmit}
-    >
-      <h1 className="font-bold text-3xl mb-2">Sign up</h1>
+    <div className="flex items-center justify-center bg-background h-full w-full">
+      <form
+        className="flex flex-col items-center justify-center gap-4 w-full max-w-lg"
+        onSubmit={handleSubmit}
+      >
+        <h1 className="font-bold text-3xl mb-12">Sign up</h1>
 
-      <Input
-        name="name"
-        label="name"
-        placeholder="Please enter your name"
-        required
-      ></Input>
-      <Input
-        name="email"
-        type="email"
-        label="email"
-        value={email}
-        onChange={(e) => {
-          setEmail(e.target.value);
-        }}
-        placeholder="Please enter your email"
-        required
-      ></Input>
-      <Input
-        label="password"
-        name="password"
-        type="password"
-        placeholder="Please enter your password"
-        required
-      ></Input>
-
-      <div className="flex flex-col mt-8 lg:grid lg:grid-cols-3 w-full items-center gap-4">
+        <Input name="name" placeholder="Name" required></Input>
+        <Input
+          name="email"
+          type="email"
+          value={email}
+          onChange={(e) => {
+            setEmail(e.target.value);
+          }}
+          placeholder="E-mail"
+          required
+        ></Input>
+        <Input
+          name="password"
+          type="password"
+          placeholder="Password"
+          required
+        ></Input>
         <Button
-          className="col-span-2 group"
+          className="group w-full"
           variant={"default"}
-          size={"lg"}
           type="submit"
           disabled={loading}
         >
           {loading && <Loader className="animate-spin" />}
           Sign up
         </Button>
-        <Button
-          variant={"link"}
-          onClick={(e) => {
-            e.preventDefault();
-            router.replace(`/?email=${encodeURIComponent(email)}`);
-          }}
-          className="flex items-center gap-1"
-        >
-          <CornerUpLeft size={16} />
-          Return to signin
-        </Button>
-      </div>
-    </form>
+        <div className="w-1/2 border-b mx-auto" />
+        <div className="text-sm text-neutral-400">
+          By signing in, you are agreeing to our Privacy Policy and Terms of
+          Use.
+        </div>
+        <div className="text-sm flex gap-1 text-neutral-400">
+          <span>Already have an account?</span>
+          <Button
+            variant={"link"}
+            onClick={(e) => {
+              e.preventDefault();
+              router.replace(`/?email=${encodeURIComponent(email)}`);
+            }}
+            className="flex items-center gap-1 p-0 h-auto"
+          >
+            sign in
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 }

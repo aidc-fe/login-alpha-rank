@@ -49,43 +49,39 @@ export default function Page() {
   };
 
   return (
-    <form
-      className="flex flex-col items-center gap-4 px-8"
-      onSubmit={handleSubmit}
-    >
-      <h1 className="font-bold text-3xl mb-2">Set Password</h1>
-      <Input
-        name="email"
-        required
-        placeholder="Please enter your email"
-        type="email"
-        label="email"
-        value={email}
-        onChange={(e) => {
-          setEmail(e.target.value);
-        }}
-      />
+    <div className="flex items-center justify-center bg-background h-full w-full">
+      <form
+        className="flex flex-col items-center justify-center gap-4 w-full max-w-lg"
+        onSubmit={handleSubmit}
+      >
+        <h1 className="font-bold text-3xl mb-12">Set Password</h1>
+        <Input
+          name="email"
+          required
+          placeholder="E-mail"
+          type="email"
+          value={email}
+          onChange={(e) => {
+            setEmail(e.target.value);
+          }}
+        />
 
-      <Input
-        name="password"
-        required
-        placeholder="Please enter new password"
-        type="password"
-        label="password"
-      />
+        <Input
+          name="password"
+          required
+          placeholder="Password"
+          type="password"
+        />
 
-      <Input
-        name="check_password"
-        label="Re-enter password"
-        required
-        type="password"
-        placeholder="Please re-enter new password"
-      />
-      <div className="flex flex-col mt-8 lg:grid lg:grid-cols-3 w-full items-center gap-4">
+        <Input
+          name="check_password"
+          required
+          type="password"
+          placeholder="Re-enter password"
+        />
         <Button
-          className="col-span-2 group"
+          className="group w-full"
           variant={"default"}
-          size={"lg"}
           type="submit"
           disabled={loading}
         >
@@ -96,18 +92,21 @@ export default function Page() {
           )}
           Send set instructions
         </Button>
-        <Button
-          variant={"link"}
-          onClick={(e) => {
-            e.preventDefault();
-            router.replace(`/?email=${encodeURIComponent(email)}`);
-          }}
-          className="flex items-center gap-1"
-        >
-          <CornerUpLeft size={16} />
-          Return to signin
-        </Button>
-      </div>
-    </form>
+        <div className="w-1/2 border-b mx-auto" />
+        <div className="flex text-sm text-neutral-400 gap-1">
+          <span>Back to</span>
+          <Button
+            variant={"link"}
+            onClick={(e) => {
+              e.preventDefault();
+              router.replace(`/?email=${encodeURIComponent(email)}`);
+            }}
+            className="flex items-center gap-1 p-0 h-auto"
+          >
+            Sign in
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 }
