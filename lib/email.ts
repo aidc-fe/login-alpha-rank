@@ -47,6 +47,7 @@ export async function sendVerificationEmail(
             </td>
         </tr>
       </table>
+    <script>
       window.onload = function() {
             document.querySelector('.copy-link').addEventListener('click', function() {
                 copyLink();
