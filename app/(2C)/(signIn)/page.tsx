@@ -98,7 +98,7 @@ export default function Home() {
                   />
                 </Button>
                 <div className="text-sm text-neutral-400">
-                  Not amember?{" "}
+                  Not a member?{" "}
                   <Button
                     className="p-0 h-auto"
                     onClick={(e) => {
