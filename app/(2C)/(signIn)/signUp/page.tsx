@@ -81,8 +81,20 @@ export default function SignUpPage() {
         </Button>
         <div className="w-1/2 border-b mx-auto" />
         <div className="text-sm text-muted-foreground font-normal flex flex-col gap-3 items-center">
-          <span>
-            By signing in, you are agreeing to our{" "}
+          <div className="text-center">
+            By continuing with any of the options above, you agree to our{" "}
+            <Button
+              onClick={() => {
+                window.open(
+                  "https://terms.alicdn.com/legal-agreement/terms/b_platform_service_agreement/20231110160335349/20231110160335349.html"
+                );
+              }}
+              variant="link"
+              className="p-0 h-fit"
+            >
+              Terms of Service
+            </Button>{" "}
+            and have read our{" "}
             <Button
               onClick={() => {
                 window.open(
@@ -94,20 +106,8 @@ export default function SignUpPage() {
             >
               Privacy Policy
             </Button>{" "}
-            and{" "}
-            <Button
-              onClick={() => {
-                window.open(
-                  "https://terms.alicdn.com/legal-agreement/terms/b_platform_service_agreement/20231110160335349/20231110160335349.html"
-                );
-              }}
-              variant="link"
-              className="p-0 h-fit"
-            >
-              Terms of Use
-            </Button>
             .
-          </span>
+          </div>
           <div className="flex gap-1">
             <span>Already have an account?</span>
             <Button

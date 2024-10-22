@@ -13,7 +13,7 @@ export default function RootLayout({
 }>) {
   return (
     <main className="grid h-full items-center md:grid-cols-2">
-      <div className="h-full bg-circle-gradient flex justify-center">
+      <div className="h-full bg-circle-gradient hidden justify-center md:flex">
         <LoginCarousel className="justify-center items-center hidden md:flex" />
       </div>
       {children}
