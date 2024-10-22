@@ -83,13 +83,9 @@ export default function Page() {
           className="group w-full"
           variant={"default"}
           type="submit"
-          disabled={loading}
+          icon={<Send size={20} className="group-hover:rotate-45 duration-150" />}
+          loading={loading}
         >
-          {loading ? (
-            <Loader className=" animate-spin" />
-          ) : (
-            <Send size={20} className="group-hover:rotate-45 duration-150" />
-          )}
           Send set instructions
         </Button>
         <div className="w-1/2 border-b mx-auto" />
