@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import request from "@/lib/request";
-import { ArrowUpRight, Loader } from "lucide-react";
+import { ArrowUpRight, Loader, LogIn } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -97,7 +97,7 @@ export default function Home() {
                     size={16}
                   />
                 </Button>
-                <div className="text-sm text-neutral-400">
+                <div className="text-sm text-muted-foreground">
                   Not a member?{" "}
                   <Button
                     className="p-0 h-auto"
@@ -116,16 +116,16 @@ export default function Home() {
               <Button
                 variant={"default"}
                 type="submit"
-                disabled={loading}
+                icon={<LogIn />}
+                loading={loading}
               >
-                {loading && <Loader className="animate-spin" />}
                 Sign in
               </Button>
             </form>
 
             <div className="w-full flex items-center">
               <div className="bg-gradient-to-r from-transparent to-neutral-300 dark:to-neutral-700 my-4 h-[1px] w-full" />
-              <span className="py-4 px-8 text-neutral-400 text-sm">or</span>
+              <span className="py-4 px-8 text-input text-sm">or</span>
               <div className="bg-gradient-to-r from-neutral-300 dark:from-neutral-700 to-transparent my-4 h-[1px] w-full" />
             </div>
 
@@ -167,14 +167,13 @@ export default function Home() {
               />
               <Button
                 type="submit"
-                disabled={loading}
+                loading={loading}
               >
-                {loading && <Loader className="animate-spin" />}
                 <span>Sign in</span>
               </Button>
             </form>
 
-            <div className="inline w-full italic text-neutral-400">
+            <div className="w-full text-muted-foreground text-sm font-normal">
               By signing in, you are agreeing to our{" "}
               <Button
                 onClick={() => {
@@ -183,7 +182,7 @@ export default function Home() {
                   );
                 }}
                 variant="link"
-                className="p-0 h-fit italic"
+                className="p-0 h-fit"
               >
                 Privacy Policy
               </Button>{" "}
@@ -195,7 +194,7 @@ export default function Home() {
                   );
                 }}
                 variant="link"
-                className="p-0 italic h-fit"
+                className="p-0 h-fit"
               >
                 Terms of Use
               </Button>
