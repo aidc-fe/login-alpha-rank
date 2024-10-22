@@ -13,6 +13,7 @@ export default function Home() {
   const { status } = useSession();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
+  const [emailLoading, setEmailLoading] = useState(false);
   const [email, setEmail] = useState(
     decodeURIComponent(searchParams.get("email") || "")
   );
@@ -32,7 +33,7 @@ export default function Home() {
 
   // 处理用户成功发送邮件后返回
   useEffect(() => {
-    setLoading(false);
+    setEmailLoading(false);
   }, []);
 
   switch (status) {
@@ -106,7 +107,7 @@ export default function Home() {
                       router.push(`/signUp?email=${encodeURIComponent(email)}`);
                     }}
                     variant={"link"}
-                    disabled={loading}
+                    disabled={loading || emailLoading}
                   >
                     Sign up
                   </Button>
@@ -116,8 +117,8 @@ export default function Home() {
               <Button
                 variant={"default"}
                 type="submit"
-                icon={<LogIn />}
                 loading={loading}
+                disabled={emailLoading}
               >
                 Sign in
               </Button>
@@ -146,7 +147,7 @@ export default function Home() {
               className="flex py-4 gap-3"
               onSubmit={(e) => {
                 e.preventDefault();
-                setLoading(true);
+                setEmailLoading(true);
                 const formData = new FormData(e.target as HTMLFormElement);
                 const email = formData.get("email");
                 // email验证页面展示
@@ -167,7 +168,8 @@ export default function Home() {
               />
               <Button
                 type="submit"
-                loading={loading}
+                loading={emailLoading}
+                disabled={loading}
               >
                 <span>Sign in</span>
               </Button>

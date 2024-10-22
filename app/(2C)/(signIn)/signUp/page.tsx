@@ -82,7 +82,7 @@ export default function SignUpPage() {
         <div className="w-1/2 border-b mx-auto" />
         <div className="text-sm text-muted-foreground font-normal flex flex-col gap-3 items-center">
           <span>
-            By signing in, you are agreeing to our{" "}
+            By signing up, you are agreeing to our{" "}
             <Button
               onClick={() => {
                 window.open(
