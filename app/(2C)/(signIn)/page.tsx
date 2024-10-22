@@ -166,17 +166,25 @@ export default function Home() {
                   setJumpEmail(e.target.value);
                 }}
               />
-              <Button
-                type="submit"
-                loading={emailLoading}
-                disabled={loading}
-              >
+              <Button type="submit" loading={emailLoading} disabled={loading}>
                 <span>Sign in</span>
               </Button>
             </form>
 
-            <div className="w-full text-muted-foreground text-sm font-normal">
-              By signing in, you are agreeing to our{" "}
+            <div className="w-full text-muted-foreground text-sm font-normal text-center">
+              By continuing with any of the options above, you agree to our{" "}
+              <Button
+                onClick={() => {
+                  window.open(
+                    "https://terms.alicdn.com/legal-agreement/terms/b_platform_service_agreement/20231110160335349/20231110160335349.html"
+                  );
+                }}
+                variant="link"
+                className="p-0 h-fit"
+              >
+                Terms of Service
+              </Button>{" "}
+              and have read our{" "}
               <Button
                 onClick={() => {
                   window.open(
@@ -188,18 +196,6 @@ export default function Home() {
               >
                 Privacy Policy
               </Button>{" "}
-              and{" "}
-              <Button
-                onClick={() => {
-                  window.open(
-                    "https://terms.alicdn.com/legal-agreement/terms/b_platform_service_agreement/20231110160335349/20231110160335349.html"
-                  );
-                }}
-                variant="link"
-                className="p-0 h-fit"
-              >
-                Terms of Use
-              </Button>
               .
             </div>
           </div>
