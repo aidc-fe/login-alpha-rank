@@ -26,18 +26,26 @@ const config = {
         foreground: "hsl(var(--foreground))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
+          hover: "hsl(var(--primary-hover))",
+          disabled: "hsl(var(--primary-disabled))",
+          light: "hsl(var(--primary-light))",
           foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
+          hover: "hsl(var(--secondary-hover))",
           foreground: "hsl(var(--secondary-foreground))",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
+          hover: "hsl(var(--destructive-hover))",
+          disabled: "hsl(var(--destructive-disabled))",
+          light: "hsl(var(--destructive-light))",
           foreground: "hsl(var(--destructive-foreground))",
         },
         constructive: {
           DEFAULT: "hsl(var(--constructive))",
+          light: "hsl(var(--constructive-light))",
           foreground: "hsl(var(--constructive-foreground))",
         },
         muted: {
@@ -55,7 +63,7 @@ const config = {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
-        },
+        }
       },
       borderRadius: {
         lg: "var(--radius)",

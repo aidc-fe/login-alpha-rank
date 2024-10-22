@@ -2,8 +2,6 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import request from "@/lib/request";
 import { ArrowUpRight, Loader } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
@@ -18,6 +16,7 @@ export default function Home() {
   const [email, setEmail] = useState(
     decodeURIComponent(searchParams.get("email") || "")
   );
+  const [jumpEmail, setJumpEmail] = useState("");
   const targetUrl = decodeURIComponent(searchParams.get("targetUrl") || "");
   const router = useRouter();
   const callbackUrl = `/login-landing-page?${
@@ -39,195 +38,169 @@ export default function Home() {
   switch (status) {
     case "unauthenticated":
       return (
-        <div className="flex flex-col justify-center items-center w-full px-8 space-y-6 ">
-          <h1 className="font-bold text-3xl mb-4">Sign in</h1>
-          <Tabs
-            defaultValue="password"
-            className="flex flex-col justify-center items-center w-full space-y-6 h-[300px] "
-          >
-            <TabsList className="mb-2">
-              <TabsTrigger value="password">Password</TabsTrigger>
-              <Separator className="h-6 bg-purple-300" orientation="vertical" />
-              <TabsTrigger value="magicLink">Email Verification</TabsTrigger>
-            </TabsList>
+        <div className="flex items-center justify-center w-full h-full px-8 -mr-4 space-y-6 bg-white">
+          <div className="max-w-lg">
+            <h1 className="font-bold text-3xl mb-12 text-center">Sign in</h1>
+            <form
+              className="flex flex-col justify-between gap-4"
+              onSubmit={(e) => {
+                e.preventDefault();
+                setLoading(true);
+                const formData = new FormData(e.target as HTMLFormElement);
+                const email = formData.get("email");
+                const password = formData.get("password");
 
-            <TabsContent value="password" className="w-full flex-grow">
-              <form
-                className="flex flex-col justify-between gap-4 h-full"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  setLoading(true);
-                  const formData = new FormData(e.target as HTMLFormElement);
-                  const email = formData.get("email");
-                  const password = formData.get("password");
-
-                  // 登录
-                  request("/api/signIn", {
-                    method: "POST",
-                    body: JSON.stringify({ email, password }),
+                // 登录
+                request("/api/signIn", {
+                  method: "POST",
+                  body: JSON.stringify({ email, password }),
+                })
+                  .then((user) => {
+                    signIn("password", { ...user, callbackUrl });
                   })
-                    .then((user) => {
-                      signIn("password", { ...user, callbackUrl });
-                    })
-                    .finally(() => {
-                      setLoading(false);
-                    });
+                  .finally(() => {
+                    setLoading(false);
+                  });
+              }}
+            >
+              <Input
+                name="email"
+                required
+                placeholder="E-mail"
+                type="email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
                 }}
-              >
-                <Input
-                  name="email"
-                  label="email"
-                  required
-                  placeholder="Please enter your email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
+              />
+              <Input
+                name="password"
+                required
+                placeholder="Password"
+                type="password"
+              />
+
+              <div className="flex justify-between">
+                <Button
+                  className="group p-0 h-auto"
+                  variant={"link"}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    router.push(
+                      `/password/emailVerify?email=${encodeURIComponent(email)}`
+                    );
                   }}
-                />
-
-                <div className="flex flex-col items-end">
-                  <Input
-                    name="password"
-                    label="password"
-                    required
-                    placeholder="Please enter your password"
-                    type="password"
+                >
+                  Forgot your password{" "}
+                  <ArrowUpRight
+                    className="group-hover:rotate-45 duration-150"
+                    size={16}
                   />
+                </Button>
+                <div className="text-sm text-neutral-400">
+                  Not a member?{" "}
                   <Button
-                    variant={"link"}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      router.push(
-                        `/password/emailVerify?email=${encodeURIComponent(
-                          email
-                        )}`
-                      );
-                    }}
-                    className="group"
-                  >
-                    Forgot your password{" "}
-                    <ArrowUpRight
-                      className="group-hover:rotate-45 duration-150"
-                      size={16}
-                    />
-                  </Button>
-                </div>
-
-                <div className="grid gap-4 grid-cols-3">
-                  <Button
-                    className="col-span-2"
-                    variant={"default"}
-                    size={"lg"}
-                    type="submit"
-                    disabled={loading}
-                  >
-                    {loading && <Loader className="animate-spin" />}
-                    Sign in
-                  </Button>
-                  <Button
+                    className="p-0 h-auto"
                     onClick={(e) => {
                       e.preventDefault();
                       router.push(`/signUp?email=${encodeURIComponent(email)}`);
                     }}
-                    variant={"outline"}
-                    size={"lg"}
+                    variant={"link"}
                     disabled={loading}
                   >
                     Sign up
                   </Button>
                 </div>
-              </form>
-            </TabsContent>
+              </div>
 
-            <TabsContent
-              value="magicLink"
-              className="w-full h-full items-center"
-            >
-              <form
-                className="flex flex-col justify-around py-4 h-full"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  setLoading(true);
-                  const formData = new FormData(e.target as HTMLFormElement);
-                  const email = formData.get("email");
-                  // email验证页面展示
-                  sessionStorage.setItem("verifyEmail", email as string);
-                  signIn("email", { email, callbackUrl });
-                }}
+              <Button
+                variant={"default"}
+                type="submit"
+                disabled={loading}
               >
-                <Input
-                  name="email"
-                  label="email"
-                  required
-                  placeholder="Please enter your email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                  }}
-                />
-                <Button
-                  className="col-span-2"
-                  variant={"default"}
-                  size={"lg"}
-                  type="submit"
-                  disabled={loading}
-                >
-                  {loading && <Loader className="animate-spin" />}
-                  <span className="text-white text-lg font-medium">
-                    Sign in
-                  </span>
-                </Button>
-              </form>
-            </TabsContent>
-          </Tabs>
-          <div className="w-full flex items-center">
-            <div className="bg-gradient-to-r from-transparent to-primary/40 dark:to-neutral-700 my-4 h-[1px] w-full" />
-            <span className=" p-2 text-muted-foreground text-sm">or</span>
-            <div className="bg-gradient-to-r from-primary/40 dark:from-neutral-700 to-transparent my-4 h-[1px] w-full" />
-          </div>
+                {loading && <Loader className="animate-spin" />}
+                Sign in
+              </Button>
+            </form>
 
-          <Button
-            variant={"outline"}
-            size={"lg"}
-            onClick={() => signIn("google", { callbackUrl })}
-          >
-            <Image
-              height="24"
-              width="24"
-              alt="provider-logo-dark"
-              src="https://authjs.dev/img/providers/google.svg"
-            ></Image>
-            Google
-          </Button>
+            <div className="w-full flex items-center">
+              <div className="bg-gradient-to-r from-transparent to-neutral-300 dark:to-neutral-700 my-4 h-[1px] w-full" />
+              <span className="py-4 px-8 text-neutral-400 text-sm">or</span>
+              <div className="bg-gradient-to-r from-neutral-300 dark:from-neutral-700 to-transparent my-4 h-[1px] w-full" />
+            </div>
 
-          <div className="inline w-full italic text-accent-foreground">
-            By signing in, you are agreeing to our{" "}
             <Button
-              onClick={() => {
-                window.open(
-                  "https://terms.alicdn.com/legal-agreement/terms/privacy_policy_full/20231109180939630/20231109180939630.html"
-                );
-              }}
-              variant="link"
-              className="p-0 h-fit italic"
+              variant={"outline"}
+              size={"lg"}
+              onClick={() => signIn("google", { callbackUrl })}
             >
-              Privacy Policy
-            </Button>{" "}
-            and{" "}
-            <Button
-              onClick={() => {
-                window.open(
-                  "https://terms.alicdn.com/legal-agreement/terms/b_platform_service_agreement/20231110160335349/20231110160335349.html"
-                );
-              }}
-              variant="link"
-              className="p-0 italic h-fit"
-            >
-              Terms of Use
+              <Image
+                height="24"
+                width="24"
+                alt="provider-logo-dark"
+                src="https://authjs.dev/img/providers/google.svg"
+              ></Image>
+              Google
             </Button>
-            .
+            <form
+              className="flex py-4 gap-3"
+              onSubmit={(e) => {
+                e.preventDefault();
+                setLoading(true);
+                const formData = new FormData(e.target as HTMLFormElement);
+                const email = formData.get("email");
+                // email验证页面展示
+                sessionStorage.setItem("verifyEmail", email as string);
+                signIn("email", { email, callbackUrl });
+              }}
+            >
+              <Input
+                className="flex-1"
+                name="email"
+                required
+                placeholder="Jump to login from E-mail"
+                type="email"
+                value={jumpEmail}
+                onChange={(e) => {
+                  setJumpEmail(e.target.value);
+                }}
+              />
+              <Button
+                type="submit"
+                disabled={loading}
+              >
+                {loading && <Loader className="animate-spin" />}
+                <span>Sign in</span>
+              </Button>
+            </form>
+
+            <div className="inline w-full italic text-neutral-400">
+              By signing in, you are agreeing to our{" "}
+              <Button
+                onClick={() => {
+                  window.open(
+                    "https://terms.alicdn.com/legal-agreement/terms/privacy_policy_full/20231109180939630/20231109180939630.html"
+                  );
+                }}
+                variant="link"
+                className="p-0 h-fit italic"
+              >
+                Privacy Policy
+              </Button>{" "}
+              and{" "}
+              <Button
+                onClick={() => {
+                  window.open(
+                    "https://terms.alicdn.com/legal-agreement/terms/b_platform_service_agreement/20231110160335349/20231110160335349.html"
+                  );
+                }}
+                variant="link"
+                className="p-0 italic h-fit"
+              >
+                Terms of Use
+              </Button>
+              .
+            </div>
           </div>
         </div>
       );
