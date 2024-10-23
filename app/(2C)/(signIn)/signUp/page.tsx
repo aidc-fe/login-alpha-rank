@@ -53,7 +53,7 @@ export default function SignUpPage() {
       >
         <h1 className="font-bold text-3xl mb-12">Sign up</h1>
 
-        <Input name="name" placeholder="Name" required></Input>
+        <Input name="name" placeholder="Username" required></Input>
         <Input
           name="email"
           type="email"

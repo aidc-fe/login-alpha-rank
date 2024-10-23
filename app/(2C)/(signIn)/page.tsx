@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import request from "@/lib/request";
-import { ArrowUpRight, Loader, LogIn } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -159,7 +159,7 @@ export default function Home() {
                 className="flex-1"
                 name="email"
                 required
-                placeholder="Jump to login from E-mail"
+                placeholder="Enter email address for Magic Link Authentication"
                 type="email"
                 value={jumpEmail}
                 onChange={(e) => {
