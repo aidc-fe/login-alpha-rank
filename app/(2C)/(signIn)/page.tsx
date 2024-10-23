@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import request from "@/lib/request";
-import { ArrowUpRight, Loader, LogIn } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
