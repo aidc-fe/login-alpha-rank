@@ -159,7 +159,7 @@ export default function Home() {
                 className="flex-1"
                 name="email"
                 required
-                placeholder="Jump to login from E-mail"
+                placeholder="Enter email address for Magic Link Authentication"
                 type="email"
                 value={jumpEmail}
                 onChange={(e) => {
