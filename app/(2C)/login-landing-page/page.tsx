@@ -28,6 +28,12 @@ function PageContent() {
       case "authenticated":
         if (jwtToken) {
           thirdPartySignIn(jwtToken, shopDomain).then(() => {
+            // 如果是在登录弹窗中，则关闭弹窗
+            if (window.opener) {
+              window.close();
+              return;
+            }
+
             let url;
             try {
               url = new URL(targetUrl || "");
