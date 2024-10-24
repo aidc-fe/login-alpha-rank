@@ -88,7 +88,7 @@ export default function Page() {
         >
           Send set instructions
         </Button>
-        <div className="w-1/2 border-b mx-auto" />
+        <div className="w-1/2 border-b mx-auto mt-4" />
         <div className="flex text-sm text-muted-foreground gap-1">
           <span>Back to</span>
           <Button

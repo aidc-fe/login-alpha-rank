@@ -170,8 +170,8 @@ export default function Home() {
                 <span>Sign in</span>
               </Button>
             </form>
-
-            <div className="w-full text-muted-foreground text-sm font-normal text-center">
+            <div className="w-1/2 border-b mx-auto mt-4" />
+            <div className="w-full text-muted-foreground text-sm font-normal text-center mt-4">
               By continuing with any of the options above, you agree to our{" "}
               <Button
                 onClick={() => {

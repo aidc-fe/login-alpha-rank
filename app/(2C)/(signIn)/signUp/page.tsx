@@ -79,7 +79,7 @@ export default function SignUpPage() {
           {loading && <Loader className="animate-spin" />}
           Sign up
         </Button>
-        <div className="w-1/2 border-b mx-auto" />
+        <div className="w-1/2 border-b mx-auto mt-4" />
         <div className="text-sm text-muted-foreground font-normal flex flex-col gap-3 items-center">
           <div className="text-center">
             By continuing with any of the options above, you agree to our{" "}
