@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import request from "@/lib/request";
-import { ArrowUpRight, Loader } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -13,6 +13,7 @@ export default function Home() {
   const { status } = useSession();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
+  const [emailLoading, setEmailLoading] = useState(false);
   const [email, setEmail] = useState(
     decodeURIComponent(searchParams.get("email") || "")
   );
@@ -32,7 +33,7 @@ export default function Home() {
 
   // 处理用户成功发送邮件后返回
   useEffect(() => {
-    setLoading(false);
+    setEmailLoading(false);
   }, []);
 
   switch (status) {
@@ -97,7 +98,7 @@ export default function Home() {
                     size={16}
                   />
                 </Button>
-                <div className="text-sm text-neutral-400">
+                <div className="text-sm text-muted-foreground">
                   Not a member?{" "}
                   <Button
                     className="p-0 h-auto"
@@ -106,7 +107,7 @@ export default function Home() {
                       router.push(`/signUp?email=${encodeURIComponent(email)}`);
                     }}
                     variant={"link"}
-                    disabled={loading}
+                    disabled={loading || emailLoading}
                   >
                     Sign up
                   </Button>
@@ -116,16 +117,16 @@ export default function Home() {
               <Button
                 variant={"default"}
                 type="submit"
-                disabled={loading}
+                loading={loading}
+                disabled={emailLoading}
               >
-                {loading && <Loader className="animate-spin" />}
                 Sign in
               </Button>
             </form>
 
             <div className="w-full flex items-center">
               <div className="bg-gradient-to-r from-transparent to-neutral-300 dark:to-neutral-700 my-4 h-[1px] w-full" />
-              <span className="py-4 px-8 text-neutral-400 text-sm">or</span>
+              <span className="py-4 px-8 text-input text-sm">or</span>
               <div className="bg-gradient-to-r from-neutral-300 dark:from-neutral-700 to-transparent my-4 h-[1px] w-full" />
             </div>
 
@@ -146,7 +147,7 @@ export default function Home() {
               className="flex py-4 gap-3"
               onSubmit={(e) => {
                 e.preventDefault();
-                setLoading(true);
+                setEmailLoading(true);
                 const formData = new FormData(e.target as HTMLFormElement);
                 const email = formData.get("email");
                 // email验证页面展示
@@ -158,36 +159,20 @@ export default function Home() {
                 className="flex-1"
                 name="email"
                 required
-                placeholder="Jump to login from E-mail"
+                placeholder="Enter email address for Magic Link Authentication"
                 type="email"
                 value={jumpEmail}
                 onChange={(e) => {
                   setJumpEmail(e.target.value);
                 }}
               />
-              <Button
-                type="submit"
-                disabled={loading}
-              >
-                {loading && <Loader className="animate-spin" />}
+              <Button type="submit" loading={emailLoading} disabled={loading}>
                 <span>Sign in</span>
               </Button>
             </form>
-
-            <div className="inline w-full italic text-neutral-400">
-              By signing in, you are agreeing to our{" "}
-              <Button
-                onClick={() => {
-                  window.open(
-                    "https://terms.alicdn.com/legal-agreement/terms/privacy_policy_full/20231109180939630/20231109180939630.html"
-                  );
-                }}
-                variant="link"
-                className="p-0 h-fit italic"
-              >
-                Privacy Policy
-              </Button>{" "}
-              and{" "}
+            <div className="w-1/2 border-b mx-auto mt-4" />
+            <div className="w-full text-muted-foreground text-sm font-normal text-center mt-4">
+              By continuing with any of the options above, you agree to our{" "}
               <Button
                 onClick={() => {
                   window.open(
@@ -195,10 +180,22 @@ export default function Home() {
                   );
                 }}
                 variant="link"
-                className="p-0 italic h-fit"
+                className="p-0 h-fit"
               >
-                Terms of Use
-              </Button>
+                Terms of Service
+              </Button>{" "}
+              and have read our{" "}
+              <Button
+                onClick={() => {
+                  window.open(
+                    "https://terms.alicdn.com/legal-agreement/terms/privacy_policy_full/20231109180939630/20231109180939630.html"
+                  );
+                }}
+                variant="link"
+                className="p-0 h-fit"
+              >
+                Privacy Policy
+              </Button>{" "}
               .
             </div>
           </div>
