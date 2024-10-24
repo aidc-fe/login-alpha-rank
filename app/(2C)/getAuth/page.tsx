@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { WEBSITE_DOMAIN } from "@/lib/url";
 
 export default function GetAuthPage() {
-  const { status } = useSession();
+  const { status, data } = useSession();
   const router = useRouter();
 
   // 如果不是在iframe中，禁止访问
@@ -18,8 +18,8 @@ export default function GetAuthPage() {
 
   useEffect(() => {
     // 向父页面发送 status
-    window.parent.postMessage({ status }, WEBSITE_DOMAIN);
-  }, [status]);
+    window.parent.postMessage({ status, userInfo: data?.user }, WEBSITE_DOMAIN);
+  }, [status, data]);
 
   useEffect(() => {
     if (window.top === window.self) {
@@ -47,36 +47,5 @@ export default function GetAuthPage() {
     };
   }, []);
 
-  return (
-    <div className="flex items-center flex-col gap-2">
-      {/* {status}
-      <div>{JSON.stringify(data?.user)}</div>
-      <button
-        onClick={() => {
-          signOut();
-        }}
-      >
-        Sign out
-      </button>
-      <button
-        onClick={() => {
-          // signIn("thirdParty", {
-          //   name: "shabi",
-          //   email: "text@163.com",
-          //   id: "123123",
-          //   callbackUrl: `/getAuth`,
-          // });
-          signIn("thirdParty", {
-            name: "xushi.zt@alibaba-inc.com",
-            email: "xushi.zt@alibaba-inc.com",
-            domain: "alpharank.myshoplaza.com",
-            from: "shoplazza",
-            callbackUrl: `/getAuth`,
-          });
-        }}
-      >
-        Sign In
-      </button> */}
-    </div>
-  );
+  return <div className="flex items-center flex-col gap-2"></div>;
 }
