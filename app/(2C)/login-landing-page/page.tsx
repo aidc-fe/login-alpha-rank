@@ -28,7 +28,7 @@ function PageContent() {
         if (jwtToken) {
           thirdPartySignIn(jwtToken, shopDomain).then(() => {
             // 如果是在登录弹窗中，则关闭弹窗
-            if (window.opener && window.opener !== window.self) {
+            if (window.opener && searchParams.get("isLoginPopup")) {
               window.close();
               return;
             }
