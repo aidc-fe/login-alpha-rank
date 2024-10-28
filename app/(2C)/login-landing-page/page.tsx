@@ -19,7 +19,6 @@ function PageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const targetUrl = searchParams.get("targetUrl");
-
   const shopDomain = searchParams.get("shopDomain");
   const jwtToken = session?.jwtToken;
 
@@ -29,7 +28,7 @@ function PageContent() {
         if (jwtToken) {
           thirdPartySignIn(jwtToken, shopDomain).then(() => {
             // 如果是在登录弹窗中，则关闭弹窗
-            if (window.opener) {
+            if (window.opener && window.opener !== window.self) {
               window.close();
               return;
             }
