@@ -272,7 +272,6 @@ export const createAuthorizationCode = async (data: {
       client_id: data.client_id,
       redirect_uri: data.redirect_uri,
       expires_at: expiresAt,
-      created_at: now,
       used: null, // 初始为空
     },
   });
@@ -333,7 +332,6 @@ export const createAccessToken = async (data: {
       data: {
         ...data,
         expires_at: expiresAt,
-        created_at: now,
       },
     });
 
@@ -378,7 +376,6 @@ export const createRefreshToken = async (data: {
         token: data.token,
         client_id: data.client_id,
         expires_at: expiresAt,
-        created_at: now,
       },
     });
 
