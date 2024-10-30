@@ -11,7 +11,7 @@
     "db:pull": "dotenv -e .env.development.local -- npx prisma db pull",
     "db:migrate.prod": "dotenv -e .env.production.local -- npx prisma migrate dev --name init",
     "db:generate": "dotenv -e .env.development.local -- npx prisma generate",
-    "db:generate:prod": "dotenv -e .env.production.local -- npx prisma generate"
+    "db:generate.prod": "dotenv -e .env.production.local -- npx prisma generate"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.4.1",
