@@ -12,8 +12,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main className="grid h-full items-center bg-circle-gradient px-4 md:grid-cols-2">
-      <LoginCarousel className="justify-center items-center hidden md:flex" />
+    <main className="grid h-full items-center md:grid-cols-2">
+      <div className="h-full bg-circle-gradient hidden justify-center md:flex">
+        <LoginCarousel className="justify-center items-center hidden md:flex" />
+      </div>
       {children}
     </main>
   );

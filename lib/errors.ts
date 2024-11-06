@@ -1,8 +1,50 @@
+class AppError extends Error {
+  statusCode: number;
+  isOperational: boolean;
+
+  constructor(message: string, statusCode = 500, isOperational = true) {
+    super(message);
+    this.statusCode = statusCode;
+    this.isOperational = isOperational;
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+
+// 客户端错误 4xx
+class ClientError extends AppError {
+  constructor(message: string, statusCode = 400) {
+    super(message, statusCode);
+  }
+}
+
+// 未授权错误 401
+class UnauthorizedError extends AppError {
+  constructor(message = "Unauthorized") {
+    super(message, 401);
+  }
+}
+
+// 资源未找到 404
+class NotFoundError extends AppError {
+  constructor(message = "Not Found") {
+    super(message, 404);
+  }
+}
+
+// 服务端错误 500
+class ServerError extends AppError {
+  constructor(message = "Internal Server Error") {
+    super(message, 500, false);
+  }
+}
+
+export { AppError, ClientError, UnauthorizedError, NotFoundError, ServerError };
+
 export const ERROR_CONFIG = {
   OAUTH: {},
   SIGNIN: {
     code: "SIGNIN_ERROR",
-    message: "错误的邮箱或密码",
+    message: "Incorrect email or password. Please try again.",
   },
   AUTH: {
     NEED_EMAIL: {
@@ -17,11 +59,11 @@ export const ERROR_CONFIG = {
       code: "AUTH_USER_NOT_EXIST",
       message: "User does not exist, please sign up.",
     },
-    SHOPLAZZA: {
-      HMAC: {
-        code: "SHOPLAZZA_HMAC",
-        message: "HMAC validation failed",
-      },
+  },
+  SHOPLAZZA: {
+    HMAC: {
+      code: "SHOPLAZZA_HMAC",
+      message: "Shoplazza Hmac validate error",
     },
   },
   PASSWORD: {

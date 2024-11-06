@@ -1,30 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "crypto";
-import { encodeJwt } from "./secret";
+import { decodeJwt, encodeJwt } from "./secret";
+import { ERROR_CONFIG } from "./errors";
 
-// 用用户信息生成 JWT，并存入 cookie
-export async function setSessionTokenCookie(
-  tokenPayload: {
-    [key: string]: string; // 根据需要定义具体的字段类型
-  },
-  response: NextResponse
-): Promise<NextResponse> {
-  // 生成 JWT
-  const sessionToken = await encodeJwt({
-    token: tokenPayload,
-    secret: process.env.NEXT_AUTH_SECRET!,
-  });
-
-  // 设置 cookie
-  response.cookies.set("next-auth.session-token", sessionToken, {
-    httpOnly: true, // 防止前端 JavaScript 访问
-    secure: true, // 确保 cookie 仅在 HTTPS 上发送
-    path: "/", // 在整个网站有效
-    sameSite: "none",
-  });
-
-  return response;
-}
+// 种植cookie的options
+export const CookieOpt = {
+  httpOnly: true, // 防止前端 JavaScript 访问
+  secure: true, // 确保 cookie 仅在 HTTPS 上发送
+  path: "/", // 在整个网站有效
+  sameSite: "none" as "none",
+};
 
 // 往所有端种登录态cookie
 export function thirdPartySignIn(jwt: string, shopDomain?: string | null) {
@@ -72,23 +57,97 @@ export function thirdPartySignOut() {
 }
 
 // shoplazza HMAC Validator Middleware
-export function hmacValidator(request: NextRequest): boolean {
-  const url = new URL(request.url);
-  const hmac = url.searchParams.get("hmac");
-  const queryParams = new URLSearchParams(url.searchParams);
-  queryParams.delete("hmac");
+export function shoplazzaHmacValidator(request: NextRequest): boolean {
+  try {
+    const url = new URL(request.url);
+    const hmac = url.searchParams.get("hmac");
+    const queryParams = new URLSearchParams(url.searchParams);
+    queryParams.delete("hmac");
 
-  const sortedKeys = Array.from(queryParams.keys()).sort();
-  const message = sortedKeys
-    .map((key) => `${key}=${queryParams.get(key)}`)
-    .join("&");
+    const sortedKeys = Array.from(queryParams.keys()).sort();
+    const message = sortedKeys
+      .map((key) => `${key}=${queryParams.get(key)}`)
+      .join("&");
 
-  const generatedHash = createHmac(
-    "sha256",
-    process.env.SHOPLAZZA_CLIENT_SECRET!
-  )
-    .update(message)
-    .digest("hex");
+    const generatedHash = createHmac(
+      "sha256",
+      process.env.SHOPLAZZA_CLIENT_SECRET!
+    )
+      .update(message)
+      .digest("hex");
 
-  return timingSafeEqual(Buffer.from(generatedHash), Buffer.from(hmac!));
+    const validate = timingSafeEqual(
+      Buffer.from(generatedHash),
+      Buffer.from(hmac!)
+    );
+
+    if (validate) {
+      return true;
+    } else {
+      throw new Error();
+    }
+  } catch {
+    throw ERROR_CONFIG.SHOPLAZZA.HMAC;
+  }
 }
+
+// 用用户信息生成 JWT，并存入 cookie
+export async function setSessionTokenCookie(
+  tokenPayload: {
+    [key: string]: string | Date | null; // 根据需要定义具体的字段类型
+  },
+  response: NextResponse,
+  request: NextRequest
+): Promise<NextResponse> {
+  // 生成 JWT
+  const sessionToken = await encodeJwt({
+    token: tokenPayload,
+    secret: process.env.NEXT_AUTH_SECRET!,
+  });
+
+  // 如果当前已经有登录态，并且登录的用户不是当前准备登录的用户，则先进行登出
+  // if (request.cookies.get("next-auth.session-token")) {
+  //   const userInfo = await decodeJwt({
+  //     token: request.cookies.get("next-auth.session-token")?.value as string,
+  //     secret: process.env.NEXT_AUTH_SECRET!,
+  //   });
+
+  //   if (userInfo?.email !== tokenPayload.email) {
+  //   }
+  // }
+
+  // 设置 cookie
+  response.cookies.set("next-auth.session-token", sessionToken, CookieOpt);
+
+  return response;
+}
+
+// shoplazza的scope
+export const SHOPLAZZA_SCOPES = [
+  "read_product write_product",
+  "read_collection",
+  "write_collection",
+  "read_script_tags",
+  "write_script_tags",
+  "read_app_proxy",
+  "write_app_proxy",
+  "read_data",
+  "write_data",
+  "read_shop",
+  "read_comments",
+  "write_comments",
+  "read_shop_navigation",
+  "write_shop_navigation",
+  "read_search_api",
+  "write_search_api",
+  "read_themes",
+  "unauthenticated_read_checkouts",
+  "unauthenticated_write_checkouts",
+  "unauthenticated_read_customers",
+  "unauthenticated_write_customers",
+  "unauthenticated_read_customer_tags",
+  "unauthenticated_read_content",
+  "unauthenticated_read_product_listings",
+  "unauthenticated_read_product_tags",
+  "unauthenticated_read_selling_plans",
+];

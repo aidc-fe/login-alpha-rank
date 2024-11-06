@@ -5,20 +5,35 @@ import {
   generateClientSecret,
   hashToken,
 } from "./secret";
-import { ERROR_CONFIG } from "@/constants/errors";
+import { ERROR_CONFIG } from "@/lib/errors";
 
 export const prisma = new PrismaClient();
 
-// 用户是否已经存在
-export const getUserByEmail = async (email: string) => {
+// 查询用户信息
+export const getUser = async (search: { email?: string; id?: string }) => {
+  // Validate input: ensure either email or id is provided
+  if (!search.email && !search.id) {
+    throw new Error(
+      "You must provide either an email or id to search for a user."
+    );
+  }
+
   try {
-    // 查找用户
+    // Find user by either email or id
     const user = await prisma.user.findFirst({
-      where: { email },
+      where: {
+        OR: [
+          { email: search.email ?? undefined }, // Only include if email is defined
+          { id: search.id ?? undefined }, // Only include if id is defined
+        ],
+      },
     });
+
+    // Return user if found, otherwise return null
     return user;
   } catch (error) {
-    throw error;
+    console.error("Error fetching user:", error);
+    throw new Error("Failed to fetch user. Please try again later.");
   }
 };
 
@@ -34,13 +49,36 @@ export const createOrUpdateUser = async (data: {
   try {
     const user = await prisma.user.upsert({
       where: { email: data.email }, // 依据 email 作为唯一字段进行查询
-      update: data,
       create: data,
+      update: {
+        name: data.name,
+        emailVerified: data.emailVerified,
+        image: data.image,
+        password: data.password,
+      },
     });
 
     return user;
   } catch (error) {
     console.error("Error creating or updating user:", error);
+    throw error;
+  }
+};
+
+// 通过邮箱查找用户，更新用户信息
+export const updateUserByEmail = async (
+  email: string,
+  data: { password?: string }
+) => {
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { email },
+      data,
+    });
+
+    return updatedUser;
+  } catch (error) {
+    console.error("Error updated user:", error);
     throw error;
   }
 };
@@ -80,22 +118,21 @@ export const createOrUpdateAccount = async (data: {
   }
 };
 
-// 通过邮箱查找用户，更新用户信息
-export const updateUserByEmail = async (
-  email: string,
-  data: { password?: string }
+//  查询指定用户的特定provide的account的数据
+export const getAccountsByUserIdAndProviders = async (
+  userId: string,
+  providers: string[]
 ) => {
-  try {
-    const updatedUser = await prisma.user.update({
-      where: { email },
-      data,
-    });
+  const accounts = await prisma.account.findMany({
+    where: {
+      userId: userId,
+      provider: {
+        in: providers, // provider 值在传入的数组中
+      },
+    },
+  });
 
-    return updatedUser;
-  } catch (error) {
-    console.error("Error updated user:", error);
-    throw error;
-  }
+  return accounts;
 };
 
 // 发送邮件前存入一条verificationToken
@@ -104,7 +141,7 @@ export const createVerificationToken = async (info: {
   name?: string;
   password?: string;
   targetUrl?: string;
-  type: "signUp" | "signIn" | "passwordReset";
+  type: "signUp" | "signIn" | "passwordSet";
 }) => {
   try {
     // 查找用户
@@ -161,7 +198,6 @@ export const validateMagicLink = async (token?: string) => {
 
     return updatedToken; // 返回更新后的数据
   } catch (error) {
-    console.log(error);
     throw error; // 抛出异常信息
   }
 };
@@ -224,23 +260,22 @@ export const updateClient = async (data: {
 };
 
 // 根据client_id查询client信息
-export const findClientByClientId = async (clientId: string) => {
-  try {
-    const client = await prisma.client.findUnique({
-      where: {
-        client_id: clientId,
-      },
-    });
+export const findClientByClientId = async (client_id: string) => {
+  const client = await prisma.client.findUnique({
+    where: {
+      client_id,
+    },
+  });
 
-    if (!client) {
-      throw new Error(`Client with client_id: ${clientId} not found`);
-    }
-
-    return client;
-  } catch (error) {
-    console.error("Error finding client by client_id:", error);
-    throw error;
+  if (!client) {
+    throw new Error(`Client with client_id: ${client_id} not found`);
   }
+
+  return {
+    ...client,
+    redirect_uris: client.redirect_uris?.split(","),
+    scope: client.scope?.split(","),
+  };
 };
 
 // 创建一条AuthorizationCode数据
@@ -249,28 +284,22 @@ export const createAuthorizationCode = async (data: {
   client_id: string;
   redirect_uri: string;
 }) => {
-  try {
-    // 计算 10 分钟后的时间作为 expires_at
-    const now = new Date();
-    const expiresAt = new Date(now.getTime() + 10 * 60 * 1000); // 当前时间加10分钟
+  // 计算 10 分钟后的时间作为 expires_at
+  const now = new Date();
+  const expiresAt = new Date(now.getTime() + 10 * 60 * 1000); // 当前时间加10分钟
 
-    // 创建新的 AuthorizationCode 记录
-    const authorizationCode = await prisma.authorizationCode.create({
-      data: {
-        code: data.code,
-        client_id: data.client_id,
-        redirect_uri: data.redirect_uri,
-        expires_at: expiresAt,
-        created_at: now,
-        used: null, // 初始为空
-      },
-    });
+  // 创建新的 AuthorizationCode 记录
+  const authorizationCode = await prisma.authorizationCode.create({
+    data: {
+      code: data.code,
+      client_id: data.client_id,
+      redirect_uri: data.redirect_uri,
+      expires_at: expiresAt,
+      used: null, // 初始为空
+    },
+  });
 
-    return authorizationCode;
-  } catch (error) {
-    console.error("Error creating authorization code:", error);
-    throw error;
-  }
+  return authorizationCode;
 };
 
 // 根据code查找code信息，并将code置为已经使用
@@ -308,7 +337,6 @@ export const findAndUseAuthorizationCode = async (code: string) => {
 
     return updatedAuthorizationCode;
   } catch (error) {
-    console.error("Error finding or using authorization code:", error);
     throw error;
   }
 };
@@ -325,11 +353,8 @@ export const createAccessToken = async (data: {
 
     const accessToken = await prisma.accessToken.create({
       data: {
-        token: data.token,
-        client_id: data.client_id,
-        refresh_token: data.refresh_token,
+        ...data,
         expires_at: expiresAt,
-        created_at: now,
       },
     });
 
@@ -356,7 +381,6 @@ export const findAccessToken = async (token: string) => {
 
     return accessToken;
   } catch (error) {
-    console.error("Error finding access token:", error);
     throw error;
   }
 };
@@ -375,7 +399,6 @@ export const createRefreshToken = async (data: {
         token: data.token,
         client_id: data.client_id,
         expires_at: expiresAt,
-        created_at: now,
       },
     });
 

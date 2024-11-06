@@ -10,11 +10,13 @@ datasource db {
 model User {
   id            String    @id @default(cuid())
   name          String?
-  email         String?   @unique
+  email         String   @unique
   emailVerified DateTime?
   image         String?
   from          String?
   password      String?
+  created_at DateTime @default(now())
+
   accounts      Account[]
   sessions      Session[]
   Client        Client[]
@@ -33,9 +35,9 @@ model Account {
   scope             String?
   id_token          String?
   session_state     String?
-  shop              String?
-  shopDisplayName   String?
-  userName          String?
+  shop_domain              String?
+  shop_domain_display   String?
+  user_name          String?
   user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])

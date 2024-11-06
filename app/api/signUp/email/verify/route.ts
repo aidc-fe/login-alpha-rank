@@ -12,17 +12,15 @@ export async function GET(request: NextRequest) {
       email: info.identifier,
       name: info.name!,
     };
-    await createOrUpdateUser(userInfo);
+    const user = await createOrUpdateUser(userInfo);
 
-    console.log(info);
     const response = NextResponse.redirect(
       `${process.env.NEXT_AUTH_URL}/login-landing-page?targetUrl=${info.targetUrl}`,
       {
         status: 302,
       }
     );
-
-    await setSessionTokenCookie(userInfo, response);
+    await setSessionTokenCookie({ ...user, sub: user.id }, response, request);
 
     return response;
   } catch {

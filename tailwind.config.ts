@@ -20,24 +20,36 @@ const config = {
     extend: {
       colors: {
         border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
+        input: {
+          DEFAULT: "hsl(var(--input))",
+          "disabled-background": "hsl(var(--input-disabled-background))",
+          "disabled-foreground": "hsl(var(--input-disabled-foreground))",
+        },
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         primary: {
           DEFAULT: "hsl(var(--primary))",
+          hover: "hsl(var(--primary-hover))",
+          disabled: "hsl(var(--primary-disabled))",
+          light: "hsl(var(--primary-light))",
           foreground: "hsl(var(--primary-foreground))",
         },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
+          hover: "hsl(var(--secondary-hover))",
           foreground: "hsl(var(--secondary-foreground))",
         },
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
+          hover: "hsl(var(--destructive-hover))",
+          disabled: "hsl(var(--destructive-disabled))",
+          light: "hsl(var(--destructive-light))",
           foreground: "hsl(var(--destructive-foreground))",
         },
         constructive: {
           DEFAULT: "hsl(var(--constructive))",
+          light: "hsl(var(--constructive-light))",
           foreground: "hsl(var(--constructive-foreground))",
         },
         muted: {
@@ -55,7 +67,7 @@ const config = {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
-        },
+        }
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -64,7 +76,7 @@ const config = {
       },
       backgroundImage: {
         "circle-gradient":
-          "radial-gradient(circle at 30% 20%, rgba(153, 102, 255, 0.3), transparent 40%), radial-gradient(circle at 70% 80%, rgba(102, 178, 255, 0.3), transparent 60%), linear-gradient(to bottom, rgba(153, 102, 255, 0.1), transparent, rgba(102, 178, 255, 0.1))",
+          "radial-gradient(circle at 30% 20%, rgba(153, 102, 255, 0.15), transparent 40%), radial-gradient(circle at 70% 80%, rgba(102, 178, 255, 0.2), transparent 55%), linear-gradient(to bottom, rgba(153, 102, 255, 0.1), transparent, rgba(102, 178, 255, 0.1))",
       },
       keyframes: {
         "accordion-down": {

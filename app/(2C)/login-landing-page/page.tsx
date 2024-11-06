@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import SuspenseWrapper from "@/components/suspend-wrapper";
 import { Loader } from "lucide-react";
 import { thirdPartySignIn } from "@/lib/auth";
+import { APP_DOMAIN } from "@/lib/url";
 
 declare module "next-auth" {
   interface Session {
@@ -18,7 +19,6 @@ function PageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const targetUrl = searchParams.get("targetUrl");
-
   const shopDomain = searchParams.get("shopDomain");
   const jwtToken = session?.jwtToken;
 
@@ -27,6 +27,12 @@ function PageContent() {
       case "authenticated":
         if (jwtToken) {
           thirdPartySignIn(jwtToken, shopDomain).then(() => {
+            // 如果是在登录弹窗中，则关闭弹窗
+            if (window.opener && window.name === "loginWindow") {
+              window.close();
+              return;
+            }
+
             let url;
             try {
               url = new URL(targetUrl || "");
@@ -40,8 +46,7 @@ function PageContent() {
             ) {
               window.location.href = targetUrl;
             } else {
-              window.location.href =
-                process.env.NEXT_PUBLIC_DEFAULT_TARGET_URL!;
+              window.location.href = APP_DOMAIN;
             }
           });
         } else {

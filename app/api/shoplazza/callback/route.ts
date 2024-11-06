@@ -1,102 +1,148 @@
-import { ERROR_CONFIG } from "@/constants/errors";
 import { setSessionTokenCookie } from "@/lib/auth";
 import { createOrUpdateAccount, createOrUpdateUser } from "@/lib/database";
+import { decryptState } from "@/lib/secret";
+import { APP_DOMAIN } from "@/lib/url";
 import { NextRequest, NextResponse } from "next/server";
 import fetch from "node-fetch";
+
+type AuthDataType = {
+  access_token: string;
+  refresh_token: string;
+  expires_at: number;
+  token_type: string;
+};
+
+type RawShopDataType = {
+  shop: {
+    account: string;
+    name: string;
+    email: string;
+    id: number;
+    domain: string;
+    system_domain: string;
+  };
+};
+
+// 辅助函数：获取Shoplazza的accessToken
+async function getShoplazzaAccessToken(
+  shop: string,
+  code: string
+): Promise<AuthDataType> {
+  const response = await fetch(`https://${shop}/admin/oauth/token`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      client_id: process.env.SHOPLAZZA_CLIENT_ID,
+      client_secret: process.env.SHOPLAZZA_CLIENT_SECRET,
+      code,
+      grant_type: "authorization_code",
+      redirect_uri: `${process.env.NEXT_PUBLIC_NEXT_AUTH_URL}/api/shoplazza/callback`,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch access token from Shoplazza");
+  }
+
+  return (await response.json()) as AuthDataType;
+}
+
+// 辅助函数：获取店铺信息
+async function getShopInfo(
+  shop: string,
+  accessToken: string
+): Promise<RawShopDataType> {
+  const response = await fetch(`https://${shop}/openapi/2022-01/shop`, {
+    headers: {
+      accept: "application/json",
+      "access-token": accessToken,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch shop information");
+  }
+
+  return (await response.json()) as RawShopDataType;
+}
 
 export async function GET(request: NextRequest) {
   try {
     const code = request.nextUrl.searchParams.get("code");
-    // todo:用这个做一下对称加密
-    const state = request.nextUrl.searchParams.get("state");
+    const state = request.nextUrl.searchParams.get("state") || "";
     const shop = request.nextUrl.searchParams.get("shop");
 
-    const hmac = request.nextUrl.searchParams.get("hmac");
-
-    const authResponse = await fetch(`https://${shop}/admin/oauth/token`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        client_id: process.env.SHOPLAZZA_CLIENT_ID,
-        client_secret: process.env.SHOPLAZZA_CLIENT_SECRET,
-        code,
-        grant_type: "authorization_code",
-        redirect_uri: `${process.env.NEXT_PUBLIC_NEXT_AUTH_URL}/api/shoplazza/callback`,
-      }),
-    });
-
-    const authData = (await authResponse.json()) as {
-      access_token: string;
-      refresh_token: string;
-      expires_at: number;
-      token_type: string;
-    };
-    console.log("Auth Response:", authData);
-
-    if (authResponse.ok) {
-      // Successful response, handle accordingly
-
-      // 获取店铺信息
-      const shopRsp = await fetch(`https://${shop}/openapi/2022-01/shop`, {
-        headers: {
-          accept: "application/json",
-          "access-token": authData.access_token,
-        },
-      });
-      const shopData = (await shopRsp.json()) as {
-        shop: {
-          account: string;
-          name: string;
-          email: string;
-          id: number;
-          domain: string;
-          system_domain: string;
-        };
-      };
-      const shopInfo = shopData?.shop;
-
-      // 提取用户信息
-      const userInfo = { name: shopInfo.account, email: shopInfo.email };
-      // 提取oAuth账号信息
-      const accountInfo = {
-        provider: "shoplazza",
-        providerAccountId: String(shopInfo.id),
-        refresh_token: authData.refresh_token,
-        access_token: authData.access_token,
-        expires_at: authData.expires_at,
-        token_type: authData.token_type,
-        shop: shopInfo.system_domain,
-        domain: shopInfo.domain,
-        userName: shopInfo.name,
-      };
-      // // 创建或更新用户信息
-      const user = await createOrUpdateUser({ ...userInfo, from: "shoplazza" });
-      // // 创建或更新oAuth账号信息
-      // const account = await createOrUpdateAccount({
-      //   ...accountInfo,
-      //   userId: user.id,
-      // });
-
-      const response = NextResponse.redirect(
-        `${process.env.DEFAULT_TARGET_URL}/web/api/auth/callback/login?userId=${user.id}&systemDomain=${shopInfo.system_domain}`,
-        302
-      );
-      setSessionTokenCookie(userInfo, response);
-
-      // 302到alpharank提供的接口
-      return response;
-    } else {
-      // Handle error response
-      console.error("Error during authentication:", authData);
+    if (!code) {
       return NextResponse.json(
-        { error: "Authentication failed", details: authData },
+        { message: "Missing or invalid 'code' parameter" },
         { status: 400 }
       );
     }
-  } catch (error) {
-    console.error("Request failed:", error);
-    return NextResponse.json(ERROR_CONFIG.SERVER.ERROR_500);
+
+    if (!shop) {
+      return NextResponse.json(
+        { message: "Missing or invalid 'shop' parameter" },
+        { status: 400 }
+      );
+    }
+
+    // 对称加密校验
+    const stateData = decryptState(state);
+    if (shop !== stateData?.shop) {
+      return NextResponse.json(
+        { message: "State validation failed" },
+        { status: 400 }
+      );
+    }
+
+    // 获取Shoplazza的accessToken
+    const authData = await getShoplazzaAccessToken(shop, code);
+
+    // 获取店铺信息
+    const shopData = await getShopInfo(shop, authData.access_token);
+    const shopInfo = shopData?.shop;
+
+    if (!shopInfo) {
+      return NextResponse.json(
+        { message: "Failed to retrieve shop information" },
+        { status: 500 }
+      );
+    }
+
+    // 提取用户信息和oAuth账号信息
+    const userInfo = { name: shopInfo.account, email: shopInfo.email };
+    const accountInfo = {
+      provider: "shoplazza",
+      providerAccountId: String(shopInfo.id),
+      refresh_token: authData.refresh_token,
+      access_token: authData.access_token,
+      expires_at: authData.expires_at,
+      token_type: authData.token_type,
+      shop_domain: shopInfo.system_domain,
+      shop_domain_display: shopInfo.domain,
+      user_name: shopInfo.name,
+    };
+
+    // 创建或更新用户信息和oAuth账号信息
+    const user = await createOrUpdateUser({ ...userInfo, from: "shoplazza" });
+    await createOrUpdateAccount({
+      ...accountInfo,
+      userId: user.id,
+    });
+
+    // 302 重定向到目标URL，并设置Cookie
+    const redirectUrl = `${APP_DOMAIN}/web/api/auth/callback/login?userId=${user.id}&systemDomain=${shopInfo.system_domain}`;
+    const response = NextResponse.redirect(redirectUrl, 302);
+    setSessionTokenCookie(userInfo, response, request);
+
+    return response;
+  } catch (error: any) {
+    console.error("Error during Shoplazza authentication:", error.message);
+    return NextResponse.json(
+      { message: error.message || "Authentication failed" },
+      { status: 401 }
+    );
   }
 }
