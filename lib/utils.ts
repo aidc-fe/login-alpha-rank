@@ -1,4 +1,5 @@
 import { type ClassValue, clsx } from "clsx";
+import { toastApi } from "@/components/ui/toaster";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
@@ -10,4 +11,13 @@ export function isGmail(email: string) {
   // 使用正则表达式检查是否为 Gmail 地址
   const gmailPattern = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
   return gmailPattern.test(email);
+}
+
+export async function copyToClipboard(text: string) {
+  try {
+    await navigator.clipboard.writeText(text);
+    toastApi.success("Copied to clipboard");
+  } catch (error) {
+    toastApi.error("Failed to copy to clipboard");
+  }
 }
