@@ -10,10 +10,10 @@ export interface Loader {
 
 const Loader: React.FC<Loader> = ({ className, loading, children }) => {
   return (
-    <div className={cn("flex items-center justify-center")}>
+    <div className="w-full h-full relative">
       {loading && (
-        <div className={cn("", className)}>
-          <LoaderCircle className="animate-spin" size={18} />
+        <div className={cn("absolute inset-0 flex justify-center pt-32 bg-background/50 z-10", className)}>
+          <LoaderCircle className="animate-spin text-primary" size={30} />
         </div>
       )}
       {children}

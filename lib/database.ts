@@ -233,26 +233,72 @@ export async function createClient(data: {
     },
   });
 
-  return newClient;
+  return {
+    ...newClient,
+    redirect_uris: newClient.redirect_uris?.split(",") ?? [],
+    scope: newClient.scope?.split(",") ?? [],
+  };
+}
+
+// 获取所有client数据
+export const getClients = async ({
+  email,
+  skip,
+  itemsPerPage
+}: {
+  email?: string;
+  skip: number;
+  itemsPerPage: number;
+}) => {
+  const where = email ? { owner_email: { contains: email } } : {};
+  const clients = await prisma.client.findMany({
+    where,
+    skip,
+    take: itemsPerPage,
+  });
+
+  const totalClients = await prisma.client.count({
+    where,
+  });
+
+  return { clients, totalClients };
 }
 
 // 修改一条client数据
-export const updateClient = async (data: {
+export const updateClient = async ({
+  client_id,
+  ...data
+}: {
   client_id: string;
-  redirect_uris: string[]; // 数组
-  scope: string[]; // 数组
-  name: string;
-  description: string;
-  signout_uri: string;
+  redirect_uris?: string[]; // 数组
+  scope?: string[]; // 数组
+  name?: string;
+  description?: string;
+  signout_uri?: string;
 }) => {
   try {
+    const editData = Object.entries(data).reduce((acc, [key, value]) => {
+      if (value !== null && value !== undefined) {
+        acc[key] = !["redirect_uris", "scope"].includes(key)
+          ? value
+          : [value as string[]].join(",");
+      }
+      return acc;
+    }, {} as Record<string, any>);
+
     const updatedClient = await prisma.client.update({
       where: {
-        client_id: data.client_id,
+        client_id: client_id,
       },
-      data,
+      data: {
+        ...editData,
+      },
     });
-    return updatedClient;
+    return {
+      ...updatedClient,
+      redirect_uris: updatedClient.redirect_uris?.split(",") ?? [],
+      scope: updatedClient.scope?.split(",") ?? [],
+    };
   } catch (error) {
     console.error("Error updating client:", error);
     throw error;

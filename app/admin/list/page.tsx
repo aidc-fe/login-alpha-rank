@@ -8,100 +8,89 @@ import {
   TableRow,
   TableCell,
 } from "@/components/ui/table";
-import { randomBytes } from "crypto";
-import { Plus } from "lucide-react";
 import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination";
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useRequest } from "ahooks";
+import { useRequest, useUpdateEffect } from "ahooks";
 import request from "@/lib/request";
-
-const clientId = randomBytes(16).toString("hex");
-const clientSecret = randomBytes(32).toString("hex");
-
-type Item = {
-  id: string;
-  client_id: string;
-  client_secret: string;
-  redirect_uris: string[];
-  grant_types: string[];
-  scope: string[];
-  created_at: number;
-  updated_at: number;
-  active: boolean;
-  default: boolean;
-  name: string;
-  description?: string;
-};
-const list: Item[] = [
-  {
-    id: "1",
-    client_id: clientId,
-    client_secret: clientSecret,
-    redirect_uris: [],
-    grant_types: ["authorization_code"],
-    scope: ["email", "openid"],
-    created_at: Date.now(),
-    updated_at: Date.now(),
-    active: true,
-    default: true,
-    name: "name",
-    description: "description",
-  },
-  {
-    id: "2",
-    client_id: clientId,
-    client_secret: clientSecret,
-    redirect_uris: [],
-    grant_types: ["authorization_code"],
-    scope: ["profile", "shopify", "shoplazza"],
-    created_at: Date.now(),
-    updated_at: Date.now(),
-    active: true,
-    default: false,
-    name: "name",
-    description: "description",
-  },
-];
+import Loader from "@/components/ui/loader";
+import { ClientDataType } from "@/lib/admin";
 
 function getList(
   current: number,
   pageSize: number
 ): Promise<{
-  list: Item[];
+  list: ClientDataType[];
   current: number;
   pageSize: number;
   totals: number;
 }> {
-  return request(`/api/client?current=${current}&pageSize=${pageSize}`, {
-    method: "GET",
-  });
+  return request(`/api/client?current=${current}&pageSize=${pageSize}`);
 }
 
 export default function List() {
   const router = useRouter();
-  const [page, setPage] = useState({ current: 1, pageSize: 10, total: 0 });
-  const { data, loading, run, refresh } = useRequest(
-    (current: number, pageSize: number) => getList(current, pageSize).then((res) => {
-        setPage({
-          current: res.current,
-          pageSize: res.pageSize,
-          total: res.totals
-        });
+  const [open, setOpen] = useState(false);
+  const [currentData, setCurrentData] = useState({
+    client_id: "",
+    active: true,
+  });
+  const [switchLoading, setLoading] = useState(false);
+  const { data, loading, run, refresh, mutate } = useRequest(
+    (current: number = 1, pageSize: number = 100) =>
+      getList(current, pageSize).then((res) => {
         return res.list;
-    }),
+      }),
     {}
   );
+
+  const handleConfirm = ({
+    client_id,
+    active,
+  }: {
+    client_id?: string;
+    active?: boolean;
+  } = currentData) => {
+    setLoading(true);
+
+    request(`/api/client/${client_id}`, {
+      method: "POST",
+      body: JSON.stringify({
+        active,
+      }),
+    })
+      .then((res) => {
+        setOpen(false);
+        setCurrentData({
+          client_id: "",
+          active: true,
+        });
+        mutate((old) =>
+          old?.map((i) => {
+            if (i.client_id === client_id) {
+              return {
+                ...i,
+                active,
+              };
+            }
+            return i;
+          })
+        );
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
 
   return (
     <div className="w-full flex-auto max-w-7xl m-auto flex flex-col gap-6">
@@ -122,64 +111,81 @@ export default function List() {
       </div>
 
       <div className="flex-auto min-h-0 relative">
-        <Table>
-          <TableHeader>
-            <TableRow className="bg-slate-200 hover:!bg-slate-200">
-              <TableHead className="w-28">Name</TableHead>
-              <TableHead>Client Id</TableHead>
-              <TableHead>Activate</TableHead>
-              <TableHead className="w-40">Action</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {(data || []).map((item, index) => (
-              <TableRow key={index}>
-                <TableCell>{item.name}</TableCell>
-                <TableCell>{item.client_id}</TableCell>
-                <TableCell>
-                  <Switch checked={item.active} />
-                </TableCell>
-                <TableCell>
-                  <Button
-                    variant={"ghost"}
-                    size={"default"}
-                    type="button"
-                    className="p-1 text-primary hover:text-primary/90"
-                    onClick={() => {
-                      router.push(`/admin/list/update?clientId=${item.id}`);
-                    }}
-                  >
-                    Edit
-                  </Button>
-                </TableCell>
+        <Loader className="top-12" loading={loading}>
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-slate-200 hover:!bg-slate-200">
+                <TableHead className="w-40">Name</TableHead>
+                <TableHead>Client Id</TableHead>
+                <TableHead>Activate</TableHead>
+                <TableHead className="w-40">Action</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {(data || []).map((item, index) => (
+                <TableRow key={index}>
+                  <TableCell>{item.name}</TableCell>
+                  <TableCell>{item.client_id}</TableCell>
+                  <TableCell>
+                    <Switch
+                      checked={item.active}
+                      loading={item.client_id === currentData.client_id}
+                      onCheckedChange={(checked) => {
+                        setCurrentData({
+                          client_id: item.client_id!,
+                          active: checked,
+                        });
+                        if (checked) {
+                          handleConfirm({
+                            client_id: item.client_id!,
+                            active: checked,
+                          });
+                        } else {
+                          setOpen(true);
+                        }
+                      }}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant={"ghost"}
+                      size={"default"}
+                      type="button"
+                      className="p-1 text-primary hover:text-primary/90"
+                      onClick={() => {
+                        router.push(
+                          `/admin/list/update?clientId=${item.client_id}`
+                        );
+                      }}
+                    >
+                      Edit
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Loader>
       </div>
-
-      <Pagination className="justify-end">
-        <PaginationContent>
-          <PaginationItem>
-            <PaginationPrevious href="#" />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink href="#">1</PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink href="#">2</PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationLink href="#">3</PaginationLink>
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationEllipsis />
-          </PaginationItem>
-          <PaginationItem>
-            <PaginationNext href="#" />
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
+      <Dialog open={open}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Deactivate Client</DialogTitle>
+          </DialogHeader>
+          <DialogDescription>
+            This client will be deactivate immediately. Once deactivate, it can
+            no longer be used to make oAuth Login.
+          </DialogDescription>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button loading={switchLoading} onClick={() => handleConfirm()}>
+              Continue
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
