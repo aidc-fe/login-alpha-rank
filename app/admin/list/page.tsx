@@ -16,7 +16,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Plus } from "lucide-react";
+import { Copy, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
@@ -25,6 +25,8 @@ import { useRequest, useUpdateEffect } from "ahooks";
 import request from "@/lib/request";
 import Loader from "@/components/ui/loader";
 import { ClientDataType } from "@/lib/admin";
+import { copyToClipboard } from "@/lib/utils";
+import Link from "next/link";
 
 function getList(
   current: number,
@@ -123,9 +125,21 @@ export default function List() {
             </TableHeader>
             <TableBody>
               {(data || []).map((item, index) => (
-                <TableRow key={index}>
+                <TableRow className="h-14" key={item.client_id}>
                   <TableCell>{item.name}</TableCell>
-                  <TableCell>{item.client_id}</TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-1">
+                      <span>{item.client_id}</span>
+                      <Button
+                        className="p-0 h-auto ml-1"
+                        variant="ghost"
+                        icon={
+                          <Copy className="text-muted-foreground" size={14} />
+                        }
+                        onClick={() => copyToClipboard(item.client_id ?? "")}
+                      />
+                    </div>
+                  </TableCell>
                   <TableCell>
                     <Switch
                       checked={item.active}
@@ -147,19 +161,12 @@ export default function List() {
                     />
                   </TableCell>
                   <TableCell>
-                    <Button
-                      variant={"ghost"}
-                      size={"default"}
-                      type="button"
+                    <Link
                       className="p-1 text-primary hover:text-primary/90"
-                      onClick={() => {
-                        router.push(
-                          `/admin/list/update?clientId=${item.client_id}`
-                        );
-                      }}
+                      href={`/admin/list/update?clientId=${item.client_id}`}
                     >
                       Edit
-                    </Button>
+                    </Link>
                   </TableCell>
                 </TableRow>
               ))}

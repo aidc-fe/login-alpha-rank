@@ -282,10 +282,10 @@ export default function EditClient({
                     <div className="text-base text-foreground flex items-center">
                       Client Id
                     </div>
-                    <div className="text-sm text-muted-foreground break-all">
-                      <span>{details?.client_id}</span>
+                    <div className="text-sm leading-none text-muted-foreground break-all">
+                      <span className="leading-5">{details?.client_id}</span>
                       <Button
-                        className="p-0 h-auto ml-1"
+                        className="p-0 w-5 h-5 ml-1"
                         variant="ghost"
                         icon={
                           <Copy className="text-muted-foreground" size={14} />
@@ -298,10 +298,10 @@ export default function EditClient({
                     <div className="text-base text-foreground flex items-center">
                       Client Secret
                     </div>
-                    <div className="text-sm text-muted-foreground break-all">
-                      <span>{details?.client_secret}</span>
+                    <div className="text-sm leading-none text-muted-foreground break-all">
+                      <span className="leading-5">{details?.client_secret}</span>
                       <Button
-                        className="p-0 h-auto ml-1"
+                        className="p-0 w-5 h-5 ml-1"
                         variant="ghost"
                         icon={
                           <Copy className="text-muted-foreground" size={14} />
