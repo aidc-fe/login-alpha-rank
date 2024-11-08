@@ -25,8 +25,8 @@ import { useRequest, useUpdateEffect } from "ahooks";
 import request from "@/lib/request";
 import Loader from "@/components/ui/loader";
 import { ClientDataType } from "@/lib/admin";
-import { copyToClipboard } from "@/lib/utils";
 import Link from "next/link";
+import CopyButton from "@/components/CopyButton";
 
 function getList(
   current: number,
@@ -130,14 +130,7 @@ export default function List() {
                   <TableCell>
                     <div className="flex items-center gap-1">
                       <span>{item.client_id}</span>
-                      <Button
-                        className="p-0 h-auto ml-1"
-                        variant="ghost"
-                        icon={
-                          <Copy className="text-muted-foreground" size={14} />
-                        }
-                        onClick={() => copyToClipboard(item.client_id ?? "")}
-                      />
+                      <CopyButton textToCopy={item.client_id} />
                     </div>
                   </TableCell>
                   <TableCell>
