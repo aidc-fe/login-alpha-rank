@@ -34,7 +34,8 @@ export default function EditClient({
   params: { operationType: OPERATION_TYPE };
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
-  const [canEdit, setCanEdit] = useState(false);
+  const operationType = params.operationType;
+  const [canEdit, setCanEdit] = useState([OPERATION_TYPE.CREATE, OPERATION_TYPE.EDIT].includes(operationType));
   const clientId = searchParams.clientId as string;
   const [loading, setLoading] = useState(false);
   const [detailLoading, setDetailLoading] = useState(!!clientId);
@@ -297,7 +298,17 @@ export default function EditClient({
                 </div>
                 {canEdit ? (
                   <div className="px-6 flex mt-8 w-full justify-center xl:justify-end gap-3">
-                    <Button variant="outline" type="button" onClick={() => setCanEdit(false)}>Cancel</Button>
+                    {pageTitle !== OPERATION_TYPE.CREATE ? (
+                      <Button
+                        variant="outline"
+                        type="button"
+                        onClick={() => {
+                          setCanEdit(false);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    ) : null}
                     <Button variant={"default"} type="submit" loading={loading}>
                       {`${upperFirst(pageTitle)}`}
                     </Button>
