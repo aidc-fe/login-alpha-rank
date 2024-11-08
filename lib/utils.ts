@@ -12,12 +12,3 @@ export function isGmail(email: string) {
   const gmailPattern = /^[a-zA-Z0-9._%+-]+@gmail\.com$/i;
   return gmailPattern.test(email);
 }
-
-export async function copyToClipboard(text: string) {
-  try {
-    await navigator.clipboard.writeText(text);
-    toastApi.success("Copied to clipboard");
-  } catch (error) {
-    toastApi.error("Failed to copy to clipboard");
-  }
-}

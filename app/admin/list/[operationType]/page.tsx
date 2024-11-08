@@ -14,7 +14,7 @@ import {
   ClientDataType,
 } from "@/lib/admin";
 import { upperFirst } from "lodash";
-import { cn, copyToClipboard } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
 import {
   Breadcrumb,
@@ -25,6 +25,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import Loader from "@/components/ui/loader";
+import CopyButton from "@/components/CopyButton";
 
 export default function EditClient({
   params,
@@ -266,7 +267,7 @@ export default function EditClient({
                 </div>
 
                 {!noEdit ? (
-                  <div className="px-6 flex mt-8 w-full justify-end">
+                  <div className="px-6 flex mt-8 w-full justify-center xl:justify-end">
                     <Button variant={"default"} type="submit" loading={loading}>
                       {`${upperFirst(operationType)}`}
                     </Button>
@@ -274,7 +275,7 @@ export default function EditClient({
                 ) : null}
               </form>
               {operationType === OPERATION_TYPE.EDIT || details ? (
-                <div className="flex-shrink-0 -order-1 flex flex-col gap-4 w-96 static xl:order-1 xl:sticky xl:top-24 xl:self-start z-0">
+                <div className="flex-shrink-0 order-1 flex flex-col gap-4 w-96 static xl:order-1 xl:sticky xl:top-24 xl:self-start z-0">
                   <div className="text-2xl font-semibold">
                     Additional Information
                   </div>
@@ -284,14 +285,7 @@ export default function EditClient({
                     </div>
                     <div className="text-sm leading-none text-muted-foreground break-all">
                       <span className="leading-5">{details?.client_id}</span>
-                      <Button
-                        className="p-0 w-5 h-5 ml-1"
-                        variant="ghost"
-                        icon={
-                          <Copy className="text-muted-foreground" size={14} />
-                        }
-                        onClick={() => copyToClipboard(details?.client_id ?? '')}
-                      />
+                      <CopyButton textToCopy={details?.client_id} />
                     </div>
                   </div>
                   <div className="flex flex-col gap-2 pl-3">
@@ -300,14 +294,7 @@ export default function EditClient({
                     </div>
                     <div className="text-sm leading-none text-muted-foreground break-all">
                       <span className="leading-5">{details?.client_secret}</span>
-                      <Button
-                        className="p-0 w-5 h-5 ml-1"
-                        variant="ghost"
-                        icon={
-                          <Copy className="text-muted-foreground" size={14} />
-                        }
-                        onClick={() => copyToClipboard(details?.client_secret ?? '')}
-                      />
+                      <CopyButton textToCopy={details?.client_secret} />
                     </div>
                   </div>
                   <div className="flex flex-col gap-2 pl-3">
