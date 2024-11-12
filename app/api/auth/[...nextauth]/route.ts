@@ -6,7 +6,7 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/lib/database";
 import { decodeJwt, encodeJwt } from "@/lib/secret";
 import { sendVerificationEmail } from "@/lib/email";
-import { CookieOpt } from "@/lib/auth";
+import { CookieOpt, rateLimiter } from "@/lib/auth";
 
 const authOptions: NextAuthOptions = {
   // debug: true,
@@ -124,26 +124,28 @@ const authOptions: NextAuthOptions = {
           user: process.env.EMAIL_SERVER_USER,
           pass: process.env.EMAIL_SERVER_PASSWORD,
         },
-        secure: true, // 使用SSL/TLS
+        secure: true,
       },
       from: process.env.EMAIL_FROM,
-      async sendVerificationRequest({
-        identifier: email,
-        url,
-        provider: { server, from },
-      }) {
-        /* your function */
+      async sendVerificationRequest({ identifier: email, url, provider }) {
+        // 调用限流函数，限制每日和每分钟的请求次数
+        const isNoLimit = await rateLimiter(email, "MagicLinkLogin");
+
+        if (!isNoLimit) {
+          return;
+        }
+        // 如果限流检查通过，发送验证邮件
         await sendVerificationEmail(email, url, "AlphaRank - Login", {
           title: "Login to AlphaRank",
           description: `<p>You can login to AlphaRank by clicking the button below.</p> 
-          <p>
-          Good news!  You and your team can use username/password to login your Alpha-Rank account now. Just set your password with the following link: <a style='color:#7c3aed' href='${
-            process.env.NEXT_PUBLIC_NEXT_AUTH_URL
-          }/password/emailVerify?email=${encodeURIComponent(
+            <p>
+            Good news!  You and your team can use username/password to login your Alpha-Rank account now. Just set your password with the following link: <a style='color:#7c3aed' href='${
+              process.env.NEXT_PUBLIC_NEXT_AUTH_URL
+            }/password/emailVerify?email=${encodeURIComponent(
             email
           )}'>setting your password.</a>.
-          </p>
-          `,
+            </p>
+            `,
           btnContent: "Login",
         });
       },
