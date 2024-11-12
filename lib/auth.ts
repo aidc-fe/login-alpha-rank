@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "crypto";
 import { decodeJwt, encodeJwt } from "./secret";
 import { ERROR_CONFIG } from "./errors";
+import Redis from "ioredis";
+import { toastApi } from "@/components/ui/toaster";
 
 // 种植cookie的options
 export const CookieOpt = {
@@ -47,7 +49,7 @@ export function thirdPartySignOut() {
       headers: {
         "Content-Type": "application/json",
         // 仅仅是为了blog产品，没有让问己新增接口，所以先保留这个
-        Authorization: `Bearer` ?? "",
+        Authorization: `Bearer`,
       },
     });
   });
@@ -151,3 +153,50 @@ export const SHOPLAZZA_SCOPES = [
   "unauthenticated_read_product_tags",
   "unauthenticated_read_selling_plans",
 ];
+
+const redis = new Redis(process.env.REDIS_URL!);
+const redisPrefix = process.env.ENV;
+
+// 限制参数
+const DAILY_EMAIL_LIMIT = 1; // 每天每个邮箱最多 10 封邮件
+const DAILY_WINDOW_IN_SECONDS = 24 * 60 * 60; // 24 小时
+const MINUTE_REQUEST_LIMIT = 20; // 每分钟最大请求次数
+const MINUTE_WINDOW_IN_SECONDS = 60; // 1 分钟
+
+export async function rateLimiter(email: string, api: string) {
+  // 生成键名
+  const dailyEmailKey = `${redisPrefix}:daily:email:${email}`; // 每日邮箱限流键
+  const minuteRequestKey = `${redisPrefix}:minute:request:${api}`; // 每分钟请求限流键
+
+  // 检查每日发送邮件限制
+  const dailyEmailCount = await redis.get(dailyEmailKey);
+  if (dailyEmailCount && parseInt(dailyEmailCount, 10) >= DAILY_EMAIL_LIMIT) {
+    throw new Error("Daily email limit reached. Try again tomorrow.");
+  }
+
+  // 检查每分钟请求限制
+  const minuteRequestCount = await redis.get(minuteRequestKey);
+  if (
+    minuteRequestCount &&
+    parseInt(minuteRequestCount, 10) >= MINUTE_REQUEST_LIMIT
+  ) {
+    toastApi.error("Too many requests, please try again later.");
+    return false;
+  } else {
+    // 增加每日邮箱计数
+    await redis
+      .multi()
+      .incr(dailyEmailKey)
+      .expire(dailyEmailKey, DAILY_WINDOW_IN_SECONDS) // 每日过期时间
+      .exec();
+
+    // 增加每分钟请求计数
+    await redis
+      .multi()
+      .incr(minuteRequestKey)
+      .expire(minuteRequestKey, MINUTE_WINDOW_IN_SECONDS) // 每分钟过期时间
+      .exec();
+
+    return true; // 如果未超限则允许请求继续
+  }
+}
