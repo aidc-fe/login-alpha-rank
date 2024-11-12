@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "crypto";
-import { decodeJwt, encodeJwt } from "./secret";
+import { encodeJwt } from "./secret";
 import { ERROR_CONFIG } from "./errors";
 
 // 种植cookie的options
@@ -47,7 +47,7 @@ export function thirdPartySignOut() {
       headers: {
         "Content-Type": "application/json",
         // 仅仅是为了blog产品，没有让问己新增接口，所以先保留这个
-        Authorization: `Bearer` ?? "",
+        Authorization: `Bearer`,
       },
     });
   });
