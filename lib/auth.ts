@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "crypto";
-import { decodeJwt, encodeJwt } from "./secret";
+import { encodeJwt } from "./secret";
 import { ERROR_CONFIG } from "./errors";
 
 // 种植cookie的options

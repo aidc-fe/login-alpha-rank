@@ -153,20 +153,27 @@ export default function Home() {
                 setEmailLoading(true);
                 const formData = new FormData(e.target as HTMLFormElement);
                 const email = formData.get("email");
-                // email验证页面展示
-                sessionStorage.setItem("verifyEmail", email as string);
-                signIn("email", { email, callbackUrl });
+
+                request("/api/emailRateLimit", {
+                  method: "POST",
+                  body: JSON.stringify({ email }),
+                })
+                  .then(() => {
+                    // email验证页面展示
+                    sessionStorage.setItem("verifyEmail", email as string);
+                    signIn("email", { email, callbackUrl });
+                  })
+                  .finally(() => {
+                    setEmailLoading(false);
+                  });
               }}
             >
               <Input
                 className="flex-1"
                 name="email"
                 required
-                disabled={emailSignInError}
                 placeholder={
-                  emailSignInError
-                    ? "Daily email limit reached. Please try again tomorrow."
-                    : "Enter email address for Magic Link Authentication"
+                  "Enter email address for Magic Link Authentication"
                 }
                 type="email"
                 value={jumpEmail}
