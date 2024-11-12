@@ -6,7 +6,8 @@ import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/lib/database";
 import { decodeJwt, encodeJwt } from "@/lib/secret";
 import { sendVerificationEmail } from "@/lib/email";
-import { CookieOpt, rateLimiter } from "@/lib/auth";
+import { CookieOpt } from "@/lib/auth";
+import { rateLimiter } from "@/lib/redis";
 
 const authOptions: NextAuthOptions = {
   // debug: true,
