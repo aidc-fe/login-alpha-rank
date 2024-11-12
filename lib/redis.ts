@@ -14,7 +14,7 @@ async function connectRedis() {
 connectRedis();
 
 // 限制参数
-const DAILY_EMAIL_LIMIT = 1; // 每天每个邮箱最多 10 封邮件
+const DAILY_EMAIL_LIMIT = 20; // 每天每个邮箱最多 10 封邮件
 const DAILY_WINDOW_IN_SECONDS = 24 * 60 * 60; // 24 小时
 
 export async function emailRateLimiter(email: string) {
