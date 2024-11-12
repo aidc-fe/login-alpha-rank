@@ -16,7 +16,7 @@ connectRedis();
 
 const redisPrefix = process.env.ENV;
 // 限制参数
-const DAILY_EMAIL_LIMIT = 1; // 每天每个邮箱最多 10 封邮件
+const DAILY_EMAIL_LIMIT = 10; // 每天每个邮箱最多 10 封邮件
 const DAILY_WINDOW_IN_SECONDS = 24 * 60 * 60; // 24 小时
 const MINUTE_REQUEST_LIMIT = 20; // 每分钟最大请求次数
 const MINUTE_WINDOW_IN_SECONDS = 60; // 1 分钟
