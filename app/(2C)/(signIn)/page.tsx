@@ -23,9 +23,6 @@ export default function Home() {
   const callbackUrl = `/login-landing-page?${
     targetUrl ? "targetUrl=" + targetUrl : ""
   }`;
-  const [emailSignInError] = useState(
-    searchParams.get("error") === "EmailSignin"
-  );
 
   // 如果用户已经登录，则进行续登
   useEffect(() => {
@@ -172,11 +169,8 @@ export default function Home() {
                 className="flex-1"
                 name="email"
                 required
-                disabled={emailSignInError}
                 placeholder={
-                  emailSignInError
-                    ? "Daily email limit reached. Please try again tomorrow."
-                    : "Enter email address for Magic Link Authentication"
+                  "Enter email address for Magic Link Authentication"
                 }
                 type="email"
                 value={jumpEmail}
