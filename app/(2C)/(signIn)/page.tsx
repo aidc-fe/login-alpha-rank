@@ -150,9 +150,19 @@ export default function Home() {
                 setEmailLoading(true);
                 const formData = new FormData(e.target as HTMLFormElement);
                 const email = formData.get("email");
-                // email验证页面展示
-                sessionStorage.setItem("verifyEmail", email as string);
-                signIn("email", { email, callbackUrl });
+
+                request("/api/emailRateLimit", {
+                  method: "POST",
+                  body: JSON.stringify({ email }),
+                })
+                  .then(() => {
+                    // email验证页面展示
+                    sessionStorage.setItem("verifyEmail", email as string);
+                    signIn("email", { email, callbackUrl });
+                  })
+                  .finally(() => {
+                    setEmailLoading(false);
+                  });
               }}
             >
               <Input

@@ -7,7 +7,6 @@ import { prisma } from "@/lib/database";
 import { decodeJwt, encodeJwt } from "@/lib/secret";
 import { sendVerificationEmail } from "@/lib/email";
 import { CookieOpt } from "@/lib/auth";
-import { rateLimiter } from "@/lib/redis";
 
 const authOptions: NextAuthOptions = {
   // debug: true,
@@ -129,12 +128,6 @@ const authOptions: NextAuthOptions = {
       },
       from: process.env.EMAIL_FROM,
       async sendVerificationRequest({ identifier: email, url, provider }) {
-        // 调用限流函数，限制每日和每分钟的请求次数
-        const isNoLimit = await rateLimiter(email, "MagicLinkLogin");
-
-        if (!isNoLimit) {
-          return;
-        }
         // 如果限流检查通过，发送验证邮件
         await sendVerificationEmail(email, url, "AlphaRank - Login", {
           title: "Login to AlphaRank",
