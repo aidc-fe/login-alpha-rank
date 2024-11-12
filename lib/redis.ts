@@ -19,7 +19,6 @@ const DAILY_WINDOW_IN_SECONDS = 24 * 60 * 60; // 24 小时
 
 export async function emailRateLimiter(email: string) {
   const dailyEmailKey = `${process.env.ENV}:daily:email:${email}`;
-
   // 每日邮箱限制
   const dailyEmailCount = await redis.get(dailyEmailKey);
   if (dailyEmailCount && parseInt(dailyEmailCount, 10) >= DAILY_EMAIL_LIMIT) {

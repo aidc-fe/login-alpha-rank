@@ -23,6 +23,9 @@ export default function Home() {
   const callbackUrl = `/login-landing-page?${
     targetUrl ? "targetUrl=" + targetUrl : ""
   }`;
+  const [emailSignInError] = useState(
+    searchParams.get("error") === "EmailSignin"
+  );
 
   // 如果用户已经登录，则进行续登
   useEffect(() => {

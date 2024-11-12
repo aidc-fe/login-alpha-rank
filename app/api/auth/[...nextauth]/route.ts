@@ -128,7 +128,6 @@ const authOptions: NextAuthOptions = {
       },
       from: process.env.EMAIL_FROM,
       async sendVerificationRequest({ identifier: email, url, provider }) {
-        // 如果限流检查通过，发送验证邮件
         await sendVerificationEmail(email, url, "AlphaRank - Login", {
           title: "Login to AlphaRank",
           description: `<p>You can login to AlphaRank by clicking the button below.</p> 
