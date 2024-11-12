@@ -43,7 +43,6 @@
     "embla-carousel-react": "^8.1.7",
     "framer-motion": "^11.3.8",
     "https-proxy-agent": "^7.0.5",
-    "ioredis": "^5.4.1",
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
     "lucide-react": "^0.400.0",
@@ -56,6 +55,7 @@
     "prisma": "^5.16.1",
     "react": "^18",
     "react-dom": "^18",
+    "redis": "^4.7.0",
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^10.0.0"

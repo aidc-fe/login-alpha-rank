@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "crypto";
 import { decodeJwt, encodeJwt } from "./secret";
 import { ERROR_CONFIG } from "./errors";
-import Redis from "ioredis";
+import { createClient } from "redis";
 import { toastApi } from "@/components/ui/toaster";
 
 // 种植cookie的options
@@ -154,9 +154,20 @@ export const SHOPLAZZA_SCOPES = [
   "unauthenticated_read_selling_plans",
 ];
 
-const redis = new Redis(process.env.REDIS_URL!);
-const redisPrefix = process.env.ENV;
+const redis = createClient({
+  url: process.env.REDIS_URL,
+});
 
+redis.on("error", (err) => console.error("Redis Client Error", err));
+
+// 确保 Redis 客户端在连接时已准备好
+async function connectRedis() {
+  await redis.connect();
+}
+
+connectRedis();
+
+const redisPrefix = process.env.ENV;
 // 限制参数
 const DAILY_EMAIL_LIMIT = 1; // 每天每个邮箱最多 10 封邮件
 const DAILY_WINDOW_IN_SECONDS = 24 * 60 * 60; // 24 小时
@@ -164,17 +175,17 @@ const MINUTE_REQUEST_LIMIT = 20; // 每分钟最大请求次数
 const MINUTE_WINDOW_IN_SECONDS = 60; // 1 分钟
 
 export async function rateLimiter(email: string, api: string) {
-  // 生成键名
-  const dailyEmailKey = `${redisPrefix}:daily:email:${email}`; // 每日邮箱限流键
-  const minuteRequestKey = `${redisPrefix}:minute:request:${api}`; // 每分钟请求限流键
+  const dailyEmailKey = `${redisPrefix}:daily:email:${email}`;
+  const minuteRequestKey = `${redisPrefix}:minute:request:${api}`;
 
-  // 检查每日发送邮件限制
+  // 每日邮箱限制
   const dailyEmailCount = await redis.get(dailyEmailKey);
   if (dailyEmailCount && parseInt(dailyEmailCount, 10) >= DAILY_EMAIL_LIMIT) {
-    throw new Error("Daily email limit reached. Try again tomorrow.");
+    toastApi.error("Daily email limit reached. Try again tomorrow.");
+    return false;
   }
 
-  // 检查每分钟请求限制
+  // 每分钟请求限制
   const minuteRequestCount = await redis.get(minuteRequestKey);
   if (
     minuteRequestCount &&
@@ -182,21 +193,16 @@ export async function rateLimiter(email: string, api: string) {
   ) {
     toastApi.error("Too many requests, please try again later.");
     return false;
-  } else {
-    // 增加每日邮箱计数
-    await redis
-      .multi()
-      .incr(dailyEmailKey)
-      .expire(dailyEmailKey, DAILY_WINDOW_IN_SECONDS) // 每日过期时间
-      .exec();
-
-    // 增加每分钟请求计数
-    await redis
-      .multi()
-      .incr(minuteRequestKey)
-      .expire(minuteRequestKey, MINUTE_WINDOW_IN_SECONDS) // 每分钟过期时间
-      .exec();
-
-    return true; // 如果未超限则允许请求继续
   }
+
+  // 增加计数
+  await redis
+    .multi()
+    .incr(dailyEmailKey)
+    .expire(dailyEmailKey, DAILY_WINDOW_IN_SECONDS)
+    .incr(minuteRequestKey)
+    .expire(minuteRequestKey, MINUTE_WINDOW_IN_SECONDS)
+    .exec();
+
+  return true; // 表示限流检查通过
 }
