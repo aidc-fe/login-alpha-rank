@@ -42,6 +42,12 @@ export interface InputProps
   label?: React.ReactNode;
 }
 
+export interface TextAreaProps
+  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+  label?: string;
+  layout?: "horizontal" | "vertical";
+}
+
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   (
     { className, rootClassName, type, label, status, layout, ...props },
@@ -52,7 +58,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         className={cn(layoutVariants({ layout, className: rootClassName }))}
       >
         {label ? (
-          <span className="font-medium capitalize text-sm">{label}</span>
+          <span className="font-medium capitalize text-sm">{label}:</span>
         ) : null}
         <input
           type={type}
@@ -66,4 +72,40 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 );
 Input.displayName = "Input";
 
-export { Input };
+const Textarea = React.forwardRef<HTMLTextAreaElement, TextAreaProps>(
+  ({ className, label, layout = "vertical", ...props }, ref) => {
+    if (label) {
+      return (
+        <label
+          className={cn("flex w-full gap-1 flex-col", {
+            "flex-row items-center": layout === "horizontal",
+          })}
+        >
+          <span className="font-medium capitalize text-sm">{label}:</span>
+          <textarea
+            className={cn(
+              "h-24 border-primary/50 w-full hover:border-primary flex rounded-md border bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+              className
+            )}
+            ref={ref}
+            {...props}
+          />
+        </label>
+      );
+    } else {
+      return (
+        <textarea
+          className={cn(
+            "h-24 border-primary/50 hover:border-primary flex w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+            className
+          )}
+          ref={ref}
+          {...props}
+        />
+      );
+    }
+  }
+);
+Textarea.displayName = "Textarea";
+
+export { Input, Textarea };
