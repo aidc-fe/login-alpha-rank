@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const Header = () => {
   return (
@@ -12,15 +11,8 @@ const Header = () => {
           alt="alpha rank"
         />
         <span className="text-2xl font-bold text-black">
-          AlphaRank Login Admin
+          PLG Login Admin
         </span>
-      </div>
-      <div className="flex items-center gap-6">
-        <Avatar>
-          <AvatarImage src="https://img.alicdn.com/imgextra/i1/O1CN010T4WOv1kED3JBbd9A_!!6000000004651-49-tps-64-64.webp" />
-          <AvatarFallback>AP</AvatarFallback>
-        </Avatar>
-        <div className="text-xl font-medium text-black">Alpha Rank</div>
       </div>
     </header>
   );

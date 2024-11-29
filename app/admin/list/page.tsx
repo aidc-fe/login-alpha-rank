@@ -126,7 +126,9 @@ export default function List() {
             <TableBody>
               {(data || []).map((item, index) => (
                 <TableRow className="h-14" key={item.client_id}>
-                  <TableCell>{item.name}</TableCell>
+                  <TableCell>
+                    <Link className="hover:underline hover:text-primary" href={`/admin/list/detail?clientId=${item.client_id}`}>{item.name}</Link>
+                  </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
                       <span>{item.client_id}</span>

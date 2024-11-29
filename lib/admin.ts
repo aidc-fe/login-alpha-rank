@@ -1,6 +1,7 @@
 export enum OPERATION_TYPE {
   CREATE = "add",
   EDIT = "update",
+  DETAIL = "detail",
 }
 
 export enum SCOPE_OPTION {

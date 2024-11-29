@@ -5,7 +5,7 @@ import { Input, Textarea } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toastApi } from "@/components/ui/toaster";
 import request from "@/lib/request";
-import { Copy, Plus, Trash2 } from "lucide-react";
+import { FilePenLine, Plus, Trash2 } from "lucide-react";
 import { FormEventHandler, useEffect, useState } from "react";
 import {
   OPERATION_TYPE,
@@ -35,16 +35,14 @@ export default function EditClient({
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
   const operationType = params.operationType;
+  const [canEdit, setCanEdit] = useState([OPERATION_TYPE.CREATE, OPERATION_TYPE.EDIT].includes(operationType));
   const clientId = searchParams.clientId as string;
   const [loading, setLoading] = useState(false);
-  const [detailLoading, setDetailLoading] = useState(
-    operationType === OPERATION_TYPE.EDIT
-  );
+  const [detailLoading, setDetailLoading] = useState(!!clientId);
   const [details, setDetails] = useState<ClientDataType>();
   const [formData, setFormData] = useState<ClientDataType>(defaultClientInfo);
 
-  const isEdit = operationType === OPERATION_TYPE.EDIT && clientId;
-  const noEdit = operationType === "add" && !!details;
+  const pageTitle = details || clientId ? (canEdit ? OPERATION_TYPE.EDIT : 'Detail' ) : OPERATION_TYPE.CREATE;
 
   const getDetail = () => {
     request(`/api/client/${clientId}`)
@@ -65,7 +63,7 @@ export default function EditClient({
   };
 
   useEffect(() => {
-    if (clientId && operationType === OPERATION_TYPE.EDIT) {
+    if (clientId) {
       getDetail();
     }
   }, []);
@@ -76,13 +74,21 @@ export default function EditClient({
     const params = {
       ...formData,
     };
-    request(`/api/client${isEdit ? `/${clientId}` : ""}`, {
-      method: "POST",
-      body: JSON.stringify(params),
-    })
+    request(
+      `/api/client${
+        details?.client_id || clientId
+          ? `/${clientId || details?.client_id}`
+          : ""
+      }`,
+      {
+        method: "POST",
+        body: JSON.stringify(params),
+      }
+    )
       .then((res) => {
-        toastApi.success(`${upperFirst(operationType)} Success`);
+        toastApi.success(`${upperFirst(pageTitle)} Success`);
         setDetails(res);
+        setCanEdit(false);
       })
       .finally(() => {
         setLoading(false);
@@ -98,7 +104,7 @@ export default function EditClient({
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>
-            <BreadcrumbPage>{upperFirst(operationType)} Client</BreadcrumbPage>
+            <BreadcrumbPage>{upperFirst(pageTitle)} Client</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -110,15 +116,30 @@ export default function EditClient({
                 className="flex-auto flex flex-col gap-4 w-full max-w-7xl m-auto"
                 onSubmit={handleSubmit}
               >
-                <div className="font-semibold text-2xl mb-2 self-start">{`${upperFirst(
-                  operationType
-                )} Client`}</div>
+                <div className="w-full flex items-center justify-between font-semibold text-2xl mb-2 self-start">
+                  <span>{`${upperFirst(pageTitle)} Client`}</span>
+                  {!canEdit && details ? (
+                    <Button
+                      variant="outline"
+                      type="button"
+                      icon={<FilePenLine size={16} />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        setCanEdit(true);
+                      }}
+                    >
+                      Edit
+                    </Button>
+                  ) : null}
+                </div>
 
                 <div className="px-3 flex flex-col gap-4">
                   <Input
+                    className="read-only:border-0 read-only:!ring-0 read-only:px-0 read-only:text-muted-foreground"
                     layout="vertical"
                     name="name"
-                    readOnly={noEdit}
+                    readOnly={!canEdit}
                     label="name"
                     placeholder="Please enter name"
                     required
@@ -129,9 +150,11 @@ export default function EditClient({
                   />
 
                   <Textarea
+                    className="h-auto read-only:border-0 read-only:!ring-0 read-only:shadow-none read-only:resize-none read-only:px-0 read-only:text-muted-foreground"
                     name="description"
+                    rows={2}
                     label="description"
-                    readOnly={noEdit}
+                    readOnly={!canEdit}
                     placeholder="Please enter your description"
                     value={formData.description}
                     onChange={(e) => {
@@ -141,21 +164,25 @@ export default function EditClient({
 
                   <div className="w-full flex flex-col gap-1">
                     <span className="capitalize text-sm">Redirect URL:</span>
-                    <div className="bg-slate-100 rounded-xl px-4 py-6">
+                    <div
+                      className={cn("flex flex-col gap-4", {
+                        "bg-slate-100 rounded-xl px-4 py-6": canEdit,
+                      })}
+                    >
                       {formData.redirect_uris?.map((item, index) => (
                         <div
                           key={`redirect_uri${index}`}
                           className={cn(
-                            "w-full grid grid-cols-[1fr_auto] gap-2 items-center mb-4",
+                            "w-full grid grid-cols-[1fr_auto] gap-2 items-center",
                             {
                               "grid-cols-1": !index,
                             }
                           )}
                         >
                           <Input
-                            className={`h-10`}
+                            className="read-only:border-0 read-only:!ring-0 read-only:px-0 read-only:text-muted-foreground"
                             layout="vertical"
-                            readOnly={noEdit}
+                            readOnly={!canEdit}
                             placeholder="Please enter your Redirect URL"
                             value={item}
                             type="url"
@@ -175,7 +202,7 @@ export default function EditClient({
                           <Button
                             size={"icon"}
                             variant={"secondary"}
-                            className={cn({ hidden: !index || noEdit })}
+                            className={cn({ hidden: !index || !canEdit })}
                             onClick={() => {
                               const new_redirect_uris = [
                                 ...(formData.redirect_uris ?? []),
@@ -191,7 +218,7 @@ export default function EditClient({
                           </Button>
                         </div>
                       ))}
-                      {!noEdit ? (
+                      {!!canEdit ? (
                         <div className="text-right">
                           <Button
                             variant="outline"
@@ -217,10 +244,11 @@ export default function EditClient({
                   </div>
 
                   <Input
+                    className="read-only:border-0 read-only:!ring-0 read-only:px-0 read-only:text-muted-foreground"
                     label="signout url"
                     layout="vertical"
                     name="signout_uri"
-                    readOnly={noEdit}
+                    readOnly={!canEdit}
                     placeholder="Please enter signout url"
                     required
                     type="url"
@@ -233,7 +261,7 @@ export default function EditClient({
 
                   <div className="w-full text-left">
                     <div className="text-sm">Scope:</div>
-                    <div className="flex items-center gap-4 mt-2">
+                    {canEdit ? <div className="flex items-center gap-4 mt-2">
                       {scopeOptions.map((key) => (
                         <div
                           className="inline-flex items-center gap-2"
@@ -242,7 +270,6 @@ export default function EditClient({
                           <Checkbox
                             id={key}
                             name="scope"
-                            disabled={noEdit}
                             checked={formData.scope?.includes(key)}
                             onClick={() => {
                               if (formData.scope?.includes(key)) {
@@ -262,19 +289,33 @@ export default function EditClient({
                           <label>{key}</label>
                         </div>
                       ))}
-                    </div>
+                    </div> : (
+                      <div className="text-sm text-muted-foreground leading-10">
+                        {formData.scope?.join(",")}
+                      </div>
+                    )}
                   </div>
                 </div>
-
-                {!noEdit ? (
-                  <div className="px-6 flex mt-8 w-full justify-center xl:justify-end">
+                {canEdit ? (
+                  <div className="px-6 flex mt-8 w-full justify-center xl:justify-end gap-3">
+                    {pageTitle !== OPERATION_TYPE.CREATE ? (
+                      <Button
+                        variant="outline"
+                        type="button"
+                        onClick={() => {
+                          setCanEdit(false);
+                        }}
+                      >
+                        Cancel
+                      </Button>
+                    ) : null}
                     <Button variant={"default"} type="submit" loading={loading}>
-                      {`${upperFirst(operationType)}`}
+                      {`${upperFirst(pageTitle)}`}
                     </Button>
                   </div>
                 ) : null}
               </form>
-              {operationType === OPERATION_TYPE.EDIT || details ? (
+              {details ? (
                 <div className="flex-shrink-0 order-1 flex flex-col gap-4 w-96 static xl:order-1 xl:sticky xl:top-24 xl:self-start z-0">
                   <div className="text-2xl font-semibold">
                     Additional Information
@@ -293,7 +334,9 @@ export default function EditClient({
                       Client Secret
                     </div>
                     <div className="text-sm leading-none text-muted-foreground break-all">
-                      <span className="leading-5">{details?.client_secret}</span>
+                      <span className="leading-5">
+                        {details?.client_secret}
+                      </span>
                       <CopyButton textToCopy={details?.client_secret} />
                     </div>
                   </div>
