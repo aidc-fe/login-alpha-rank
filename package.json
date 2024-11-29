@@ -7,10 +7,11 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "db:migrate": "dotenv -e .env.development.local -- npx prisma migrate dev --name init",
     "db:pull": "dotenv -e .env.development.local -- npx prisma db pull",
-    "db:migrate.prod": "dotenv -e .env.production.local -- npx prisma migrate dev --name init",
+    "db:push": "dotenv -e .env.development.local -- npx prisma db push",
+    "db:migrate": "dotenv -e .env.development.local -- npx prisma migrate dev --name init",
     "db:generate": "dotenv -e .env.development.local -- npx prisma generate",
+    "db:migrate.prod": "dotenv -e .env.production.local -- npx prisma migrate deploy --name init",
     "db:generate.prod": "dotenv -e .env.production.local -- npx prisma generate"
   },
   "dependencies": {
