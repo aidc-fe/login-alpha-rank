@@ -1,8 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Input, Textarea } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
+
 import { toastApi } from "@/components/ui/toaster";
 import request from "@/lib/request";
 import { FilePenLine, Plus, Trash2 } from "lucide-react";
@@ -26,6 +24,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import Loader from "@/components/ui/loader";
 import CopyButton from "@/components/CopyButton";
+import { Input, Button, Checkbox ,Textarea} from "@nextui-org/react";
 
 export default function EditClient({
   params,
@@ -120,9 +119,8 @@ export default function EditClient({
                   <span>{`${upperFirst(pageTitle)} Client`}</span>
                   {!canEdit && details ? (
                     <Button
-                      variant="outline"
                       type="button"
-                      icon={<FilePenLine size={16} />}
+                      startContent={<FilePenLine size={16} />}
                       onClick={(e) => {
                         e.stopPropagation();
                         e.preventDefault();
@@ -135,121 +133,108 @@ export default function EditClient({
                 </div>
 
                 <div className="px-3 flex flex-col gap-4">
-                  <Input
-                    className="read-only:border-0 read-only:!ring-0 read-only:px-0 read-only:text-muted-foreground"
-                    layout="vertical"
-                    name="name"
-                    readOnly={!canEdit}
-                    label="name"
-                    placeholder="Please enter name"
-                    required
-                    value={formData.name}
-                    onChange={(e) => {
-                      setFormData({ ...formData, name: e.target.value });
-                    }}
-                  />
+                 
+                <Input  
+                  name="name"
+                  readOnly={!canEdit}
+                  label="Name"
+                  required
+                  value={formData.name}
+                  onChange={(e) => {
+                    setFormData({ ...formData, name: e.target.value });
+                  }}  
+                />
+
 
                   <Textarea
-                    className="h-auto read-only:border-0 read-only:!ring-0 read-only:shadow-none read-only:resize-none read-only:px-0 read-only:text-muted-foreground"
                     name="description"
                     rows={2}
-                    label="description"
+                    label="Description"
                     readOnly={!canEdit}
-                    placeholder="Please enter your description"
                     value={formData.description}
                     onChange={(e) => {
                       setFormData({ ...formData, description: e.target.value });
                     }}
                   />
 
-                  <div className="w-full flex flex-col gap-1">
-                    <span className="capitalize text-sm">Redirect URL:</span>
-                    <div
-                      className={cn("flex flex-col gap-4", {
-                        "bg-slate-100 rounded-xl px-4 py-6": canEdit,
-                      })}
-                    >
-                      {formData.redirect_uris?.map((item, index) => (
-                        <div
-                          key={`redirect_uri${index}`}
-                          className={cn(
-                            "w-full grid grid-cols-[1fr_auto] gap-2 items-center",
-                            {
-                              "grid-cols-1": !index,
-                            }
-                          )}
+                  <div
+                    className={cn("flex flex-col gap-4", {
+                      "border border-border rounded-xl px-4 py-6": canEdit,
+                    })}
+                  >
+                    {formData.redirect_uris?.map((item, index) => (
+                      <div
+                        key={`redirect_uri${index}`}
+                        className={cn(
+                          "w-full grid grid-cols-[1fr_auto] gap-2 items-center",
+                          {
+                            "grid-cols-1": !index,
+                          }
+                        )}
+                      >
+                        <Input
+                          readOnly={!canEdit}
+                          label="Redirect URL"
+                          value={item}
+                          type="url"
+                          pattern="^(https?|ftp)://.+"
+                          onChange={(e) => {
+                            const new_redirect_uris = [
+                              ...(formData.redirect_uris ?? []),
+                            ];
+                            new_redirect_uris[index] = e.target.value;
+                            setFormData({
+                              ...formData,
+                              redirect_uris: new_redirect_uris,
+                            });
+                          }}
+                          required
+                        />
+                        <Button
+                          isIconOnly
+                          color="danger"
+                          className={cn({ hidden: !index || !canEdit })}
+                          onClick={() => {
+                            const new_redirect_uris = [
+                              ...(formData.redirect_uris ?? []),
+                            ];
+                            new_redirect_uris.splice(index, 1);
+                            setFormData({
+                              ...formData,
+                              redirect_uris: new_redirect_uris,
+                            });
+                          }}
                         >
-                          <Input
-                            className="read-only:border-0 read-only:!ring-0 read-only:px-0 read-only:text-muted-foreground"
-                            layout="vertical"
-                            readOnly={!canEdit}
-                            placeholder="Please enter your Redirect URL"
-                            value={item}
-                            type="url"
-                            pattern="^(https?|ftp)://.+"
-                            onChange={(e) => {
-                              const new_redirect_uris = [
+                          <Trash2 size={20}/>
+                        </Button>
+                      </div>
+                    ))}
+                    {!!canEdit ? (
+                      <div className="text-right">
+                        <Button
+                          type="button"
+                          startContent={<Plus size={20} />}
+                          disabled={loading}
+                          onClick={() =>
+                            setFormData({
+                              ...formData,
+                              redirect_uris: [
                                 ...(formData.redirect_uris ?? []),
-                              ];
-                              new_redirect_uris[index] = e.target.value;
-                              setFormData({
-                                ...formData,
-                                redirect_uris: new_redirect_uris,
-                              });
-                            }}
-                            required
-                          />
-                          <Button
-                            size={"icon"}
-                            variant={"secondary"}
-                            className={cn({ hidden: !index || !canEdit })}
-                            onClick={() => {
-                              const new_redirect_uris = [
-                                ...(formData.redirect_uris ?? []),
-                              ];
-                              new_redirect_uris.splice(index, 1);
-                              setFormData({
-                                ...formData,
-                                redirect_uris: new_redirect_uris,
-                              });
-                            }}
-                          >
-                            <Trash2 />
-                          </Button>
-                        </div>
-                      ))}
-                      {!!canEdit ? (
-                        <div className="text-right">
-                          <Button
-                            variant="outline"
-                            type="button"
-                            disabled={loading}
-                            className="inline-flex items-center gap-1"
-                            onClick={() =>
-                              setFormData({
-                                ...formData,
-                                redirect_uris: [
-                                  ...(formData.redirect_uris ?? []),
-                                  "",
-                                ],
-                              })
-                            }
-                          >
-                            <Plus size={20} />
-                            Add
-                          </Button>
-                        </div>
-                      ) : null}
-                    </div>
+                                "",
+                              ],
+                            })
+                          }
+                        >
+                          Add
+                        </Button>
+                      </div>
+                    ) : null}
                   </div>
 
                   <Input
-                    className="read-only:border-0 read-only:!ring-0 read-only:px-0 read-only:text-muted-foreground"
-                    label="signout url"
-                    layout="vertical"
+                    label="Signout url"
                     name="signout_uri"
                     readOnly={!canEdit}
-                    placeholder="Please enter signout url"
                     required
                     type="url"
                     pattern="^(https?|ftp)://.+"
@@ -268,25 +253,20 @@ export default function EditClient({
                           key={key}
                         >
                           <Checkbox
+                            onValueChange={(val) => {
+                              setFormData({
+                                ...formData,
+                                scope: val
+                                  ? [...(formData.scope ?? []), key]
+                                  : formData.scope?.filter((item) => item !== key) ?? [],
+                              });
+                            }}
                             id={key}
                             name="scope"
                             checked={formData.scope?.includes(key)}
-                            onClick={() => {
-                              if (formData.scope?.includes(key)) {
-                                const new_scope = formData.scope.filter(
-                                  (item) => item !== key
-                                );
-                                setFormData({ ...formData, scope: new_scope });
-                              } else {
-                                const new_scope = [
-                                  ...(formData.scope ?? []),
-                                  key,
-                                ];
-                                setFormData({ ...formData, scope: new_scope });
-                              }
-                            }}
-                          />
-                          <label>{key}</label>
+                          >
+                            {key}
+                          </Checkbox>
                         </div>
                       ))}
                     </div> : (
@@ -300,7 +280,6 @@ export default function EditClient({
                   <div className="px-6 flex mt-8 w-full justify-center xl:justify-end gap-3">
                     {pageTitle !== OPERATION_TYPE.CREATE ? (
                       <Button
-                        variant="outline"
                         type="button"
                         onClick={() => {
                           setCanEdit(false);
@@ -309,7 +288,7 @@ export default function EditClient({
                         Cancel
                       </Button>
                     ) : null}
-                    <Button variant={"default"} type="submit" loading={loading}>
+                    <Button  type="submit" isLoading={loading}>
                       {`${upperFirst(pageTitle)}`}
                     </Button>
                   </div>
