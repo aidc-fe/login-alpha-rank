@@ -1,7 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input, Button } from "@nextui-org/react";
 import request from "@/lib/request";
 import { CornerUpLeft, Loader } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -72,7 +71,7 @@ export default function SignUpPage() {
         ></Input>
         <Button
           className="group w-full"
-          variant={"default"}
+          color="primary"
           type="submit"
           disabled={loading}
         >
@@ -89,8 +88,9 @@ export default function SignUpPage() {
                   "https://terms.alicdn.com/legal-agreement/terms/b_platform_service_agreement/20231110160335349/20231110160335349.html"
                 );
               }}
-              variant="link"
-              className="p-0 h-fit"
+              color="primary"
+              variant="light"
+              className="p-0 h-auto !bg-transparent w-auto min-w-0"
             >
               Terms of Service
             </Button>{" "}
@@ -101,8 +101,9 @@ export default function SignUpPage() {
                   "https://terms.alicdn.com/legal-agreement/terms/privacy_policy_full/20231109180939630/20231109180939630.html"
                 );
               }}
-              variant="link"
-              className="p-0 h-fit"
+              color="primary"
+              variant="light"
+              className="p-0 h-auto !bg-transparent w-auto min-w-0"
             >
               Privacy Policy
             </Button>{" "}
@@ -111,12 +112,13 @@ export default function SignUpPage() {
           <div className="flex gap-1">
             <span>Already have an account?</span>
             <Button
-              variant={"link"}
+              color="primary"
+              variant="light"
               onClick={(e) => {
                 e.preventDefault();
                 router.replace(`/?email=${encodeURIComponent(email)}`);
               }}
-              className="flex items-center gap-1 p-0 h-auto"
+              className="flex items-center gap-1 p-0 h-auto !bg-transparent w-auto min-w-0"
             >
               sign in
             </Button>

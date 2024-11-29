@@ -39,7 +39,7 @@ export default function Home() {
   switch (status) {
     case "unauthenticated":
       return (
-        <div className="flex items-center justify-center w-full h-full px-8 -mr-4 space-y-6 bg-white">
+        <div className="flex items-center justify-center w-full h-full px-8 -mr-4 space-y-6">
           <div className="max-w-lg">
             <h1 className="font-bold text-3xl mb-12 text-center">Sign in</h1>
             <form

@@ -1,11 +1,10 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { toastApi } from "@/components/ui/toaster";
 import request from "@/lib/request";
 import { CornerUpLeft, Loader, Send } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEventHandler, useState } from "react";
+import { Input, Button } from "@nextui-org/react";
 
 export default function Page() {
   const searchParams = useSearchParams();
@@ -81,10 +80,12 @@ export default function Page() {
         />
         <Button
           className="group w-full"
-          variant={"default"}
+          color="primary"
           type="submit"
-          icon={<Send size={20} className="group-hover:rotate-45 duration-150" />}
-          loading={loading}
+          startContent={
+            <Send size={20} className="group-hover:rotate-45 duration-150" />
+          }
+          isLoading={loading}
         >
           Send set instructions
         </Button>
@@ -92,12 +93,13 @@ export default function Page() {
         <div className="flex text-sm text-muted-foreground gap-1">
           <span>Back to</span>
           <Button
-            variant={"link"}
+            color="primary"
+            variant="light"
             onClick={(e) => {
               e.preventDefault();
               router.replace(`/?email=${encodeURIComponent(email)}`);
             }}
-            className="flex items-center gap-1 p-0 h-auto"
+            className="flex items-center gap-1 p-0 h-auto !bg-transparent w-auto min-w-0"
           >
             Sign in
           </Button>
