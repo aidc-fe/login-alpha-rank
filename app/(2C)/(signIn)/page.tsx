@@ -7,6 +7,7 @@ import { Button, Input, Link } from '@nextui-org/react'
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useClient } from "@/providers/client-provider";
 
 export default function Home() {
   const { status } = useSession();
@@ -22,6 +23,7 @@ export default function Home() {
   const callbackUrl = `/login-landing-page?${
     targetUrl ? "targetUrl=" + targetUrl : ""
   }`;
+ const { businessDomainId } = useClient();
 
   // 如果用户已经登录，则进行续登
   useEffect(() => {
@@ -56,7 +58,7 @@ export default function Home() {
                   body: JSON.stringify({ email, password }),
                 })
                   .then((user) => {
-                    signIn("password", { ...user, callbackUrl });
+                    signIn("password", { ...user, callbackUrl ,businessDomainId});
                   })
                   .finally(() => {
                     setLoading(false);

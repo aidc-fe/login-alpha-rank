@@ -4,6 +4,7 @@ import { Input, Button, Link } from "@nextui-org/react";
 import request from "@/lib/request";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEventHandler, useState } from "react";
+import { useClient } from "@/providers/client-provider";
 
 export default function SignUpPage() {
   const searchParams = useSearchParams();
@@ -12,6 +13,7 @@ export default function SignUpPage() {
   const [email, setEmail] = useState(
     decodeURIComponent(searchParams.get("email") || "")
   );
+  const { businessDomainId } = useClient();
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
@@ -29,6 +31,7 @@ export default function SignUpPage() {
         email,
         password,
         targetUrl: searchParams.get("targetUrl"),
+        businessDomainId
       }),
     })
       .then(() => {

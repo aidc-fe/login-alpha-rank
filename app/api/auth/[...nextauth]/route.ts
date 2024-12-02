@@ -49,17 +49,22 @@ const authOptions: NextAuthOptions = {
         email: {},
         from: {},
         image: {},
+        businessDomainId: {},
       },
       async authorize(credentials) {
         const name = credentials?.name || "";
         const email = credentials?.email || "";
         const from = credentials?.from || "";
         const image = credentials?.image || "";
-
+        const businessDomainId = credentials?.businessDomainId || "";
         // 在数据库中查找用户
         let user = await prisma.user.findUnique({
-          where: { email },
-        });
+          where: { 
+            email_businessDomainId: {
+              email,
+              businessDomainId
+            }
+          },         });
 
         // 如果用户不存在，创建新用户
         if (!user) {
@@ -68,6 +73,7 @@ const authOptions: NextAuthOptions = {
               name,
               email,
               from,
+              businessDomainId,
               image,
             },
           });
@@ -83,15 +89,20 @@ const authOptions: NextAuthOptions = {
     CredentialsProvider({
       id: "password",
       name: "Password",
-      credentials: { id: {}, password: {}, name: {}, email: {} },
+      credentials: { id: {}, password: {}, name: {}, email: {}, businessDomainId: {} },
       async authorize(credentials) {
         const name = credentials?.name || "";
         const email = credentials?.email || "";
         const password = credentials?.password || "";
-
+        const businessDomainId = credentials?.businessDomainId || "";
         // 在数据库中查找用户
         let user = await prisma.user.findUnique({
-          where: { email },
+          where: { 
+            email_businessDomainId: {
+              email,
+              businessDomainId
+            }
+          },
         });
 
         // 如果用户不存在，创建新用户
@@ -101,6 +112,7 @@ const authOptions: NextAuthOptions = {
               name,
               email,
               password,
+              businessDomainId
             },
           });
         }

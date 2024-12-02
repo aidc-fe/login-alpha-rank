@@ -4,11 +4,13 @@ import { signIn, useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { WEBSITE_DOMAIN } from "@/lib/url";
+import { useClient } from "@/providers/client-provider";
 
 export default function GetAuthPage() {
   const { status, data } = useSession();
   const router = useRouter();
-
+  const { businessDomainId } = useClient();
+  
   // 如果不是在iframe中，禁止访问
   useEffect(() => {
     if (window.top === window.self) {
@@ -37,6 +39,7 @@ export default function GetAuthPage() {
       // 接收用户信息，并且进行登录
       signIn("thirdParty", {
         ...event.data,
+        businessDomainId,
         callbackUrl: `/getAuth`,
       });
     };

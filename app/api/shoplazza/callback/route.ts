@@ -126,7 +126,7 @@ export async function GET(request: NextRequest) {
     };
 
     // 创建或更新用户信息和oAuth账号信息
-    const user = await createOrUpdateUser({ ...userInfo, from: "shoplazza" });
+    const user = await createOrUpdateUser({ ...userInfo, from: "shoplazza", businessDomainId: stateData?.businessDomainId });
     await createOrUpdateAccount({
       ...accountInfo,
       userId: user.id,

@@ -5,7 +5,7 @@ import { formateError, formatSuccess } from "@/lib/request";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
-  const { email, password } = (await request.json()) || {};
+  const { email, password, businessDomainId } = (await request.json()) || {};
 
   if (!email) {
     return NextResponse.json(formateError(ERROR_CONFIG.AUTH.NEED_EMAIL));
@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
       password,
       type: "passwordSet", // 可选
     });
-    const verificationLink = `${process.env.NEXT_AUTH_URL}/api/password/set?token=${newToken.token}`;
+    const verificationLink = `${process.env.NEXT_AUTH_URL}/api/password/set?token=${newToken.token}&businessDomainId=${businessDomainId}`;
 
     // 发送验证邮件
     await sendVerificationEmail(
