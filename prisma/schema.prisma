@@ -89,7 +89,7 @@ model Client {
   name              String
   description       String
   signout_uri       String
-  auth_domain       String?        // Domain related to login system
+  auth_domain       String        // Domain related to login system
   brand_color       String?        // Brand color
   materials         Json?          // Materials array (each material contains title, description, image)
   businessDomainId  String         // Foreign key to BusinessDomain model

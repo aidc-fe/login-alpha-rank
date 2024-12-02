@@ -71,7 +71,7 @@ export default function EditClient({
   const getDetail = () => {
     request(`/api/client/${clientId}`)
       .then((res) => {
-        const { brand_color, materials, redirect_uris } = res;
+        const { materials, redirect_uris } = res;
         setDetails(res);
         setMaterials(materials || []);
         setBrandColor(brand_color);
@@ -295,7 +295,6 @@ export default function EditClient({
                                     name="material_image"
                                     readOnly={!canEdit}
                                     type="url"
-                                    pattern="^(https?|ftp)://.+"
                                     defaultValue={item.image}
                                     isClearable={canEdit}
                                   />
@@ -426,8 +425,8 @@ export default function EditClient({
                     defaultValue={details?.signout_uri}
                   />
 
-                  <div className="w-full text-left">
-                    <div className="text-sm">Scope:</div>
+                  <div className="flex gap-2 items-center">
+                    <label className="text-sm">Scope:</label>
                     {canEdit ? (
                       <div className="mt-2">
                         <CheckboxGroup

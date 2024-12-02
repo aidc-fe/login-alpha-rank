@@ -228,6 +228,7 @@ export async function createClient(data: {
     ...restData
   } = data;
 
+  console.log(data)
   // 插入数据到 Client 表
   const newClient = await prisma.client.create({
     data: {
@@ -252,7 +253,6 @@ export async function createClient(data: {
 
 // 获取所有client数据
 export const getClients = async ({
-  email,
   skip,
   itemsPerPage
 }: {
@@ -260,16 +260,12 @@ export const getClients = async ({
   skip: number;
   itemsPerPage: number;
 }) => {
-  const where = email ? { owner_email: { contains: email } } : {};
   const clients = await prisma.client.findMany({
-    where,
     skip,
     take: itemsPerPage,
   });
 
-  const totalClients = await prisma.client.count({
-    where,
-  });
+  const totalClients = await prisma.client.count();
 
   return { clients, totalClients };
 }
@@ -516,3 +512,27 @@ export async function getAllBusinessDomains() {
     await prisma.$disconnect();
   }
 }
+
+// 根据auth_domain查询client信息
+export async function getClientByAuthDomain(authDomain: string) {
+  try {
+    // 使用 Prisma ORM 查询 Client 表，使用 findFirst 来根据 auth_domain 查询
+    const client = await prisma.client.findFirst({
+      where: {
+        auth_domain: authDomain,
+      },
+    });
+
+    if (!client) {
+      throw new Error('Client not found');
+    }
+
+    return client;
+  } catch (error) {
+    console.error('Error fetching client by auth_domain:', error);
+    throw error;
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+

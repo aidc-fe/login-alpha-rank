@@ -16,11 +16,11 @@ export default function RootLayout({
   const router = useRouter();
   const { data } = useSession();
   
-  useEffect(() => {
-    if (data && (!data?.user?.email || !whiteList.includes(data?.user?.email))) {
-      router.replace(`/`)
-    }
-  }, [data?.user?.email]);
+  // useEffect(() => {
+  //   if (data && (!data?.user?.email || !whiteList.includes(data?.user?.email))) {
+  //     router.replace(`/`)
+  //   }
+  // }, [data?.user?.email]);
 
   return (
     <div className="min-h-screen">
