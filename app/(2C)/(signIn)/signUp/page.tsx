@@ -2,7 +2,6 @@
 
 import { Input, Button, Link } from "@nextui-org/react";
 import request from "@/lib/request";
-import {  Loader } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEventHandler, useState } from "react";
 
@@ -70,22 +69,21 @@ export default function SignUpPage() {
           required
         ></Input>
         <Button
-          className="group w-full"
+          className="w-full"
           color="primary"
           type="submit"
           disabled={loading}
+          isLoading={loading}
         >
-          {loading && <Loader className="animate-spin" />}
           Sign up
         </Button>
         <div className="w-1/2 border-b mx-auto mt-4" />
         <div className="text-muted-foreground font-normal flex flex-col gap-3 items-center">
-          <div className="text-center text-sm">
+          <div className="text-center">
             By continuing with any of the options above, you agree to our{" "}
             <Link
               underline="always"
               isExternal
-              size="sm"
               href={
                 "https://terms.alicdn.com/legal-agreement/terms/b_platform_service_agreement/20231110160335349/20231110160335349.html"
               }
@@ -96,7 +94,6 @@ export default function SignUpPage() {
             <Link
               underline="always"
               isExternal
-              size="sm"
               href={"https://terms.alicdn.com/legal-agreement/terms/privacy_policy_full/20231109180939630/20231109180939630.html"}
             >
               Privacy Policy
@@ -106,7 +103,6 @@ export default function SignUpPage() {
           <div className="flex gap-1 items-center">
             <span>Already have an account?</span>
             <Link
-              underline="always"
               href={`/?email=${encodeURIComponent(email)}`}
               >
               sign in

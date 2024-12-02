@@ -211,6 +211,7 @@ export async function createClient(data: {
   description: string;
   signout_uri: string;
   owner_email: string;
+  businessDomainId: string;
   auth_domain?: string;
   brand_color?: string;
   materials?: Array<{
@@ -236,7 +237,7 @@ export async function createClient(data: {
       client_secret: generateClientSecret(),
       redirect_uris: redirect_uris.join(","),
       scope: scope.join(","),
-      materials: materials ? JSON.stringify(materials) : null, // 将 materials 转换为 JSON 字符串
+      materials: JSON.stringify(materials||[]), // 将 materials 转换为 JSON 字符串
       active: true,
       grant_types: "authorization_code",
     },
@@ -479,3 +480,40 @@ export const createRefreshToken = async (data: {
     throw error;
   }
 };
+
+
+// 创建一条businessDomain数据
+export async function createBusinessDomain(name: string, description: string, active: boolean, sso: boolean) {
+  try {
+    const newBusinessDomain = await prisma.businessDomain.create({
+      data: {
+        name,
+        description,
+        active,
+        sso,
+      },
+    });
+
+    console.log("New BusinessDomain created:", newBusinessDomain);
+    return newBusinessDomain;
+  } catch (error) {
+    console.error("Error creating BusinessDomain:", error);
+    throw error;
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+// 查询全量的BusinessDomain数据
+export async function getAllBusinessDomains() {
+  try {
+    const allBusinessDomains = await prisma.businessDomain.findMany();
+    console.log("All BusinessDomains:", allBusinessDomains);
+    return allBusinessDomains;
+  } catch (error) {
+    console.error("Error fetching BusinessDomains:", error);
+    throw error;
+  } finally {
+    await prisma.$disconnect();
+  }
+}

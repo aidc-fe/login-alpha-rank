@@ -3,7 +3,7 @@
 import request from "@/lib/request";
 import { ArrowUpRight } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
-import { Button, Input } from '@nextui-org/react'
+import { Button, Input, Link } from '@nextui-org/react'
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -81,37 +81,22 @@ export default function Home() {
               />
 
               <div className="flex justify-between">
-                <Button
-                  className="group p-0 h-auto !bg-transparent w-auto min-w-0"
-                  color="primary"
-                  variant="light"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    router.push(
-                      `/password/emailVerify?email=${encodeURIComponent(email)}`
-                    );
-                  }}
-                >
+                <Link showAnchorIcon anchorIcon={<ArrowUpRight
+                  className="group-hover:rotate-45 duration-150"
+                  size={20}
+                  />} 
+                className="group" 
+                href={`/password/emailVerify?email=${encodeURIComponent(email)}`}>
                   Forgot your password{" "}
-                  <ArrowUpRight
-                    className="group-hover:rotate-45 duration-150"
-                    size={16}
-                  />
-                </Button>
-                <div className="text-sm text-muted-foreground">
+                </Link>
+                <div className="text-muted-foreground">
                   Not a member?{" "}
-                  <Button
-                    className="p-0 h-auto !bg-transparent w-auto min-w-0"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      router.push(`/signUp?email=${encodeURIComponent(email)}`);
-                    }}
-                    color="primary"
-                    variant="light"
-                    disabled={loading || emailLoading}
+                  <Link
+                    href={`/signUp?email=${encodeURIComponent(email)}`}
+                    isDisabled={loading || emailLoading}
                   >
                     Sign up
-                  </Button>
+                  </Link>
                 </div>
               </div>
 
@@ -133,8 +118,6 @@ export default function Home() {
 
             <Button
               className="w-full"
-              variant="bordered"
-              size={"lg"}
               radius="sm"
               onClick={() => signIn("google", { callbackUrl })}
             >
@@ -147,7 +130,7 @@ export default function Home() {
               Google
             </Button>
             <form
-              className="flex py-4 gap-3"
+              className="flex py-4 gap-3 items-center"
               onSubmit={(e) => {
                 e.preventDefault();
                 setEmailLoading(true);
@@ -169,10 +152,9 @@ export default function Home() {
               }}
             >
               <Input
-                className="flex-1"
                 name="email"
                 required
-                placeholder={
+                label={
                   "Enter email address for Magic Link Authentication"
                 }
                 type="email"
@@ -181,38 +163,28 @@ export default function Home() {
                   setJumpEmail(e.target.value);
                 }}
               />
-              <Button color="primary" type="submit" isLoading={emailLoading} disabled={loading}>
-                <span>Sign in</span>
+              <Button color="primary" type="submit" isLoading={emailLoading} isDisabled={loading}>
+                Sign in
               </Button>
             </form>
             <div className="w-1/2 border-b mx-auto mt-4" />
-            <div className="w-full text-muted-foreground text-sm font-normal text-center mt-4">
+            <div className="w-full text-muted-foreground font-normal text-center mt-4">
               By continuing with any of the options above, you agree to our{" "}
-              <Button
-                onClick={() => {
-                  window.open(
-                    "https://terms.alicdn.com/legal-agreement/terms/b_platform_service_agreement/20231110160335349/20231110160335349.html"
-                  );
-                }}
-                color="primary"
-                variant="light"
-                className="p-0 h-auto !bg-transparent w-auto min-w-0"
+              <Link
+                href="https://terms.alicdn.com/legal-agreement/terms/b_platform_service_agreement/20231110160335349/20231110160335349.html"
+                isExternal
+                underline="always"
               >
                 Terms of Service
-              </Button>{" "}
+              </Link>{" "}
               and have read our{" "}
-              <Button
-                onClick={() => {
-                  window.open(
-                    "https://terms.alicdn.com/legal-agreement/terms/privacy_policy_full/20231109180939630/20231109180939630.html"
-                  );
-                }}
-                color="primary"
-                variant="light"
-                className="p-0 h-auto !bg-transparent w-auto min-w-0"
+              <Link
+                href="https://terms.alicdn.com/legal-agreement/terms/privacy_policy_full/20231109180939630/20231109180939630.html"
+                isExternal
+                underline="always"
               >
                 Privacy Policy
-              </Button>{" "}
+              </Link>{" "}
               .
             </div>
           </div>
