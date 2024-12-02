@@ -74,7 +74,7 @@ export default function EditClient({
         const { materials, redirect_uris } = res;
         setDetails(res);
         setMaterials(materials || []);
-        setBrandColor(brand_color);
+        setBrandColor(brandColor);
         setRedirectUris(redirect_uris || [""]);
       })
       .finally(() => {
