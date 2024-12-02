@@ -8,35 +8,41 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String    @unique
-  emailVerified DateTime?
-  image         String?
-  from          String?
-  password      String?
-  created_at    DateTime  @default(now())
-  accounts      Account[]
-  sessions      Session[]
+  id               String    @id @default(cuid())
+  name             String?
+  email            String
+  emailVerified    DateTime?
+  image            String?
+  from             String?
+  password         String?
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @updatedAt
+  businessDomainId String   // Foreign key to BusinessDomain model
+  businessDomain   BusinessDomain @relation(fields: [businessDomainId], references: [id], onDelete: Cascade)
+
+  accounts         Account[]
+  sessions         Session[]
+
+  @@unique([email, businessDomainId]) // Unique constraint on email + businessDomainId
 }
 
 model Account {
-  id                  String  @id @default(cuid())
-  userId              String
-  type                String
-  provider            String
-  providerAccountId   String
-  refresh_token       String?
-  access_token        String?
-  expires_at          Int?
-  token_type          String?
-  scope               String?
-  id_token            String?
-  session_state       String?
-  shop_domain         String?
-  shop_domain_display String?
-  user_name           String?
-  user                User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  shop_domain              String?
+  shop_domain_display   String?
+  user_name          String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -72,20 +78,27 @@ model AuthorizationCode {
 }
 
 model Client {
-  client_id     String         @id @unique
-  client_secret String
-  redirect_uris String
-  grant_types   String
-  scope         String
-  created_at    DateTime       @default(now())
-  updated_at    DateTime       @updatedAt
-  active        Boolean        @default(true)
-  name          String
-  description   String
-  signout_uri   String
-  auth_domain   String?        // Domain related to login system
-  accessTokens  AccessToken[]
-  refreshTokens RefreshToken[]
+  client_id         String         @id @unique
+  client_secret     String
+  redirect_uris     String
+  grant_types       String
+  scope             String
+  created_at        DateTime       @default(now())
+  updated_at        DateTime       @updatedAt
+  active            Boolean        @default(true)
+  name              String
+  description       String
+  signout_uri       String
+  auth_domain       String?        // Domain related to login system
+  brand_color       String?        // Brand color
+  materials         Json?          // Materials array (each material contains title, description, image)
+  businessDomainId  String         // Foreign key to BusinessDomain model
+  tos_doc           String?        // Terms of Service document URL
+  pp_doc            String?        // Privacy Policy document URL
+
+  businessDomain    BusinessDomain @relation(fields: [businessDomainId], references: [id], onDelete: Cascade)
+  accessTokens      AccessToken[]
+  refreshTokens     RefreshToken[]
 }
 
 
@@ -106,4 +119,16 @@ model RefreshToken {
   created_at   DateTime      @default(now())
   accessTokens AccessToken[]
   client       Client        @relation(fields: [client_id], references: [client_id], onDelete: Cascade)
+}
+
+model BusinessDomain {
+  id               String    @id @default(cuid())
+  name             String    @unique
+  description      String?
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @updatedAt
+  active           Boolean   @default(true)
+  sso Boolean @default(false) // Field indicating if SSO is required
+  users            User[]    // Relationship to User model
+  clients          Client[]  // Relationship to Client model
 }

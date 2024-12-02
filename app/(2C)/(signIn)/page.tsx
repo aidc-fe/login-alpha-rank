@@ -1,8 +1,7 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import request from "@/lib/request";
+import { Button, Input, Link } from "@nextui-org/react";
 import { ArrowUpRight } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
@@ -82,43 +81,32 @@ export default function Home() {
               />
 
               <div className="flex justify-between">
-                <Button
+                <Link
+                  underline="always"
+                  showAnchorIcon
                   className="group p-0 h-auto"
-                  variant={"link"}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    router.push(
-                      `/password/emailVerify?email=${encodeURIComponent(email)}`
-                    );
-                  }}
+                  anchorIcon={<ArrowUpRight className="group-hover:rotate-45 duration-150" size={16} />}
+                  href={`/password/emailVerify?email=${encodeURIComponent(email)}`}
                 >
-                  Forgot your password{" "}
-                  <ArrowUpRight
-                    className="group-hover:rotate-45 duration-150"
-                    size={16}
-                  />
-                </Button>
-                <div className="text-sm text-muted-foreground">
+                  Forgot your password
+                </Link>
+                <div className="text-muted-foreground">
                   Not a member?{" "}
-                  <Button
-                    className="p-0 h-auto"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      router.push(`/signUp?email=${encodeURIComponent(email)}`);
-                    }}
-                    variant={"link"}
-                    disabled={loading || emailLoading}
+                  <Link
+                    href={`/signUp?email=${encodeURIComponent(email)}`}
+                    underline="always"
+                    isDisabled={loading || emailLoading}
                   >
                     Sign up
-                  </Button>
+                  </Link>
                 </div>
               </div>
 
               <Button
-                variant={"default"}
                 type="submit"
-                loading={loading}
-                disabled={emailLoading}
+                isLoading={loading}
+                isDisabled={emailLoading}
+                color="primary"
               >
                 Sign in
               </Button>
@@ -131,16 +119,16 @@ export default function Home() {
             </div>
 
             <Button
-              variant={"outline"}
-              size={"lg"}
+              variant="bordered"
+              className="w-full"
               onClick={() => signIn("google", { callbackUrl })}
-            >
-              <Image
+              startContent={<Image
                 height="24"
                 width="24"
                 alt="provider-logo-dark"
                 src="https://authjs.dev/img/providers/google.svg"
-              ></Image>
+              ></Image>}
+            >
               Google
             </Button>
             <form
@@ -178,36 +166,30 @@ export default function Home() {
                   setJumpEmail(e.target.value);
                 }}
               />
-              <Button type="submit" loading={emailLoading} disabled={loading}>
+              <Button type="submit" color="primary" isLoading={emailLoading} isDisabled={loading}>
                 <span>Sign in</span>
               </Button>
             </form>
             <div className="w-1/2 border-b mx-auto mt-4" />
             <div className="w-full text-muted-foreground text-sm font-normal text-center mt-4">
               By continuing with any of the options above, you agree to our{" "}
-              <Button
-                onClick={() => {
-                  window.open(
-                    "https://terms.alicdn.com/legal-agreement/terms/b_platform_service_agreement/20231110160335349/20231110160335349.html"
-                  );
-                }}
-                variant="link"
-                className="p-0 h-fit"
+              <Link
+                href={"https://terms.alicdn.com/legal-agreement/terms/b_platform_service_agreement/20231110160335349/20231110160335349.html"}
+                underline="always"
+                isExternal
+                size="sm"
               >
                 Terms of Service
-              </Button>{" "}
+              </Link>{" "}
               and have read our{" "}
-              <Button
-                onClick={() => {
-                  window.open(
-                    "https://terms.alicdn.com/legal-agreement/terms/privacy_policy_full/20231109180939630/20231109180939630.html"
-                  );
-                }}
-                variant="link"
-                className="p-0 h-fit"
+              <Link
+                href={"https://terms.alicdn.com/legal-agreement/terms/privacy_policy_full/20231109180939630/20231109180939630.html"}
+                underline="always"
+                isExternal
+                size="sm"
               >
                 Privacy Policy
-              </Button>{" "}
+              </Link>{" "}
               .
             </div>
           </div>

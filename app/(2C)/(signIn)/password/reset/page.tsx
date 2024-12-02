@@ -2,7 +2,7 @@
 import { CornerUpLeft, Loader, Send } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
-import { Button, Input } from "@nextui-org/react";
+import { Button, Input, Link } from "@nextui-org/react";
 
 export default function Page() {
   const searchParams = useSearchParams();
@@ -49,23 +49,17 @@ export default function Page() {
           size={"lg"}
           type="submit"
           disabled={loading}
-          onClick={() => {}}
         >
           {loading && <Loader className="text-primary animate-spin" />}
           Set Password
         </Button>
-        <Button
-          color="primary"
-          variant="flat"
-          onClick={(e) => {
-            e.preventDefault();
-            router.replace(`/?email=${encodeURIComponent(email)}`);
-          }}
+        <Link
+        href={`/?email=${encodeURIComponent(email)}`}
           className="flex items-center gap-1 h-auto bg-transparent w-auto min-w-0"
         >
           <CornerUpLeft size={16} />
           Return to signin
-        </Button>
+        </Link>
       </div>
     </form>
   );

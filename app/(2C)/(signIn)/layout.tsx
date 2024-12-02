@@ -12,6 +12,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <main className="grid h-screen items-center md:grid-cols-2 relative">
       <div className="h-full bg-circle-gradient hidden justify-center md:flex">
