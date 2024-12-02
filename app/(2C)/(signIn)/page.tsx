@@ -1,10 +1,9 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import request from "@/lib/request";
 import { ArrowUpRight } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
+import { Button, Input, Link } from '@nextui-org/react'
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -42,7 +41,7 @@ export default function Home() {
   switch (status) {
     case "unauthenticated":
       return (
-        <div className="flex items-center justify-center w-full h-full px-8 -mr-4 space-y-6 bg-white">
+        <div className="flex items-center justify-center w-full h-full px-8 -mr-4 space-y-6">
           <div className="max-w-lg">
             <h1 className="font-bold text-3xl mb-12 text-center">Sign in</h1>
             <form
@@ -69,8 +68,8 @@ export default function Home() {
             >
               <Input
                 name="email"
+                label="E-mail"
                 required
-                placeholder="E-mail"
                 type="email"
                 value={email}
                 onChange={(e) => {
@@ -79,48 +78,35 @@ export default function Home() {
               />
               <Input
                 name="password"
+                label="Password"
                 required
-                placeholder="Password"
                 type="password"
               />
 
               <div className="flex justify-between">
-                <Button
-                  className="group p-0 h-auto"
-                  variant={"link"}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    router.push(
-                      `/password/emailVerify?email=${encodeURIComponent(email)}`
-                    );
-                  }}
-                >
+                <Link showAnchorIcon anchorIcon={<ArrowUpRight
+                  className="group-hover:rotate-45 duration-150"
+                  size={20}
+                  />} 
+                className="group" 
+                href={`/password/emailVerify?email=${encodeURIComponent(email)}`}>
                   Forgot your password{" "}
-                  <ArrowUpRight
-                    className="group-hover:rotate-45 duration-150"
-                    size={16}
-                  />
-                </Button>
-                <div className="text-sm text-muted-foreground">
+                </Link>
+                <div className="text-muted-foreground">
                   Not a member?{" "}
-                  <Button
-                    className="p-0 h-auto"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      router.push(`/signUp?email=${encodeURIComponent(email)}`);
-                    }}
-                    variant={"link"}
-                    disabled={loading || emailLoading}
+                  <Link
+                    href={`/signUp?email=${encodeURIComponent(email)}`}
+                    isDisabled={loading || emailLoading}
                   >
                     Sign up
-                  </Button>
+                  </Link>
                 </div>
               </div>
 
               <Button
-                variant={"default"}
+                color="primary"
                 type="submit"
-                loading={loading}
+                isLoading={loading}
                 disabled={emailLoading}
               >
                 Sign in
@@ -134,8 +120,8 @@ export default function Home() {
             </div>
 
             <Button
-              variant={"outline"}
-              size={"lg"}
+              className="w-full"
+              radius="sm"
               onClick={() => signIn("google", { callbackUrl })}
             >
               <Image
@@ -147,7 +133,7 @@ export default function Home() {
               Google
             </Button>
             <form
-              className="flex py-4 gap-3"
+              className="flex py-4 gap-3 items-center"
               onSubmit={(e) => {
                 e.preventDefault();
                 setEmailLoading(true);
@@ -169,10 +155,9 @@ export default function Home() {
               }}
             >
               <Input
-                className="flex-1"
                 name="email"
                 required
-                placeholder={
+                label={
                   "Enter email address for Magic Link Authentication"
                 }
                 type="email"
@@ -181,36 +166,28 @@ export default function Home() {
                   setJumpEmail(e.target.value);
                 }}
               />
-              <Button type="submit" loading={emailLoading} disabled={loading}>
-                <span>Sign in</span>
+              <Button color="primary" type="submit" isLoading={emailLoading} isDisabled={loading}>
+                Sign in
               </Button>
             </form>
             <div className="w-1/2 border-b mx-auto mt-4" />
-            <div className="w-full text-muted-foreground text-sm font-normal text-center mt-4">
+            <div className="w-full text-muted-foreground font-normal text-center mt-4">
               By continuing with any of the options above, you agree to our{" "}
-              <Button
-                onClick={() => {
-                  window.open(
-                    "https://terms.alicdn.com/legal-agreement/terms/b_platform_service_agreement/20231110160335349/20231110160335349.html"
-                  );
-                }}
-                variant="link"
-                className="p-0 h-fit"
+              <Link
+                href="https://terms.alicdn.com/legal-agreement/terms/b_platform_service_agreement/20231110160335349/20231110160335349.html"
+                isExternal
+                underline="always"
               >
                 Terms of Service
-              </Button>{" "}
+              </Link>{" "}
               and have read our{" "}
-              <Button
-                onClick={() => {
-                  window.open(
-                    "https://terms.alicdn.com/legal-agreement/terms/privacy_policy_full/20231109180939630/20231109180939630.html"
-                  );
-                }}
-                variant="link"
-                className="p-0 h-fit"
+              <Link
+                href="https://terms.alicdn.com/legal-agreement/terms/privacy_policy_full/20231109180939630/20231109180939630.html"
+                isExternal
+                underline="always"
               >
                 Privacy Policy
-              </Button>{" "}
+              </Link>{" "}
               .
             </div>
           </div>

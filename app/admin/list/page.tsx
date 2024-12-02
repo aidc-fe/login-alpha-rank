@@ -1,24 +1,22 @@
 "use client";
-import { Switch } from "@/components/ui/switch";
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableHead,
-  TableRow,
-  TableCell,
-} from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
 import { Copy, Plus } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button,
+  useDisclosure,
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  Switch,
+} from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useRequest, useUpdateEffect } from "ahooks";
@@ -42,7 +40,6 @@ function getList(
 
 export default function List() {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
   const [currentData, setCurrentData] = useState({
     client_id: "",
     active: true,
@@ -55,6 +52,7 @@ export default function List() {
       }),
     {}
   );
+  const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
   const handleConfirm = ({
     client_id,
@@ -72,7 +70,7 @@ export default function List() {
       }),
     })
       .then((res) => {
-        setOpen(false);
+        onClose();
         setCurrentData({
           client_id: "",
           active: true,
@@ -99,9 +97,7 @@ export default function List() {
       <div className="flex items-center justify-between">
         <span className="text-2xl font-semibold">My Clients</span>
         <Button
-          variant={"default"}
-          size={"default"}
-          icon={<Plus size={16} />}
+          startContent={<Plus size={16} />}
           type="button"
           className="inline-flex items-center gap-1"
           onClick={() => {
@@ -114,20 +110,23 @@ export default function List() {
 
       <div className="flex-auto min-h-0 relative">
         <Loader className="top-12" loading={loading}>
-          <Table>
+          <Table removeWrapper>
             <TableHeader>
-              <TableRow className="bg-slate-200 hover:!bg-slate-200">
-                <TableHead className="w-40">Name</TableHead>
-                <TableHead>Client Id</TableHead>
-                <TableHead>Activate</TableHead>
-                <TableHead className="w-40">Action</TableHead>
-              </TableRow>
+              <TableColumn className="w-40">Name</TableColumn>
+              <TableColumn>Client Id</TableColumn>
+              <TableColumn>Activate</TableColumn>
+              <TableColumn className="w-40">Action</TableColumn>
             </TableHeader>
             <TableBody>
               {(data || []).map((item, index) => (
                 <TableRow className="h-14" key={item.client_id}>
                   <TableCell>
-                    <Link className="hover:underline hover:text-primary" href={`/admin/list/detail?clientId=${item.client_id}`}>{item.name}</Link>
+                    <Link
+                      className="hover:underline hover:text-primary"
+                      href={`/admin/list/detail?clientId=${item.client_id}`}
+                    >
+                      {item.name}
+                    </Link>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-1">
@@ -137,9 +136,10 @@ export default function List() {
                   </TableCell>
                   <TableCell>
                     <Switch
-                      checked={item.active}
-                      loading={item.client_id === currentData.client_id}
-                      onCheckedChange={(checked) => {
+                      isSelected={item.active}
+                      // Nextui不存在loading态
+                      // loading={item.client_id === currentData.client_id}
+                      onValueChange={(checked) => {
                         setCurrentData({
                           client_id: item.client_id!,
                           active: checked,
@@ -150,7 +150,7 @@ export default function List() {
                             active: checked,
                           });
                         } else {
-                          setOpen(true);
+                          onOpen();
                         }
                       }}
                     />
@@ -169,25 +169,35 @@ export default function List() {
           </Table>
         </Loader>
       </div>
-      <Dialog open={open}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Deactivate Client</DialogTitle>
-          </DialogHeader>
-          <DialogDescription>
-            This client will be deactivate immediately. Once deactivate, it can
-            no longer be used to make oAuth Login.
-          </DialogDescription>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>
-              Cancel
-            </Button>
-            <Button loading={switchLoading} onClick={() => handleConfirm()}>
-              Continue
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                Deactivate Client
+              </ModalHeader>
+              <ModalBody>
+                <p>
+                  This client will be deactivate immediately. Once deactivate,
+                  it can no longer be used to make oAuth Login.
+                </p>
+              </ModalBody>
+              <ModalFooter>
+                <Button variant="faded" onPress={onClose}>
+                  Cancel
+                </Button>
+                <Button
+                  isLoading={switchLoading}
+                  color="primary"
+                  onClick={() => handleConfirm()}
+                >
+                  Continue
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </div>
   );
 }

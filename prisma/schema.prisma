@@ -8,18 +8,22 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String   @unique
-  emailVerified DateTime?
-  image         String?
-  from          String?
-  password      String?
-  created_at DateTime @default(now())
+  id               String    @id @default(cuid())
+  name             String?
+  email            String
+  emailVerified    DateTime?
+  image            String?
+  from             String?
+  password         String?
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @updatedAt
+  businessDomainId String   // Foreign key to BusinessDomain model
+  businessDomain   BusinessDomain @relation(fields: [businessDomainId], references: [id], onDelete: Cascade)
 
-  accounts      Account[]
-  sessions      Session[]
-  Client        Client[]
+  accounts         Account[]
+  sessions         Session[]
+
+  @@unique([email, businessDomainId]) // Unique constraint on email + businessDomainId
 }
 
 model Account {
@@ -74,22 +78,29 @@ model AuthorizationCode {
 }
 
 model Client {
-  client_id     String         @id @unique
-  client_secret String
-  redirect_uris String
-  grant_types   String
-  scope         String
-  created_at    DateTime       @default(now())
-  updated_at    DateTime       @updatedAt
-  active        Boolean
-  name          String
-  description   String
-  owner_email   String // Foreign key to User's email
-  signout_uri   String
-  user          User           @relation(fields: [owner_email], references: [email], onDelete: Cascade) // Defines relationship with User model
-  accessTokens  AccessToken[]
-  refreshTokens RefreshToken[]
+  client_id         String         @id @unique
+  client_secret     String
+  redirect_uris     String
+  grant_types       String
+  scope             String
+  created_at        DateTime       @default(now())
+  updated_at        DateTime       @updatedAt
+  active            Boolean        @default(true)
+  name              String
+  description       String
+  signout_uri       String
+  auth_domain       String        // Domain related to login system
+  brand_color       String?        // Brand color
+  materials         Json?          // Materials array (each material contains title, description, image)
+  businessDomainId  String         // Foreign key to BusinessDomain model
+  tos_doc           String?        // Terms of Service document URL
+  pp_doc            String?        // Privacy Policy document URL
+
+  businessDomain    BusinessDomain @relation(fields: [businessDomainId], references: [id], onDelete: Cascade)
+  accessTokens      AccessToken[]
+  refreshTokens     RefreshToken[]
 }
+
 
 model AccessToken {
   token         String       @id
@@ -108,4 +119,16 @@ model RefreshToken {
   created_at   DateTime      @default(now())
   accessTokens AccessToken[]
   client       Client        @relation(fields: [client_id], references: [client_id], onDelete: Cascade)
+}
+
+model BusinessDomain {
+  id               String    @id @default(cuid())
+  name             String    @unique
+  description      String?
+  created_at       DateTime  @default(now())
+  updated_at       DateTime  @updatedAt
+  active           Boolean   @default(true)
+  sso Boolean @default(false) // Field indicating if SSO is required
+  users            User[]    // Relationship to User model
+  clients          Client[]  // Relationship to Client model
 }

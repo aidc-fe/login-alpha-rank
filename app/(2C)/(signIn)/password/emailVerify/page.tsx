@@ -1,11 +1,10 @@
 "use client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { toastApi } from "@/components/ui/toaster";
 import request from "@/lib/request";
-import { CornerUpLeft, Loader, Send } from "lucide-react";
+import { Send } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEventHandler, useState } from "react";
+import { Input, Button, Link } from "@nextui-org/react";
 
 export default function Page() {
   const searchParams = useSearchParams();
@@ -49,7 +48,7 @@ export default function Page() {
   };
 
   return (
-    <div className="flex items-center justify-center bg-background h-full w-full">
+    <div className="flex items-center justify-center h-full w-full">
       <form
         className="flex flex-col items-center justify-center gap-4 w-full max-w-lg"
         onSubmit={handleSubmit}
@@ -58,7 +57,7 @@ export default function Page() {
         <Input
           name="email"
           required
-          placeholder="E-mail"
+          label="E-mail"
           type="email"
           value={email}
           onChange={(e) => {
@@ -69,7 +68,7 @@ export default function Page() {
         <Input
           name="password"
           required
-          placeholder="Password"
+          label="Password"
           type="password"
         />
 
@@ -77,30 +76,28 @@ export default function Page() {
           name="check_password"
           required
           type="password"
-          placeholder="Re-enter password"
+          label="Re-enter password"
         />
         <Button
           className="group w-full"
-          variant={"default"}
+          color="primary"
           type="submit"
-          icon={<Send size={20} className="group-hover:rotate-45 duration-150" />}
-          loading={loading}
+          startContent={
+            <Send size={20} className="group-hover:rotate-45 duration-150" />
+          }
+          isLoading={loading}
         >
           Send set instructions
         </Button>
         <div className="w-1/2 border-b mx-auto mt-4" />
-        <div className="flex text-sm text-muted-foreground gap-1">
+        <div className="flex items-center text-muted-foreground gap-2">
           <span>Back to</span>
-          <Button
-            variant={"link"}
-            onClick={(e) => {
-              e.preventDefault();
-              router.replace(`/?email=${encodeURIComponent(email)}`);
-            }}
-            className="flex items-center gap-1 p-0 h-auto"
+          <Link
+           href={`/?email=${encodeURIComponent(email)}`}
+            className="flex items-center gap-1 p-0 h-auto !bg-transparent w-auto min-w-0"
           >
             Sign in
-          </Button>
+          </Link>
         </div>
       </form>
     </div>

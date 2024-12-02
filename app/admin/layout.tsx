@@ -2,11 +2,11 @@
 
 import Header from "@/components/admin/Layouts/Header";
 import Sider from "@/components/admin/Layouts/Sider";
-import { useUpdateEffect } from "ahooks";
-import type { Metadata } from "next";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
+
+const whiteList = ['hedyli1018+39@gmail.com', 'yuyuqueenlovemyself@gmail.com'];
 
 export default function RootLayout({
   children,
@@ -14,13 +14,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const router = useRouter();
-  const { status } = useSession();
+  const { data } = useSession();
   
-  useEffect(() => {
-    if (status === 'unauthenticated') {
-      router.replace(`/`)
-    }
-  }, [status]);
+  // useEffect(() => {
+  //   if (data && (!data?.user?.email || !whiteList.includes(data?.user?.email))) {
+  //     router.replace(`/`)
+  //   }
+  // }, [data?.user?.email]);
 
   return (
     <div className="min-h-screen">

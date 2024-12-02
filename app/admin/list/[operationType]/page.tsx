@@ -1,8 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Input, Textarea } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 import { toastApi } from "@/components/ui/toaster";
 import request from "@/lib/request";
 import { FilePenLine, Plus, Trash2 } from "lucide-react";
@@ -10,22 +7,32 @@ import { FormEventHandler, useEffect, useState } from "react";
 import {
   OPERATION_TYPE,
   scopeOptions,
-  defaultClientInfo,
   ClientDataType,
+  BusinessDomainDataType,
 } from "@/lib/admin";
 import { upperFirst } from "lodash";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import Loader from "@/components/ui/loader";
 import CopyButton from "@/components/CopyButton";
+import {
+  Input,
+  Button,
+  CheckboxGroup,
+  Checkbox,
+  Textarea,
+  Table,
+  TableHeader,
+  TableColumn,
+  TableBody,
+  TableRow,
+  TableCell,
+  Breadcrumbs,
+  BreadcrumbItem,
+  Select,
+  SelectItem,
+} from "@nextui-org/react";
+import Link from "next/link";
 
 export default function EditClient({
   params,
@@ -35,56 +42,107 @@ export default function EditClient({
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
   const operationType = params.operationType;
-  const [canEdit, setCanEdit] = useState([OPERATION_TYPE.CREATE, OPERATION_TYPE.EDIT].includes(operationType));
+  const [canEdit, setCanEdit] = useState(
+    [OPERATION_TYPE.CREATE, OPERATION_TYPE.EDIT].includes(operationType)
+  );
   const clientId = searchParams.clientId as string;
   const [loading, setLoading] = useState(false);
   const [detailLoading, setDetailLoading] = useState(!!clientId);
   const [details, setDetails] = useState<ClientDataType>();
-  const [formData, setFormData] = useState<ClientDataType>(defaultClientInfo);
 
-  const pageTitle = details || clientId ? (canEdit ? OPERATION_TYPE.EDIT : 'Detail' ) : OPERATION_TYPE.CREATE;
+  const [materials, setMaterials] = useState<
+    Array<{ title: string; image: string; description: string }>
+  >([{ title: "", image: "", description: "" }]);
+  const [redirectUris, setRedirectUris] = useState<string[]>([""]);
+  const [brandColor, setBrandColor] = useState(
+    details?.brand_color || "#000000"
+  );
+  const [businessDomains, setBusinessDomains] = useState<
+    BusinessDomainDataType[]
+  >([]);
+
+  const pageTitle =
+    details || clientId
+      ? canEdit
+        ? OPERATION_TYPE.EDIT
+        : "Detail"
+      : OPERATION_TYPE.CREATE;
 
   const getDetail = () => {
     request(`/api/client/${clientId}`)
       .then((res) => {
-        const { scope, redirect_uris, name, signout_uri, description } = res;
+        const { materials, redirect_uris } = res;
         setDetails(res);
-        setFormData({
-          redirect_uris,
-          scope,
-          name,
-          signout_uri,
-          description,
-        });
+        setMaterials(materials || []);
+        setBrandColor(brand_color);
+        setRedirectUris(redirect_uris || [""]);
       })
       .finally(() => {
         setDetailLoading(false);
       });
   };
 
+  const getBusinessDomains = () => {
+    request("/api/businessDomain").then((res) => {
+      setBusinessDomains(res);
+    });
+  };
+
   useEffect(() => {
     if (clientId) {
       getDetail();
     }
+    getBusinessDomains();
   }, []);
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
     setLoading(true);
+
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+
+    // 处理materials数据
+    const materials = [];
+    const titles = formData.getAll("material_title");
+    const images = formData.getAll("material_image");
+    const descriptions = formData.getAll("material_description");
+
+    for (let i = 0; i < titles.length; i++) {
+      materials.push({
+        title: titles[i],
+        image: images[i],
+        description: descriptions[i],
+      });
+    }
+
+    // 处理scope数据
+    const scope = formData.getAll("scope");
+
+    // 处理redirect_uris数据
+    const redirect_uris = formData.getAll("redirect_uri").filter((uri) => uri);
+
     const params = {
-      ...formData,
+      businessDomainId: formData.get("businessDomainId"),
+      name: formData.get("name"),
+      description: formData.get("description"),
+      auth_domain: formData.get("auth_domain"),
+      brand_color: formData.get("brand_color"),
+      tos_doc: formData.get("tos_doc"),
+      pp_doc: formData.get("pp_doc"),
+      signout_uri: formData.get("signout_uri"),
+      materials,
+      scope,
+      redirect_uris,
     };
-    request(
-      `/api/client${
-        details?.client_id || clientId
-          ? `/${clientId || details?.client_id}`
-          : ""
-      }`,
-      {
-        method: "POST",
-        body: JSON.stringify(params),
-      }
-    )
+
+    // 当clientId存在时，表示是编辑，否则是新建
+    const url = clientId ? `/api/client/${clientId}` : "/api/client";
+
+    request(url, {
+      method: "POST",
+      body: JSON.stringify(params),
+    })
       .then((res) => {
         toastApi.success(`${upperFirst(pageTitle)} Success`);
         setDetails(res);
@@ -97,17 +155,14 @@ export default function EditClient({
 
   return (
     <>
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/list">My Client</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>{upperFirst(pageTitle)} Client</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      <Breadcrumbs>
+        <BreadcrumbItem>
+          <Link href="/admin/list">My Client</Link>
+        </BreadcrumbItem>
+        <BreadcrumbItem className="capitalize">
+          {pageTitle} Client
+        </BreadcrumbItem>
+      </Breadcrumbs>
       <Loader loading={detailLoading}>
         <div className="flex gap-4 mt-4 flex-col xl:gap-8 xl:flex-row">
           {!detailLoading ? (
@@ -120,9 +175,8 @@ export default function EditClient({
                   <span>{`${upperFirst(pageTitle)} Client`}</span>
                   {!canEdit && details ? (
                     <Button
-                      variant="outline"
                       type="button"
-                      icon={<FilePenLine size={16} />}
+                      startContent={<FilePenLine size={16} />}
                       onClick={(e) => {
                         e.stopPropagation();
                         e.preventDefault();
@@ -135,41 +189,184 @@ export default function EditClient({
                 </div>
 
                 <div className="px-3 flex flex-col gap-4">
-                  <Input
-                    className="read-only:border-0 read-only:!ring-0 read-only:px-0 read-only:text-muted-foreground"
-                    layout="vertical"
-                    name="name"
-                    readOnly={!canEdit}
-                    label="name"
-                    placeholder="Please enter name"
+                  <Select
+                    label="Business Domain ID"
+                    className="max-w-xs"
+                    name="businessDomainId"
+                    isDisabled={!canEdit}
                     required
-                    value={formData.name}
-                    onChange={(e) => {
-                      setFormData({ ...formData, name: e.target.value });
-                    }}
+                    defaultSelectedKeys={
+                      details?.businessDomainId
+                        ? [details.businessDomainId]
+                        : []
+                    }
+                  >
+                    {businessDomains.map((item) => (
+                      <SelectItem key={item.id}>{item.name}</SelectItem>
+                    ))}
+                  </Select>
+                  <Input
+                    name="name"
+                    label="Name"
+                    readOnly={!canEdit}
+                    required
+                    defaultValue={details?.name}
                   />
 
                   <Textarea
-                    className="h-auto read-only:border-0 read-only:!ring-0 read-only:shadow-none read-only:resize-none read-only:px-0 read-only:text-muted-foreground"
                     name="description"
+                    label="Description"
                     rows={2}
-                    label="description"
                     readOnly={!canEdit}
-                    placeholder="Please enter your description"
-                    value={formData.description}
-                    onChange={(e) => {
-                      setFormData({ ...formData, description: e.target.value });
-                    }}
+                    defaultValue={details?.description}
+                  />
+
+                  <Input
+                    name="auth_domain"
+                    label="Auth Domain"
+                    readOnly={!canEdit}
+                    defaultValue={details?.auth_domain}
+                  />
+
+                  <div className="flex w-full items-center gap-2">
+                    <span className="capitalize text-sm">Brand Color:</span>
+                    <label
+                      htmlFor="brand_color"
+                      className="h-10 w-10 p-2 rounded-xl border-1 cursor-pointer relative"
+                    >
+                      <Input
+                        id="brand_color"
+                        label="Brand Color"
+                        type="color"
+                        name="brand_color"
+                        disabled={!canEdit}
+                        value={brandColor}
+                        onChange={(e) => setBrandColor(e.target.value)}
+                        className="absolute inset-0 pointer-events-none opacity-0"
+                      />
+                      <div
+                        className="rounded-md w-full h-full"
+                        style={{ backgroundColor: brandColor }}
+                      />
+                    </label>
+                  </div>
+
+                  <div className="flex flex-col gap-1">
+                    <div className="capitalize text-sm">Materials:</div>
+                    <div className={cn("flex flex-col gap-4")}>
+                      <Table
+                        aria-label="Materials table"
+                        classNames={{
+                          wrapper: cn("border rounded-xl", {
+                            "bg-content1": canEdit,
+                          }),
+                        }}
+                      >
+                        <TableHeader>
+                          <TableColumn>Title</TableColumn>
+                          <TableColumn>Description</TableColumn>
+                          <TableColumn>Image Url</TableColumn>
+                          <TableColumn hidden={!canEdit} width={65}>
+                            Operation
+                          </TableColumn>
+                        </TableHeader>
+                        {materials.length ? (
+                          <TableBody>
+                            {materials.map((item, index) => (
+                              <TableRow key={index}>
+                                <TableCell>
+                                  <Input
+                                    name="material_title"
+                                    readOnly={!canEdit}
+                                    defaultValue={item.title}
+                                    isClearable={canEdit}
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    name="material_description"
+                                    readOnly={!canEdit}
+                                    defaultValue={item.description}
+                                    isClearable={canEdit}
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    name="material_image"
+                                    readOnly={!canEdit}
+                                    type="url"
+                                    defaultValue={item.image}
+                                    isClearable={canEdit}
+                                  />
+                                </TableCell>
+                                <TableCell hidden={!canEdit}>
+                                  <Button
+                                    isIconOnly
+                                    color="danger"
+                                    variant="light"
+                                    onClick={() => {
+                                      const newMaterials = [...materials];
+                                      newMaterials.splice(index, 1);
+                                      setMaterials(newMaterials);
+                                    }}
+                                  >
+                                    <Trash2 size={20} />
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        ) : (
+                          <></>
+                        )}
+                      </Table>
+
+                      {canEdit && (
+                        <div className="text-right">
+                          <Button
+                            type="button"
+                            startContent={<Plus size={20} />}
+                            disabled={loading}
+                            onClick={() =>
+                              setMaterials([
+                                ...materials,
+                                { title: "", description: "", image: "" },
+                              ])
+                            }
+                          >
+                            Add Material
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <Input
+                    name="tos_doc"
+                    label="Terms of Service URL"
+                    readOnly={!canEdit}
+                    type="url"
+                    pattern="^(https?|ftp)://.+"
+                    defaultValue={details?.tos_doc}
+                  />
+
+                  <Input
+                    name="pp_doc"
+                    label="Privacy Policy URL"
+                    readOnly={!canEdit}
+                    type="url"
+                    pattern="^(https?|ftp)://.+"
+                    defaultValue={details?.pp_doc}
                   />
 
                   <div className="w-full flex flex-col gap-1">
                     <span className="capitalize text-sm">Redirect URL:</span>
                     <div
                       className={cn("flex flex-col gap-4", {
-                        "bg-slate-100 rounded-xl px-4 py-6": canEdit,
+                        "border border-border rounded-xl px-4 py-6": canEdit,
                       })}
                     >
-                      {formData.redirect_uris?.map((item, index) => (
+                      {redirectUris.map((item, index) => (
                         <div
                           key={`redirect_uri${index}`}
                           className={cn(
@@ -180,118 +377,78 @@ export default function EditClient({
                           )}
                         >
                           <Input
-                            className="read-only:border-0 read-only:!ring-0 read-only:px-0 read-only:text-muted-foreground"
-                            layout="vertical"
+                            name="redirect_uri"
                             readOnly={!canEdit}
-                            placeholder="Please enter your Redirect URL"
-                            value={item}
+                            defaultValue={item}
                             type="url"
                             pattern="^(https?|ftp)://.+"
-                            onChange={(e) => {
-                              const new_redirect_uris = [
-                                ...(formData.redirect_uris ?? []),
-                              ];
-                              new_redirect_uris[index] = e.target.value;
-                              setFormData({
-                                ...formData,
-                                redirect_uris: new_redirect_uris,
-                              });
-                            }}
                             required
                           />
                           <Button
-                            size={"icon"}
-                            variant={"secondary"}
+                            isIconOnly
+                            color="danger"
                             className={cn({ hidden: !index || !canEdit })}
                             onClick={() => {
-                              const new_redirect_uris = [
-                                ...(formData.redirect_uris ?? []),
-                              ];
-                              new_redirect_uris.splice(index, 1);
-                              setFormData({
-                                ...formData,
-                                redirect_uris: new_redirect_uris,
-                              });
+                              const newUris = [...redirectUris];
+                              newUris.splice(index, 1);
+                              setRedirectUris(newUris);
                             }}
                           >
-                            <Trash2 />
+                            <Trash2 size={20} />
                           </Button>
                         </div>
                       ))}
-                      {!!canEdit ? (
+                      {canEdit && (
                         <div className="text-right">
                           <Button
-                            variant="outline"
                             type="button"
+                            startContent={<Plus size={20} />}
                             disabled={loading}
-                            className="inline-flex items-center gap-1"
                             onClick={() =>
-                              setFormData({
-                                ...formData,
-                                redirect_uris: [
-                                  ...(formData.redirect_uris ?? []),
-                                  "",
-                                ],
-                              })
+                              setRedirectUris([...redirectUris, ""])
                             }
                           >
-                            <Plus size={20} />
                             Add
                           </Button>
                         </div>
-                      ) : null}
+                      )}
                     </div>
                   </div>
 
                   <Input
-                    className="read-only:border-0 read-only:!ring-0 read-only:px-0 read-only:text-muted-foreground"
-                    label="signout url"
-                    layout="vertical"
                     name="signout_uri"
+                    label="Signout URL"
                     readOnly={!canEdit}
-                    placeholder="Please enter signout url"
                     required
                     type="url"
                     pattern="^(https?|ftp)://.+"
-                    value={formData.signout_uri}
-                    onChange={(e) => {
-                      setFormData({ ...formData, signout_uri: e.target.value });
-                    }}
+                    defaultValue={details?.signout_uri}
                   />
 
-                  <div className="w-full text-left">
-                    <div className="text-sm">Scope:</div>
-                    {canEdit ? <div className="flex items-center gap-4 mt-2">
-                      {scopeOptions.map((key) => (
-                        <div
-                          className="inline-flex items-center gap-2"
-                          key={key}
+                  <div className="flex gap-2 items-center">
+                    <label className="text-sm">Scope:</label>
+                    {canEdit ? (
+                      <div className="mt-2">
+                        <CheckboxGroup
+                          name="scope"
+                          orientation="horizontal"
+                          defaultValue={details?.scope ?? []}
                         >
-                          <Checkbox
-                            id={key}
-                            name="scope"
-                            checked={formData.scope?.includes(key)}
-                            onClick={() => {
-                              if (formData.scope?.includes(key)) {
-                                const new_scope = formData.scope.filter(
-                                  (item) => item !== key
-                                );
-                                setFormData({ ...formData, scope: new_scope });
-                              } else {
-                                const new_scope = [
-                                  ...(formData.scope ?? []),
-                                  key,
-                                ];
-                                setFormData({ ...formData, scope: new_scope });
-                              }
-                            }}
-                          />
-                          <label>{key}</label>
-                        </div>
-                      ))}
-                    </div> : (
+                          {scopeOptions.map((key) => (
+                            <div
+                              className="inline-flex items-center gap-2"
+                              key={key}
+                            >
+                              <Checkbox id={key} value={key}>
+                                {key}
+                              </Checkbox>
+                            </div>
+                          ))}
+                        </CheckboxGroup>
+                      </div>
+                    ) : (
                       <div className="text-sm text-muted-foreground leading-10">
-                        {formData.scope?.join(",")}
+                        {details?.scope?.join(",")}
                       </div>
                     )}
                   </div>
@@ -300,7 +457,6 @@ export default function EditClient({
                   <div className="px-6 flex mt-8 w-full justify-center xl:justify-end gap-3">
                     {pageTitle !== OPERATION_TYPE.CREATE ? (
                       <Button
-                        variant="outline"
                         type="button"
                         onClick={() => {
                           setCanEdit(false);
@@ -309,7 +465,7 @@ export default function EditClient({
                         Cancel
                       </Button>
                     ) : null}
-                    <Button variant={"default"} type="submit" loading={loading}>
+                    <Button type="submit" isLoading={loading}>
                       {`${upperFirst(pageTitle)}`}
                     </Button>
                   </div>

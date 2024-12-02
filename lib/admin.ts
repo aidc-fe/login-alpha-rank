@@ -21,6 +21,7 @@ export const scopeOptions = [
 ]; //允许的权限范围。
 
 export type ClientDataType = {
+  businessDomainId:string;
   active?: boolean;
   client_id?: string;
   client_secret?: string;
@@ -33,12 +34,20 @@ export type ClientDataType = {
   scope?: string[];
   signout_uri?: string;
   updated_at?: string;
+  auth_domain?: string;
+  brand_color?: string;
+  materials?: {
+    description: string;
+    title: string;
+    image: string;
+  }[];
+  tos_doc?: string;
+  pp_doc?: string;
 }
 
-export const defaultClientInfo: ClientDataType = {
-  redirect_uris: [""],
-  scope: [],
-  name: "",
-  signout_uri: "",
-  description: "",
-};
+export type BusinessDomainDataType = {
+  id: string;
+  name: string;
+  active: boolean;
+  sso: boolean;
+}
