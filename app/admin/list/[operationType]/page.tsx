@@ -175,7 +175,6 @@ export default function EditClient({
                     name="business_domain_id"
                     label="Business Domain ID"
                     readOnly={!canEdit}
-                    variant="bordered"
                     required
                     defaultValue={details?.business_domain_id}
                   />
@@ -183,7 +182,6 @@ export default function EditClient({
                     name="name"
                     label="Name"
                     readOnly={!canEdit}
-                    variant="bordered"
                     required
                     defaultValue={details?.name}
                   />
@@ -191,7 +189,6 @@ export default function EditClient({
                   <Textarea
                     name="description"
                     label="Description"
-                    variant="bordered"
                     rows={2}
                     readOnly={!canEdit}
                     defaultValue={details?.description}
@@ -201,7 +198,6 @@ export default function EditClient({
                     name="auth_domain"
                     label="Auth Domain"
                     readOnly={!canEdit}
-                    variant="bordered"
                     type="url"
                     pattern="^(https?|ftp)://.+"
                     defaultValue={details?.auth_domain}
@@ -219,7 +215,6 @@ export default function EditClient({
                           type="color"
                           name="brand_color"
                           readOnly={!canEdit}
-                          variant="bordered"
                           value={brandColor}
                           onChange={(e) => setBrandColor(e.target.value)}
                           className="absolute inset-0 pointer-events-none opacity-0"
@@ -258,7 +253,6 @@ export default function EditClient({
                                   <Input
                                     name="material_title"
                                     readOnly={!canEdit}
-                                    variant="bordered"
                                     defaultValue={item.title}
                                   />
                                 </TableCell>
@@ -266,7 +260,6 @@ export default function EditClient({
                                   <Input
                                     name="material_image"
                                     readOnly={!canEdit}
-                                    variant="bordered"
                                     type="url"
                                     pattern="^(https?|ftp)://.+"
                                     defaultValue={item.image}
@@ -276,7 +269,6 @@ export default function EditClient({
                                   <Input
                                     name="material_description"
                                     readOnly={!canEdit}
-                                    variant="bordered"
                                     defaultValue={item.description}
                                   />
                                 </TableCell>
@@ -330,7 +322,6 @@ export default function EditClient({
                     name="tos_doc"
                     label="Terms of Service URL"
                     readOnly={!canEdit}
-                    variant="bordered"
                     type="url"
                     pattern="^(https?|ftp)://.+"
                     defaultValue={details?.tos_doc}
@@ -340,7 +331,6 @@ export default function EditClient({
                     name="pp_doc"
                     label="Privacy Policy URL"
                     readOnly={!canEdit}
-                    variant="bordered"
                     type="url"
                     pattern="^(https?|ftp)://.+"
                     defaultValue={details?.pp_doc}
@@ -366,7 +356,6 @@ export default function EditClient({
                           <Input
                             name="redirect_uri"
                             readOnly={!canEdit}
-                            variant="bordered"
                             defaultValue={item}
                             type="url"
                             pattern="^(https?|ftp)://.+"
@@ -407,7 +396,6 @@ export default function EditClient({
                     name="signout_uri"
                     label="Signout URL"
                     readOnly={!canEdit}
-                    variant="bordered"
                     required
                     type="url"
                     pattern="^(https?|ftp)://.+"
