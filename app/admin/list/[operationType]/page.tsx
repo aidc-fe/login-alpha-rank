@@ -8,6 +8,7 @@ import {
   OPERATION_TYPE,
   scopeOptions,
   ClientDataType,
+  BusinessDomainDataType,
 } from "@/lib/admin";
 import { upperFirst } from "lodash";
 import { cn } from "@/lib/utils";
@@ -27,6 +28,8 @@ import {
   TableCell,
   Breadcrumbs,
   BreadcrumbItem,
+  Select,
+  SelectItem
 } from "@nextui-org/react";
 import Link from "next/link";
 
@@ -50,8 +53,8 @@ export default function EditClient({
     Array<{ title: string; image: string; description: string }>
   >([{ title: "", image: "", description: "" }]);
   const [redirectUris, setRedirectUris] = useState<string[]>([""]);
-
   const [brandColor, setBrandColor] = useState(details?.brand_color || "#000000");
+  const [businessDomains, setBusinessDomains] = useState<BusinessDomainDataType[]>([]);
 
   const pageTitle =
     details || clientId
@@ -73,10 +76,18 @@ export default function EditClient({
       });
   };
 
+  const getBusinessDomains = () => {
+    request("/api/businessDomain")
+      .then((res) => {
+        setBusinessDomains(res);
+      });
+  };
+
   useEffect(() => {
     if (clientId) {
       getDetail();
     }
+    getBusinessDomains();
   }, []);
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
@@ -107,7 +118,7 @@ export default function EditClient({
     const redirect_uris = formData.getAll("redirect_uri").filter((uri) => uri);
 
     const params = {
-      business_domain_id: formData.get("business_domain_id"),
+      businessDomainId: formData.get("businessDomainId"),
       name: formData.get("name"),
       description: formData.get("description"),
       auth_domain: formData.get("auth_domain"),
@@ -120,8 +131,11 @@ export default function EditClient({
       redirect_uris,
     };
 
+    // 当clientId存在时，表示是编辑，否则是新建
+    const url = clientId ? `/api/client/${clientId}` : "/api/client";
+
     request(
-      `/api/client${details?.client_id || clientId ? `/${clientId || details?.client_id}` : ""}`,
+      url,
       {
         method: "POST",
         body: JSON.stringify(params),
@@ -143,7 +157,7 @@ export default function EditClient({
         <BreadcrumbItem>
           <Link href="/admin/list">My Client</Link>
         </BreadcrumbItem>
-        <BreadcrumbItem>{upperFirst(pageTitle)} Client</BreadcrumbItem>
+        <BreadcrumbItem className="capitalize">{pageTitle} Client</BreadcrumbItem>
       </Breadcrumbs>
       <Loader loading={detailLoading}>
         <div className="flex gap-4 mt-4 flex-col xl:gap-8 xl:flex-row">
@@ -171,13 +185,19 @@ export default function EditClient({
                 </div>
 
                 <div className="px-3 flex flex-col gap-4">
-                  <Input
-                    name="business_domain_id"
+                  <Select 
                     label="Business Domain ID"
-                    readOnly={!canEdit}
+                    className="max-w-xs" 
+                    name="businessDomainId"
                     required
-                    defaultValue={details?.business_domain_id}
-                  />
+                    defaultSelectedKeys={details?.businessDomainId}
+                  >
+                    {businessDomains.map((item) => (
+                      <SelectItem key={item.id}>
+                        {item.name}
+                      </SelectItem>
+                    ))}
+                  </Select>
                   <Input
                     name="name"
                     label="Name"
@@ -203,7 +223,7 @@ export default function EditClient({
                     defaultValue={details?.auth_domain}
                   />
 
-                  <div className="flex w-full gap-1 items-center gap-2">
+                  <div className="flex w-full items-center gap-2">
                     <span className="capitalize text-sm">Brand Color:</span>
                       <label
                         htmlFor="brand_color"
@@ -235,9 +255,9 @@ export default function EditClient({
                         }}
                       >
                         <TableHeader>
-                          <TableColumn>TITLE</TableColumn>
-                          <TableColumn>IMAGE URL</TableColumn>
-                          <TableColumn>DESCRIPTION</TableColumn>
+                          <TableColumn>Title</TableColumn>
+                          <TableColumn>Description</TableColumn>
+                          <TableColumn>Image Url</TableColumn>
                           {canEdit ? (
                             <TableColumn width={65}>Operation</TableColumn>
                           ) : (
@@ -253,6 +273,15 @@ export default function EditClient({
                                     name="material_title"
                                     readOnly={!canEdit}
                                     defaultValue={item.title}
+                                    isClearable
+                                  />
+                                </TableCell>
+                                <TableCell>
+                                  <Input
+                                    name="material_description"
+                                    readOnly={!canEdit}
+                                    defaultValue={item.description}
+                                    isClearable
                                   />
                                 </TableCell>
                                 <TableCell>
@@ -262,13 +291,7 @@ export default function EditClient({
                                     type="url"
                                     pattern="^(https?|ftp)://.+"
                                     defaultValue={item.image}
-                                  />
-                                </TableCell>
-                                <TableCell>
-                                  <Input
-                                    name="material_description"
-                                    readOnly={!canEdit}
-                                    defaultValue={item.description}
+                                    isClearable
                                   />
                                 </TableCell>
                                 {canEdit ? (
