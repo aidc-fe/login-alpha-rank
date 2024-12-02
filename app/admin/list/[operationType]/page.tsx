@@ -203,15 +203,15 @@ export default function EditClient({
                     defaultValue={details?.auth_domain}
                   />
 
-                  <div className="flex w-full gap-1 flex-col">
+                  <div className="flex w-full gap-1 items-center gap-2">
                     <span className="capitalize text-sm">Brand Color:</span>
-                    <div className="flex items-center gap-3">
                       <label
                         htmlFor="brand_color"
                         className="h-10 w-10 p-2 rounded-xl border-1 cursor-pointer relative"
                       >
                         <Input
                           id="brand_color"
+                          label="Brand Color"
                           type="color"
                           name="brand_color"
                           readOnly={!canEdit}
@@ -221,7 +221,6 @@ export default function EditClient({
                         />
                         <div className="rounded-md w-full h-full" style={{ backgroundColor: brandColor }} />
                       </label>
-                    </div>
                   </div>
 
                   <div className="flex flex-col gap-1">
