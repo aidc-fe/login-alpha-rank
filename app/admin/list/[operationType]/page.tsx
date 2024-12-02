@@ -18,6 +18,7 @@ import CopyButton from "@/components/CopyButton";
 import {
   Input,
   Button,
+  CheckboxGroup,
   Checkbox,
   Textarea,
   Table,
@@ -29,7 +30,7 @@ import {
   Breadcrumbs,
   BreadcrumbItem,
   Select,
-  SelectItem
+  SelectItem,
 } from "@nextui-org/react";
 import Link from "next/link";
 
@@ -53,8 +54,12 @@ export default function EditClient({
     Array<{ title: string; image: string; description: string }>
   >([{ title: "", image: "", description: "" }]);
   const [redirectUris, setRedirectUris] = useState<string[]>([""]);
-  const [brandColor, setBrandColor] = useState(details?.brand_color || "#000000");
-  const [businessDomains, setBusinessDomains] = useState<BusinessDomainDataType[]>([]);
+  const [brandColor, setBrandColor] = useState(
+    details?.brand_color || "#000000"
+  );
+  const [businessDomains, setBusinessDomains] = useState<
+    BusinessDomainDataType[]
+  >([]);
 
   const pageTitle =
     details || clientId
@@ -69,6 +74,7 @@ export default function EditClient({
         const { brand_color, materials, redirect_uris } = res;
         setDetails(res);
         setMaterials(materials || []);
+        setBrandColor(brand_color);
         setRedirectUris(redirect_uris || [""]);
       })
       .finally(() => {
@@ -77,10 +83,9 @@ export default function EditClient({
   };
 
   const getBusinessDomains = () => {
-    request("/api/businessDomain")
-      .then((res) => {
-        setBusinessDomains(res);
-      });
+    request("/api/businessDomain").then((res) => {
+      setBusinessDomains(res);
+    });
   };
 
   useEffect(() => {
@@ -134,13 +139,10 @@ export default function EditClient({
     // 当clientId存在时，表示是编辑，否则是新建
     const url = clientId ? `/api/client/${clientId}` : "/api/client";
 
-    request(
-      url,
-      {
-        method: "POST",
-        body: JSON.stringify(params),
-      }
-    )
+    request(url, {
+      method: "POST",
+      body: JSON.stringify(params),
+    })
       .then((res) => {
         toastApi.success(`${upperFirst(pageTitle)} Success`);
         setDetails(res);
@@ -157,7 +159,9 @@ export default function EditClient({
         <BreadcrumbItem>
           <Link href="/admin/list">My Client</Link>
         </BreadcrumbItem>
-        <BreadcrumbItem className="capitalize">{pageTitle} Client</BreadcrumbItem>
+        <BreadcrumbItem className="capitalize">
+          {pageTitle} Client
+        </BreadcrumbItem>
       </Breadcrumbs>
       <Loader loading={detailLoading}>
         <div className="flex gap-4 mt-4 flex-col xl:gap-8 xl:flex-row">
@@ -185,17 +189,20 @@ export default function EditClient({
                 </div>
 
                 <div className="px-3 flex flex-col gap-4">
-                  <Select 
+                  <Select
                     label="Business Domain ID"
-                    className="max-w-xs" 
+                    className="max-w-xs"
                     name="businessDomainId"
+                    isDisabled={!canEdit}
                     required
-                    defaultSelectedKeys={details?.businessDomainId}
+                    defaultSelectedKeys={
+                      details?.businessDomainId
+                        ? [details.businessDomainId]
+                        : []
+                    }
                   >
                     {businessDomains.map((item) => (
-                      <SelectItem key={item.id}>
-                        {item.name}
-                      </SelectItem>
+                      <SelectItem key={item.id}>{item.name}</SelectItem>
                     ))}
                   </Select>
                   <Input
@@ -218,29 +225,30 @@ export default function EditClient({
                     name="auth_domain"
                     label="Auth Domain"
                     readOnly={!canEdit}
-                    type="url"
-                    pattern="^(https?|ftp)://.+"
                     defaultValue={details?.auth_domain}
                   />
 
                   <div className="flex w-full items-center gap-2">
                     <span className="capitalize text-sm">Brand Color:</span>
-                      <label
-                        htmlFor="brand_color"
-                        className="h-10 w-10 p-2 rounded-xl border-1 cursor-pointer relative"
-                      >
-                        <Input
-                          id="brand_color"
-                          label="Brand Color"
-                          type="color"
-                          name="brand_color"
-                          readOnly={!canEdit}
-                          value={brandColor}
-                          onChange={(e) => setBrandColor(e.target.value)}
-                          className="absolute inset-0 pointer-events-none opacity-0"
-                        />
-                        <div className="rounded-md w-full h-full" style={{ backgroundColor: brandColor }} />
-                      </label>
+                    <label
+                      htmlFor="brand_color"
+                      className="h-10 w-10 p-2 rounded-xl border-1 cursor-pointer relative"
+                    >
+                      <Input
+                        id="brand_color"
+                        label="Brand Color"
+                        type="color"
+                        name="brand_color"
+                        disabled={!canEdit}
+                        value={brandColor}
+                        onChange={(e) => setBrandColor(e.target.value)}
+                        className="absolute inset-0 pointer-events-none opacity-0"
+                      />
+                      <div
+                        className="rounded-md w-full h-full"
+                        style={{ backgroundColor: brandColor }}
+                      />
+                    </label>
                   </div>
 
                   <div className="flex flex-col gap-1">
@@ -258,22 +266,20 @@ export default function EditClient({
                           <TableColumn>Title</TableColumn>
                           <TableColumn>Description</TableColumn>
                           <TableColumn>Image Url</TableColumn>
-                          {canEdit ? (
-                            <TableColumn width={65}>Operation</TableColumn>
-                          ) : (
-                            <></>
-                          )}
+                          <TableColumn hidden={!canEdit} width={65}>
+                            Operation
+                          </TableColumn>
                         </TableHeader>
-                        <TableBody>
-                          {materials.length ? (
-                            materials.map((item, index) => (
+                        {materials.length ? (
+                          <TableBody>
+                            {materials.map((item, index) => (
                               <TableRow key={index}>
                                 <TableCell>
                                   <Input
                                     name="material_title"
                                     readOnly={!canEdit}
                                     defaultValue={item.title}
-                                    isClearable
+                                    isClearable={canEdit}
                                   />
                                 </TableCell>
                                 <TableCell>
@@ -281,7 +287,7 @@ export default function EditClient({
                                     name="material_description"
                                     readOnly={!canEdit}
                                     defaultValue={item.description}
-                                    isClearable
+                                    isClearable={canEdit}
                                   />
                                 </TableCell>
                                 <TableCell>
@@ -291,33 +297,29 @@ export default function EditClient({
                                     type="url"
                                     pattern="^(https?|ftp)://.+"
                                     defaultValue={item.image}
-                                    isClearable
+                                    isClearable={canEdit}
                                   />
                                 </TableCell>
-                                {canEdit ? (
-                                  <TableCell>
-                                    <Button
-                                      isIconOnly
-                                      color="danger"
-                                      variant="light"
-                                      onClick={() => {
-                                        const newMaterials = [...materials];
-                                        newMaterials.splice(index, 1);
-                                        setMaterials(newMaterials);
-                                      }}
-                                    >
-                                      <Trash2 size={20} />
-                                    </Button>
-                                  </TableCell>
-                                ) : (
-                                  <></>
-                                )}
+                                <TableCell hidden={!canEdit}>
+                                  <Button
+                                    isIconOnly
+                                    color="danger"
+                                    variant="light"
+                                    onClick={() => {
+                                      const newMaterials = [...materials];
+                                      newMaterials.splice(index, 1);
+                                      setMaterials(newMaterials);
+                                    }}
+                                  >
+                                    <Trash2 size={20} />
+                                  </Button>
+                                </TableCell>
                               </TableRow>
-                            ))
-                          ) : (
-                            <></>
-                          )}
-                        </TableBody>
+                            ))}
+                          </TableBody>
+                        ) : (
+                          <></>
+                        )}
                       </Table>
 
                       {canEdit && (
@@ -427,22 +429,23 @@ export default function EditClient({
                   <div className="w-full text-left">
                     <div className="text-sm">Scope:</div>
                     {canEdit ? (
-                      <div className="flex items-center gap-4 mt-2">
-                        {scopeOptions.map((key) => (
-                          <div
-                            className="inline-flex items-center gap-2"
-                            key={key}
-                          >
-                            <Checkbox
-                              name="scope"
-                              id={key}
-                              defaultChecked={details?.scope?.includes(key)}
-                              value={key}
+                      <div className="mt-2">
+                        <CheckboxGroup
+                          name="scope"
+                          orientation="horizontal"
+                          defaultValue={details?.scope ?? []}
+                        >
+                          {scopeOptions.map((key) => (
+                            <div
+                              className="inline-flex items-center gap-2"
+                              key={key}
                             >
-                              {key}
-                            </Checkbox>
-                          </div>
-                        ))}
+                              <Checkbox id={key} value={key}>
+                                {key}
+                              </Checkbox>
+                            </div>
+                          ))}
+                        </CheckboxGroup>
                       </div>
                     ) : (
                       <div className="text-sm text-muted-foreground leading-10">
