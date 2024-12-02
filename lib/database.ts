@@ -45,10 +45,16 @@ export const createOrUpdateUser = async (data: {
   image?: string;
   from?: string;
   password?: string;
+  businessDomainId: string;
 }) => {
   try {
     const user = await prisma.user.upsert({
-      where: { email: data.email }, // 依据 email 作为唯一字段进行查询
+      where: { 
+        email_businessDomainId: {
+          email: data.email,
+          businessDomainId: data.businessDomainId
+        }
+      },
       create: data,
       update: {
         name: data.name,
@@ -68,11 +74,16 @@ export const createOrUpdateUser = async (data: {
 // 通过邮箱查找用户，更新用户信息
 export const updateUserByEmail = async (
   email: string,
-  data: { password?: string }
+  data: { password?: string; businessDomainId: string }
 ) => {
   try {
     const updatedUser = await prisma.user.update({
-      where: { email },
+      where: { 
+        email_businessDomainId: {
+          email: email,
+          businessDomainId: data.businessDomainId
+        }
+      },     
       data,
     });
 
@@ -211,7 +222,7 @@ export async function createClient(data: {
   signout_uri: string;
   owner_email: string;
   businessDomainId: string;
-  auth_domain?: string;
+  auth_domain: string;
   brand_color?: string;
   materials?: Array<{
     title: string;
@@ -228,7 +239,7 @@ export async function createClient(data: {
     ...restData
   } = data;
 
-  console.log(data)
+
   // 插入数据到 Client 表
   const newClient = await prisma.client.create({
     data: {
@@ -282,7 +293,7 @@ export const updateClient = async ({
   businessDomainId?: string;
   description?: string;
   signout_uri?: string;
-  auth_domain?: string;
+  auth_domain: string;
   brand_color?: string;
   materials?: Array<{
     title: string;

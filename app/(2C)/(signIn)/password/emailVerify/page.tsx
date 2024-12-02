@@ -5,6 +5,7 @@ import { Send } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEventHandler, useState } from "react";
 import { Input, Button, Link } from "@nextui-org/react";
+import { useClient } from "@/providers/client-provider";
 
 export default function Page() {
   const searchParams = useSearchParams();
@@ -20,6 +21,7 @@ export default function Page() {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const checkPassword = formData.get("check_password") as string;
+    const { businessDomainId}=useClient()
 
     // 校验新旧密码
     if (checkPassword !== password) {
@@ -30,7 +32,7 @@ export default function Page() {
     setLoading(true);
     request("/api/password/emailVerify", {
       method: "POST",
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email, password, businessDomainId }),
     })
       .then(() => {
         router.push(
