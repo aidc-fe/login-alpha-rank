@@ -204,6 +204,7 @@ export const validateMagicLink = async (token?: string) => {
 
 // 插入一条client数据
 export async function createClient(data: {
+  business_domain_id?: string;
   redirect_uris: string[];
   scope: string[];
   name: string;
@@ -278,6 +279,7 @@ export const updateClient = async ({
   client_id,
   ...data
 }: {
+  business_domain_id?: string;
   client_id: string;
   redirect_uris?: string[];
   scope?: string[];
