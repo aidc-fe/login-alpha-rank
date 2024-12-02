@@ -204,31 +204,39 @@ export const validateMagicLink = async (token?: string) => {
 
 // 插入一条client数据
 export async function createClient(data: {
-  redirect_uris: string[]; // 数组
-  scope: string[]; // 数组
+  redirect_uris: string[];
+  scope: string[];
   name: string;
   description: string;
   signout_uri: string;
-  owner_email: string; // 用户的email
+  owner_email: string;
+  auth_domain?: string;
+  brand_color?: string;
+  materials?: Array<{
+    title: string;
+    description: string;
+    image: string;
+  }>;
+  tos_doc?: string;
+  pp_doc?: string;
 }) {
   const {
-    redirect_uris, // 数组
-    scope, // 数组
+    redirect_uris,
+    scope,
+    materials,
+    ...restData
   } = data;
-
-  // 生成 client_id 和 client_secret
-  const client_id = generateClientId();
-  const client_secret = generateClientSecret();
 
   // 插入数据到 Client 表
   const newClient = await prisma.client.create({
     data: {
-      ...data,
-      client_id,
-      client_secret,
-      redirect_uris: redirect_uris.join(","), // 使用逗号连接数组
-      scope: scope.join(","), // 使用逗号连接数组
-      active: true, // 默认为active
+      ...restData,
+      client_id: generateClientId(),
+      client_secret: generateClientSecret(),
+      redirect_uris: redirect_uris.join(","),
+      scope: scope.join(","),
+      materials: materials ? JSON.stringify(materials) : null, // 将 materials 转换为 JSON 字符串
+      active: true,
       grant_types: "authorization_code",
     },
   });
@@ -237,6 +245,7 @@ export async function createClient(data: {
     ...newClient,
     redirect_uris: newClient.redirect_uris?.split(",") ?? [],
     scope: newClient.scope?.split(",") ?? [],
+    materials: newClient.materials ? JSON.parse(newClient.materials as string) : [], // 解析 JSON 字符串
   };
 }
 
@@ -270,18 +279,31 @@ export const updateClient = async ({
   ...data
 }: {
   client_id: string;
-  redirect_uris?: string[]; // 数组
-  scope?: string[]; // 数组
+  redirect_uris?: string[];
+  scope?: string[];
   name?: string;
   description?: string;
   signout_uri?: string;
+  auth_domain?: string;
+  brand_color?: string;
+  materials?: Array<{
+    title: string;
+    description: string;
+    image: string;
+  }>;
+  tos_doc?: string;
+  pp_doc?: string;
 }) => {
   try {
     const editData = Object.entries(data).reduce((acc, [key, value]) => {
       if (value !== null && value !== undefined) {
-        acc[key] = !["redirect_uris", "scope"].includes(key)
-          ? value
-          : [value as string[]].join(",");
+        if (key === 'materials') {
+          acc[key] = JSON.stringify(value);
+        } else if (['redirect_uris', 'scope'].includes(key)) {
+          acc[key] = (value as string[]).join(',');
+        } else {
+          acc[key] = value;
+        }
       }
       return acc;
     }, {} as Record<string, any>);
@@ -290,14 +312,14 @@ export const updateClient = async ({
       where: {
         client_id: client_id,
       },
-      data: {
-        ...editData,
-      },
+      data: editData,
     });
+
     return {
       ...updatedClient,
       redirect_uris: updatedClient.redirect_uris?.split(",") ?? [],
       scope: updatedClient.scope?.split(",") ?? [],
+      materials: updatedClient.materials ? JSON.parse(updatedClient.materials as string) : [],
     };
   } catch (error) {
     console.error("Error updating client:", error);
@@ -321,6 +343,7 @@ export const findClientByClientId = async (client_id: string) => {
     ...client,
     redirect_uris: client.redirect_uris?.split(","),
     scope: client.scope?.split(","),
+    materials: client.materials ? JSON.parse(client.materials as string) : [],
   };
 };
 

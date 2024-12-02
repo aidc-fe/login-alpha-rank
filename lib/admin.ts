@@ -33,6 +33,15 @@ export type ClientDataType = {
   scope?: string[];
   signout_uri?: string;
   updated_at?: string;
+  auth_domain?: string;
+  brand_color?: string;
+  materials?: {
+    description: string;
+    title: string;
+    image: string;
+  }[];
+  tos_doc?: string;
+  pp_doc?: string;
 }
 
 export const defaultClientInfo: ClientDataType = {
@@ -41,4 +50,13 @@ export const defaultClientInfo: ClientDataType = {
   name: "",
   signout_uri: "",
   description: "",
+  auth_domain: '',
+  brand_color: '',
+  materials: [{
+    description: "",
+    title: "",
+    image: ""
+  }],
+  tos_doc: '',
+  pp_doc: '',
 };
