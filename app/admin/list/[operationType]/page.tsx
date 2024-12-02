@@ -7,20 +7,11 @@ import { FormEventHandler, useEffect, useState } from "react";
 import {
   OPERATION_TYPE,
   scopeOptions,
-  defaultClientInfo,
   ClientDataType,
 } from "@/lib/admin";
 import { upperFirst } from "lodash";
 import { cn } from "@/lib/utils";
 import dayjs from "dayjs";
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb";
 import Loader from "@/components/ui/loader";
 import CopyButton from "@/components/CopyButton";
 import {
@@ -34,9 +25,10 @@ import {
   TableBody,
   TableRow,
   TableCell,
-  Popover, PopoverTrigger, PopoverContent
+  Breadcrumbs,
+  BreadcrumbItem,
 } from "@nextui-org/react";
-import { HexColorPicker } from "react-colorful";
+import Link from "next/link";
 
 export default function EditClient({
   params,
@@ -53,7 +45,13 @@ export default function EditClient({
   const [loading, setLoading] = useState(false);
   const [detailLoading, setDetailLoading] = useState(!!clientId);
   const [details, setDetails] = useState<ClientDataType>();
-  const [formData, setFormData] = useState<ClientDataType>(defaultClientInfo);
+
+  const [materials, setMaterials] = useState<
+    Array<{ title: string; image: string; description: string }>
+  >([{ title: "", image: "", description: "" }]);
+  const [redirectUris, setRedirectUris] = useState<string[]>([""]);
+
+  const [brandColor, setBrandColor] = useState(details?.brand_color || "#000000");
 
   const pageTitle =
     details || clientId
@@ -65,15 +63,10 @@ export default function EditClient({
   const getDetail = () => {
     request(`/api/client/${clientId}`)
       .then((res) => {
-        const { scope, redirect_uris, name, signout_uri, description } = res;
+        const { brand_color, materials, redirect_uris } = res;
         setDetails(res);
-        setFormData({
-          redirect_uris,
-          scope,
-          name,
-          signout_uri,
-          description,
-        });
+        setMaterials(materials || []);
+        setRedirectUris(redirect_uris || [""]);
       })
       .finally(() => {
         setDetailLoading(false);
@@ -89,15 +82,46 @@ export default function EditClient({
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
     setLoading(true);
+
+    const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
+
+    // 处理materials数据
+    const materials = [];
+    const titles = formData.getAll("material_title");
+    const images = formData.getAll("material_image");
+    const descriptions = formData.getAll("material_description");
+
+    for (let i = 0; i < titles.length; i++) {
+      materials.push({
+        title: titles[i],
+        image: images[i],
+        description: descriptions[i],
+      });
+    }
+
+    // 处理scope数据
+    const scope = formData.getAll("scope");
+
+    // 处理redirect_uris数据
+    const redirect_uris = formData.getAll("redirect_uri").filter((uri) => uri);
+
     const params = {
-      ...formData,
+      business_domain_id: formData.get("business_domain_id"),
+      name: formData.get("name"),
+      description: formData.get("description"),
+      auth_domain: formData.get("auth_domain"),
+      brand_color: formData.get("brand_color"),
+      tos_doc: formData.get("tos_doc"),
+      pp_doc: formData.get("pp_doc"),
+      signout_uri: formData.get("signout_uri"),
+      materials,
+      scope,
+      redirect_uris,
     };
+
     request(
-      `/api/client${
-        details?.client_id || clientId
-          ? `/${clientId || details?.client_id}`
-          : ""
-      }`,
+      `/api/client${details?.client_id || clientId ? `/${clientId || details?.client_id}` : ""}`,
       {
         method: "POST",
         body: JSON.stringify(params),
@@ -115,17 +139,12 @@ export default function EditClient({
 
   return (
     <>
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/admin/list">My Client</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>
-            <BreadcrumbPage>{upperFirst(pageTitle)} Client</BreadcrumbPage>
-          </BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      <Breadcrumbs>
+        <BreadcrumbItem>
+          <Link href="/admin/list">My Client</Link>
+        </BreadcrumbItem>
+        <BreadcrumbItem>{upperFirst(pageTitle)} Client</BreadcrumbItem>
+      </Breadcrumbs>
       <Loader loading={detailLoading}>
         <div className="flex gap-4 mt-4 flex-col xl:gap-8 xl:flex-row">
           {!detailLoading ? (
@@ -152,135 +171,63 @@ export default function EditClient({
                 </div>
 
                 <div className="px-3 flex flex-col gap-4">
-                  <label className="flex w-full gap-1 flex-col">
-                    <span className="capitalize text-sm">Name:</span>
-                    <Input
-                      name="name"
-                      readOnly={!canEdit}
-                      variant="bordered"
-                      required
-                      value={formData.name}
-                      onChange={(e) => {
-                        setFormData({ ...formData, name: e.target.value });
-                      }}
-                    />
-                  </label>
+                  <Input
+                    name="business_domain_id"
+                    label="Business Domain ID"
+                    readOnly={!canEdit}
+                    variant="bordered"
+                    required
+                    defaultValue={details?.business_domain_id}
+                  />
+                  <Input
+                    name="name"
+                    label="Name"
+                    readOnly={!canEdit}
+                    variant="bordered"
+                    required
+                    defaultValue={details?.name}
+                  />
 
-                  <label className="flex w-full gap-1 flex-col">
-                    <span className="capitalize text-sm">Description:</span>
-                    <Textarea
-                      name="description"
-                      variant="bordered"
-                      rows={2}
-                      readOnly={!canEdit}
-                      value={formData.description}
-                      onChange={(e) => {
-                        setFormData({
-                          ...formData,
-                          description: e.target.value,
-                        });
-                      }}
-                    />
-                  </label>
+                  <Textarea
+                    name="description"
+                    label="Description"
+                    variant="bordered"
+                    rows={2}
+                    readOnly={!canEdit}
+                    defaultValue={details?.description}
+                  />
 
-                  <label className="flex w-full gap-1 flex-col">
-                    <span className="capitalize text-sm">Auth Domain:</span>
-                    <Input
-                      name="auth_domain"
-                      readOnly={!canEdit}
-                      variant="bordered"
-                      type="url"
-                      pattern="^(https?|ftp)://.+"
-                      value={formData.auth_domain}
-                      onChange={(e) => {
-                        setFormData({
-                          ...formData,
-                          auth_domain: e.target.value,
-                        });
-                      }}
-                    />
-                  </label>
+                  <Input
+                    name="auth_domain"
+                    label="Auth Domain"
+                    readOnly={!canEdit}
+                    variant="bordered"
+                    type="url"
+                    pattern="^(https?|ftp)://.+"
+                    defaultValue={details?.auth_domain}
+                  />
 
-                  <label className="flex w-full gap-1 flex-col">
+                  <div className="flex w-full gap-1 flex-col">
                     <span className="capitalize text-sm">Brand Color:</span>
-                    <div className="flex gap-2 items-center">
-                      <Input
-                        name="brand_color"
-                        readOnly
-                        variant="bordered"
-                        value={formData.brand_color || ""}
-                        placeholder="#000000"
-                        startContent={
-                          <div 
-                            className="w-4 h-4 rounded-full border"
-                            style={{ backgroundColor: formData.brand_color || '#fff' }}
-                          />
-                        }
-                      />
-                      {canEdit ? (
-                        <Popover placement="bottom-end">
-                          <PopoverTrigger>
-                            <Button 
-                              isIconOnly 
-                              className="min-w-[40px] h-[40px]"
-                              variant="bordered"
-                            >
-                              <div 
-                                className="w-6 h-6 rounded-full border transition-transform hover:scale-110"
-                                style={{ 
-                                  backgroundColor: formData.brand_color || '#fff',
-                                  boxShadow: '0 0 0 2px white, 0 0 0 4px var(--nextui-border-color)'
-                                }}
-                              />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="p-3">
-                            <div className="flex flex-col gap-3">
-                              <HexColorPicker
-                                color={formData.brand_color || '#000000'}
-                                onChange={(color: string) => {
-                                  setFormData({
-                                    ...formData,
-                                    brand_color: color,
-                                  });
-                                }}
-                                style={{
-                                  width: '200px',
-                                  height: '200px'
-                                }}
-                              />
-                              <Input
-                                size="sm"
-                                variant="bordered"
-                                value={formData.brand_color || ""}
-                                onChange={(e) => {
-                                  setFormData({
-                                    ...formData,
-                                    brand_color: e.target.value,
-                                  });
-                                }}
-                                placeholder="#000000"
-                                startContent={
-                                  <div 
-                                    className="w-4 h-4 rounded-full border"
-                                    style={{ backgroundColor: formData.brand_color || '#fff' }}
-                                  />
-                                }
-                              />
-                            </div>
-                          </PopoverContent>
-                        </Popover>
-                      ) : (
-                        <div 
-                          className="w-10 h-10 rounded-full border"
-                          style={{ 
-                            backgroundColor: formData.brand_color,
-                            boxShadow: '0 0 0 2px white, 0 0 0 4px var(--nextui-border-color)'
-                          }}
+                    <div className="flex items-center gap-3">
+                      <label
+                        htmlFor="brand_color"
+                        className="h-10 w-10 p-2 rounded-xl border-1 cursor-pointer relative"
+                      >
+                        <Input
+                          id="brand_color"
+                          type="color"
+                          name="brand_color"
+                          readOnly={!canEdit}
+                          variant="bordered"
+                          value={brandColor}
+                          onChange={(e) => setBrandColor(e.target.value)}
+                          className="absolute inset-0 pointer-events-none opacity-0"
                         />
-                      )}
+                        <div className="rounded-md w-full h-full" style={{ backgroundColor: brandColor }} />
+                      </label>
                     </div>
-                  </label>
+                  </div>
 
                   <div className="flex flex-col gap-1">
                     <div className="capitalize text-sm">Materials:</div>
@@ -304,69 +251,33 @@ export default function EditClient({
                           )}
                         </TableHeader>
                         <TableBody>
-                          {formData.materials?.length ? (
-                            formData.materials.map((item, index) => (
+                          {materials.length ? (
+                            materials.map((item, index) => (
                               <TableRow key={index}>
                                 <TableCell>
                                   <Input
+                                    name="material_title"
                                     readOnly={!canEdit}
                                     variant="bordered"
-                                    value={item.title}
-                                    onChange={(e) => {
-                                      const newMaterials = [
-                                        ...(formData.materials ?? []),
-                                      ];
-                                      newMaterials[index] = {
-                                        ...item,
-                                        title: e.target.value,
-                                      };
-                                      setFormData({
-                                        ...formData,
-                                        materials: newMaterials,
-                                      });
-                                    }}
+                                    defaultValue={item.title}
                                   />
                                 </TableCell>
                                 <TableCell>
                                   <Input
+                                    name="material_image"
                                     readOnly={!canEdit}
                                     variant="bordered"
                                     type="url"
                                     pattern="^(https?|ftp)://.+"
-                                    value={item.image}
-                                    onChange={(e) => {
-                                      const newMaterials = [
-                                        ...(formData.materials ?? []),
-                                      ];
-                                      newMaterials[index] = {
-                                        ...item,
-                                        image: e.target.value,
-                                      };
-                                      setFormData({
-                                        ...formData,
-                                        materials: newMaterials,
-                                      });
-                                    }}
+                                    defaultValue={item.image}
                                   />
                                 </TableCell>
                                 <TableCell>
                                   <Input
+                                    name="material_description"
                                     readOnly={!canEdit}
                                     variant="bordered"
-                                    value={item.description}
-                                    onChange={(e) => {
-                                      const newMaterials = [
-                                        ...(formData.materials ?? []),
-                                      ];
-                                      newMaterials[index] = {
-                                        ...item,
-                                        description: e.target.value,
-                                      };
-                                      setFormData({
-                                        ...formData,
-                                        materials: newMaterials,
-                                      });
-                                    }}
+                                    defaultValue={item.description}
                                   />
                                 </TableCell>
                                 {canEdit ? (
@@ -376,14 +287,9 @@ export default function EditClient({
                                       color="danger"
                                       variant="light"
                                       onClick={() => {
-                                        const newMaterials = [
-                                          ...(formData.materials ?? []),
-                                        ];
+                                        const newMaterials = [...materials];
                                         newMaterials.splice(index, 1);
-                                        setFormData({
-                                          ...formData,
-                                          materials: newMaterials,
-                                        });
+                                        setMaterials(newMaterials);
                                       }}
                                     >
                                       <Trash2 size={20} />
@@ -407,13 +313,10 @@ export default function EditClient({
                             startContent={<Plus size={20} />}
                             disabled={loading}
                             onClick={() =>
-                              setFormData({
-                                ...formData,
-                                materials: [
-                                  ...(formData.materials ?? []),
-                                  { title: "", description: "", image: "" },
-                                ],
-                              })
+                              setMaterials([
+                                ...materials,
+                                { title: "", description: "", image: "" },
+                              ])
                             }
                           >
                             Add Material
@@ -423,39 +326,25 @@ export default function EditClient({
                     </div>
                   </div>
 
-                  <label className="flex w-full gap-1 flex-col">
-                    <span className="capitalize text-sm">
-                      Terms of Service URL:
-                    </span>
-                    <Input
-                      name="tos_doc"
-                      readOnly={!canEdit}
-                      variant="bordered"
-                      type="url"
-                      pattern="^(https?|ftp)://.+"
-                      value={formData.tos_doc}
-                      onChange={(e) => {
-                        setFormData({ ...formData, tos_doc: e.target.value });
-                      }}
-                    />
-                  </label>
+                  <Input
+                    name="tos_doc"
+                    label="Terms of Service URL"
+                    readOnly={!canEdit}
+                    variant="bordered"
+                    type="url"
+                    pattern="^(https?|ftp)://.+"
+                    defaultValue={details?.tos_doc}
+                  />
 
-                  <label className="flex w-full gap-1 flex-col">
-                    <span className="capitalize text-sm">
-                      Privacy Policy URL:
-                    </span>
-                    <Input
-                      name="pp_doc"
-                      readOnly={!canEdit}
-                      variant="bordered"
-                      type="url"
-                      pattern="^(https?|ftp)://.+"
-                      value={formData.pp_doc}
-                      onChange={(e) => {
-                        setFormData({ ...formData, pp_doc: e.target.value });
-                      }}
-                    />
-                  </label>
+                  <Input
+                    name="pp_doc"
+                    label="Privacy Policy URL"
+                    readOnly={!canEdit}
+                    variant="bordered"
+                    type="url"
+                    pattern="^(https?|ftp)://.+"
+                    defaultValue={details?.pp_doc}
+                  />
 
                   <div className="w-full flex flex-col gap-1">
                     <span className="capitalize text-sm">Redirect URL:</span>
@@ -464,7 +353,7 @@ export default function EditClient({
                         "border border-border rounded-xl px-4 py-6": canEdit,
                       })}
                     >
-                      {formData.redirect_uris?.map((item, index) => (
+                      {redirectUris.map((item, index) => (
                         <div
                           key={`redirect_uri${index}`}
                           className={cn(
@@ -475,21 +364,12 @@ export default function EditClient({
                           )}
                         >
                           <Input
+                            name="redirect_uri"
                             readOnly={!canEdit}
                             variant="bordered"
-                            value={item}
+                            defaultValue={item}
                             type="url"
                             pattern="^(https?|ftp)://.+"
-                            onChange={(e) => {
-                              const new_redirect_uris = [
-                                ...(formData.redirect_uris ?? []),
-                              ];
-                              new_redirect_uris[index] = e.target.value;
-                              setFormData({
-                                ...formData,
-                                redirect_uris: new_redirect_uris,
-                              });
-                            }}
                             required
                           />
                           <Button
@@ -497,61 +377,42 @@ export default function EditClient({
                             color="danger"
                             className={cn({ hidden: !index || !canEdit })}
                             onClick={() => {
-                              const new_redirect_uris = [
-                                ...(formData.redirect_uris ?? []),
-                              ];
-                              new_redirect_uris.splice(index, 1);
-                              setFormData({
-                                ...formData,
-                                redirect_uris: new_redirect_uris,
-                              });
+                              const newUris = [...redirectUris];
+                              newUris.splice(index, 1);
+                              setRedirectUris(newUris);
                             }}
                           >
                             <Trash2 size={20} />
                           </Button>
                         </div>
                       ))}
-                      {!!canEdit ? (
+                      {canEdit && (
                         <div className="text-right">
                           <Button
                             type="button"
                             startContent={<Plus size={20} />}
                             disabled={loading}
                             onClick={() =>
-                              setFormData({
-                                ...formData,
-                                redirect_uris: [
-                                  ...(formData.redirect_uris ?? []),
-                                  "",
-                                ],
-                              })
+                              setRedirectUris([...redirectUris, ""])
                             }
                           >
                             Add
                           </Button>
                         </div>
-                      ) : null}
+                      )}
                     </div>
                   </div>
 
-                  <label className="flex w-full gap-1 flex-col">
-                    <span className="capitalize text-sm">Signout URL:</span>
-                    <Input
-                      name="signout_uri"
-                      readOnly={!canEdit}
-                      variant="bordered"
-                      required
-                      type="url"
-                      pattern="^(https?|ftp)://.+"
-                      value={formData.signout_uri}
-                      onChange={(e) => {
-                        setFormData({
-                          ...formData,
-                          signout_uri: e.target.value,
-                        });
-                      }}
-                    />
-                  </label>
+                  <Input
+                    name="signout_uri"
+                    label="Signout URL"
+                    readOnly={!canEdit}
+                    variant="bordered"
+                    required
+                    type="url"
+                    pattern="^(https?|ftp)://.+"
+                    defaultValue={details?.signout_uri}
+                  />
 
                   <div className="w-full text-left">
                     <div className="text-sm">Scope:</div>
@@ -563,19 +424,10 @@ export default function EditClient({
                             key={key}
                           >
                             <Checkbox
-                              onValueChange={(val) => {
-                                setFormData({
-                                  ...formData,
-                                  scope: val
-                                    ? [...(formData.scope ?? []), key]
-                                    : formData.scope?.filter(
-                                        (item) => item !== key
-                                      ) ?? [],
-                                });
-                              }}
-                              id={key}
                               name="scope"
-                              checked={formData.scope?.includes(key)}
+                              id={key}
+                              defaultChecked={details?.scope?.includes(key)}
+                              value={key}
                             >
                               {key}
                             </Checkbox>
@@ -584,7 +436,7 @@ export default function EditClient({
                       </div>
                     ) : (
                       <div className="text-sm text-muted-foreground leading-10">
-                        {formData.scope?.join(",")}
+                        {details?.scope?.join(",")}
                       </div>
                     )}
                   </div>

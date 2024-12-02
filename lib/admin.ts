@@ -21,6 +21,7 @@ export const scopeOptions = [
 ]; //允许的权限范围。
 
 export type ClientDataType = {
+  business_domain_id?: string;
   active?: boolean;
   client_id?: string;
   client_secret?: string;

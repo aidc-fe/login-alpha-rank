@@ -65,8 +65,8 @@ export default function Home() {
             >
               <Input
                 name="email"
+                label="E-mail"
                 required
-                placeholder="E-mail"
                 type="email"
                 value={email}
                 onChange={(e) => {
@@ -75,8 +75,8 @@ export default function Home() {
               />
               <Input
                 name="password"
+                label="Password"
                 required
-                placeholder="Password"
                 type="password"
               />
 

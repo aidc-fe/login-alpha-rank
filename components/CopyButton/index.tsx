@@ -3,15 +3,15 @@
 // components/CopyButton.jsx
 import React, { useState } from "react";
 import { Copy, CopyCheck } from "lucide-react";
-import { Button } from "../ui/button";
+import { Button } from "@nextui-org/react";
 import { cn } from "@/lib/utils";
-import { toastApi } from '@/components/ui/toaster';
+import { toastApi } from "@/components/ui/toaster";
 
 export interface CopyButtonProps {
   textToCopy?: string;
 }
 
-const CopyButton: React.FC<CopyButtonProps> = ({ textToCopy = '' }) => {
+const CopyButton: React.FC<CopyButtonProps> = ({ textToCopy = "" }) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
@@ -35,10 +35,10 @@ const CopyButton: React.FC<CopyButtonProps> = ({ textToCopy = '' }) => {
       onClick={handleCopy}
       className={cn("p-0 w-5 h-5 ml-1", { "pointer-events-none": copied })}
       variant="ghost"
-      icon={
-        <Icon className="text-muted-foreground" size={16} />
-      }
-    />
+      isIconOnly
+    >
+      <Icon className="text-muted-foreground" size={16} />
+    </Button>
   );
 };
 

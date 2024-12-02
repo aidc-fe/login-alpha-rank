@@ -57,7 +57,7 @@ export default function Page() {
         <Input
           name="email"
           required
-          placeholder="E-mail"
+          label="E-mail"
           type="email"
           value={email}
           onChange={(e) => {
@@ -68,7 +68,7 @@ export default function Page() {
         <Input
           name="password"
           required
-          placeholder="Password"
+          label="Password"
           type="password"
         />
 
@@ -76,7 +76,7 @@ export default function Page() {
           name="check_password"
           required
           type="password"
-          placeholder="Re-enter password"
+          label="Re-enter password"
         />
         <Button
           className="group w-full"

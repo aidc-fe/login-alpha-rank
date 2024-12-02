@@ -52,7 +52,7 @@ export default function SignUpPage() {
       >
         <h1 className="font-bold text-3xl mb-12">Sign up</h1>
 
-        <Input name="name" placeholder="Username" required></Input>
+        <Input name="name" label="Username" required></Input>
         <Input
           name="email"
           type="email"
@@ -60,13 +60,13 @@ export default function SignUpPage() {
           onChange={(e) => {
             setEmail(e.target.value);
           }}
-          placeholder="E-mail"
+          label="E-mail"
           required
         ></Input>
         <Input
           name="password"
           type="password"
-          placeholder="Password"
+          label="Password"
           required
         ></Input>
         <Button
