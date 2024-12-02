@@ -11,7 +11,7 @@ export default function ClientProvider({ children }: { children: React.ReactNode
   const [client,setClient]=useState<Client>();
 
   useEffect(()=>{
-    request(`/api/client/get_by_domain/${`pre-login.text2go.ai`}`).then((res)=>{
+    request(`/api/client/get_by_domain/${window.location.hostname}`).then((res)=>{
       setClient(res);
     });
   },[])
