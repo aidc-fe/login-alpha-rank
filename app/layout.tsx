@@ -7,7 +7,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { NextUIProviderWrapper } from "@/providers/nextui-provider";
 
-
 export const metadata: Metadata = {
   title: "Alpha Rank Login",
   description: "Login to your Alpha Rank",
@@ -38,15 +37,15 @@ export default function RootLayout({
           }}
         ></script>
       </head>
+      <body className={"h-screen"}>
         <NextUIProviderWrapper>
-      <body className={ "h-screen"}>
           <SuspenseWrapper>
             <SessionProvider>{children}</SessionProvider>
           </SuspenseWrapper>
           <Analytics />
           <Toaster />
+        </NextUIProviderWrapper>
       </body>
-      </NextUIProviderWrapper>
     </html>
   );
 }
