@@ -6,7 +6,7 @@ import {NextUIProvider} from "@nextui-org/react";
 export function NextUIProviderWrapper({ children, ...props }: ThemeProviderProps) {
 
 
-  return <NextUIProvider  {...props}>{children}</NextUIProvider>;
+  return <NextUIProvider className="h-screen" {...props}>{children}</NextUIProvider>;
 }
 
 
