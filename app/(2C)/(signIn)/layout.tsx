@@ -1,19 +1,8 @@
-'use client'
 
-import type { Metadata } from "next";
 import LoginCarousel from "@/components/login-carousel";
 import Image from "next/image";
-import { useClient } from "@/providers/client-provider";
 
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { name, description}= await useClient();
-
-  return {
-    title: name,
-    description: description,
-  }
-}
 export default function RootLayout({
   children,
 }: Readonly<{
