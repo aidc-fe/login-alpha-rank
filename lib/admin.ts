@@ -26,15 +26,15 @@ export type ClientDataType = {
   client_id?: string;
   client_secret?: string;
   created_at?: string;
-  description?: string;
+  description: string;
   grant_types?: string;
-  name?: string;
-  owner_email?: string;
-  redirect_uris?: string[];
-  scope?: string[];
-  signout_uri?: string;
+  name: string;
+  owner_email: string;
+  redirect_uris: string[];
+  scope: string[];
+  signout_uri: string;
   updated_at?: string;
-  auth_domain?: string;
+  auth_domain: string;
   brand_color?: string;
   materials?: {
     description: string;
