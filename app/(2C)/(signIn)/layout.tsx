@@ -1,12 +1,17 @@
 import type { Metadata } from "next";
 import LoginCarousel from "@/components/login-carousel";
 import Image from "next/image";
+import { useClient } from "@/providers/client-provider";
 
-export const metadata: Metadata = {
-  title: "Alpha Rank Login",
-  description: "Login to your Alpha Rank",
-};
 
+export async function generateMetadata(): Promise<Metadata> {
+  const { name, description}= await useClient();
+
+  return {
+    title: name,
+    description: description,
+  }
+}
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -14,7 +19,7 @@ export default function RootLayout({
 }>) {
 
   return (
-       <main className="grid h-screen items-center md:grid-cols-2 relative">
+    <main className="grid h-screen items-center md:grid-cols-2 relative">
       <div className="h-full bg-circle-gradient hidden justify-center md:flex">
         <LoginCarousel className="justify-center items-center hidden md:flex" />
       </div>
@@ -27,6 +32,5 @@ export default function RootLayout({
         alt="background"
       />
     </main>
-   
   );
 }
