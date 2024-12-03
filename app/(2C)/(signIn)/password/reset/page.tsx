@@ -1,6 +1,6 @@
 "use client";
 import { CornerUpLeft, Loader, Send } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Button, Input, Link } from "@nextui-org/react";
 
@@ -10,7 +10,6 @@ export default function Page() {
     decodeURIComponent(searchParams.get("email") || "")
   );
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   return (
     <form

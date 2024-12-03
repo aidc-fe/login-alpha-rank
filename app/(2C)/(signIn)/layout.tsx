@@ -1,3 +1,5 @@
+'use client'
+
 import type { Metadata } from "next";
 import LoginCarousel from "@/components/login-carousel";
 import Image from "next/image";

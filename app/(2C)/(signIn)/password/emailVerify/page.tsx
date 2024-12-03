@@ -1,4 +1,5 @@
 "use client";
+
 import { toastApi } from "@/components/ui/toaster";
 import request from "@/lib/request";
 import { Send } from "lucide-react";
@@ -21,7 +22,7 @@ export default function Page() {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const checkPassword = formData.get("check_password") as string;
-    const { businessDomainId}=useClient()
+    const { businessDomainId} = useClient();
 
     // 校验新旧密码
     if (checkPassword !== password) {
