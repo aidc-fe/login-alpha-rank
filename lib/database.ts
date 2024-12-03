@@ -5,6 +5,7 @@ import {
   generateClientSecret,
   hashToken,
 } from "./secret";
+import { ClientDataType } from "./admin";
 import { ERROR_CONFIG } from "@/lib/errors";
 
 export const prisma = new PrismaClient();
@@ -49,11 +50,11 @@ export const createOrUpdateUser = async (data: {
 }) => {
   try {
     const user = await prisma.user.upsert({
-      where: { 
+      where: {
         email_businessDomainId: {
           email: data.email,
-          businessDomainId: data.businessDomainId
-        }
+          businessDomainId: data.businessDomainId,
+        },
       },
       create: data,
       update: {
@@ -78,12 +79,12 @@ export const updateUserByEmail = async (
 ) => {
   try {
     const updatedUser = await prisma.user.update({
-      where: { 
+      where: {
         email_businessDomainId: {
           email: email,
-          businessDomainId: data.businessDomainId
-        }
-      },     
+          businessDomainId: data.businessDomainId,
+        },
+      },
       data,
     });
 
@@ -214,31 +215,8 @@ export const validateMagicLink = async (token?: string) => {
 };
 
 // 插入一条client数据
-export async function createClient(data: {
-  redirect_uris: string[];
-  scope: string[];
-  name: string;
-  description: string;
-  signout_uri: string;
-  owner_email: string;
-  businessDomainId: string;
-  auth_domain: string;
-  brand_color?: string;
-  materials?: Array<{
-    title: string;
-    description: string;
-    image: string;
-  }>;
-  tos_doc?: string;
-  pp_doc?: string;
-}) {
-  const {
-    redirect_uris,
-    scope,
-    materials,
-    ...restData
-  } = data;
-
+export async function createClient(data: ClientDataType) {
+  const { redirect_uris, scope, materials, ...restData } = data;
 
   // 插入数据到 Client 表
   const newClient = await prisma.client.create({
@@ -248,7 +226,7 @@ export async function createClient(data: {
       client_secret: generateClientSecret(),
       redirect_uris: redirect_uris.join(","),
       scope: scope.join(","),
-      materials: JSON.stringify(materials||[]), // 将 materials 转换为 JSON 字符串
+      materials: JSON.stringify(materials || []), // 将 materials 转换为 JSON 字符串
       active: true,
       grant_types: "authorization_code",
     },
@@ -258,14 +236,16 @@ export async function createClient(data: {
     ...newClient,
     redirect_uris: newClient.redirect_uris?.split(",") ?? [],
     scope: newClient.scope?.split(",") ?? [],
-    materials: newClient.materials ? JSON.parse(newClient.materials as string) : [], // 解析 JSON 字符串
+    materials: newClient.materials
+      ? JSON.parse(newClient.materials as string)
+      : [], // 解析 JSON 字符串
   };
 }
 
 // 获取所有client数据
 export const getClients = async ({
   skip,
-  itemsPerPage
+  itemsPerPage,
 }: {
   email?: string;
   skip: number;
@@ -279,37 +259,20 @@ export const getClients = async ({
   const totalClients = await prisma.client.count();
 
   return { clients, totalClients };
-}
+};
 
 // 修改一条client数据
 export const updateClient = async ({
   client_id,
   ...data
-}: {
-  client_id: string;
-  redirect_uris?: string[];
-  scope?: string[];
-  name?: string;
-  businessDomainId?: string;
-  description?: string;
-  signout_uri?: string;
-  auth_domain: string;
-  brand_color?: string;
-  materials?: Array<{
-    title: string;
-    description: string;
-    image: string;
-  }>;
-  tos_doc?: string;
-  pp_doc?: string;
-}) => {
+}: Partial<Omit<ClientDataType, "client_id">> & { client_id: string }) => {
   try {
     const editData = Object.entries(data).reduce((acc, [key, value]) => {
       if (value !== null && value !== undefined) {
-        if (key === 'materials') {
+        if (key === "materials") {
           acc[key] = JSON.stringify(value);
-        } else if (['redirect_uris', 'scope'].includes(key)) {
-          acc[key] = (value as string[]).join(',');
+        } else if (["redirect_uris", "scope"].includes(key)) {
+          acc[key] = (value as string[]).join(",");
         } else {
           acc[key] = value;
         }
@@ -328,7 +291,9 @@ export const updateClient = async ({
       ...updatedClient,
       redirect_uris: updatedClient.redirect_uris?.split(",") ?? [],
       scope: updatedClient.scope?.split(",") ?? [],
-      materials: updatedClient.materials ? JSON.parse(updatedClient.materials as string) : [],
+      materials: updatedClient.materials
+        ? JSON.parse(updatedClient.materials as string)
+        : [],
     };
   } catch (error) {
     console.error("Error updating client:", error);
@@ -487,9 +452,13 @@ export const createRefreshToken = async (data: {
   }
 };
 
-
 // 创建一条businessDomain数据
-export async function createBusinessDomain(name: string, description: string, active: boolean, sso: boolean) {
+export async function createBusinessDomain(
+  name: string,
+  description: string,
+  active: boolean,
+  sso: boolean
+) {
   try {
     const newBusinessDomain = await prisma.businessDomain.create({
       data: {
@@ -535,15 +504,14 @@ export async function getClientByAuthDomain(authDomain: string) {
     });
 
     if (!client) {
-      throw new Error('Client not found');
+      throw new Error("Client not found");
     }
 
     return client;
   } catch (error) {
-    console.error('Error fetching client by auth_domain:', error);
+    console.error("Error fetching client by auth_domain:", error);
     throw error;
   } finally {
     await prisma.$disconnect();
   }
 }
-
