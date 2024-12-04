@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
 
   if (!userInfo.email) {
     return NextResponse.json(formateError(ERROR_CONFIG.AUTH.NEED_EMAIL));
-  } else if (await getUser({ email: userInfo.email })) {
+  } else if (await getUser({ email: userInfo.email, businessDomainId: userInfo.businessDomainId })) {
     return NextResponse.json(formateError(ERROR_CONFIG.AUTH.USER_EXIST));
   } else {
     // 生成验证链接（你需要实现生成实际的链接）

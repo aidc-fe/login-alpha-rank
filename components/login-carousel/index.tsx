@@ -13,7 +13,7 @@ export default function LoginCarousel({ className }: { className?: string }) {
   return (
     <div className={cn("overflow-hidden", className)} ref={emblaRef}>
       <div className="flex">
-        {JSON.parse(materials as string || "[]").map(({ image, title, description }:{image:string,title:string,description:string}) => {
+        {(materials ||[])?.map(({ image, title, description }:{image:string,title:string,description:string}) => {
           return (
             <div
               className="min-w-0 flex-grow-0 flex-shrink-0 basis-full flex flex-col items-center"
