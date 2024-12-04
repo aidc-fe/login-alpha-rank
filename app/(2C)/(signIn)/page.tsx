@@ -8,9 +8,12 @@ import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useClient } from "@/providers/client-provider";
+import { Session } from "next-auth";
 
 export default function Home() {
-  const { status } = useSession();
+  const { status, data } = useSession() as { 
+    status: 'loading'|'authenticated'|'unauthenticated', 
+    data: Session & { id: string } | null };
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [emailLoading, setEmailLoading] = useState(false);
@@ -21,7 +24,7 @@ export default function Home() {
   const targetUrl = decodeURIComponent(searchParams.get("targetUrl") || "");
   const router = useRouter();
   const [callbackUrl, setCallbackUrl]=useState("");
-  const { businessDomainId, isSSO, redirect_uris,client_id} = useClient();
+  const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc} = useClient();
 
   // 根据是否是单点登录，判断登录后跳转的页面
   useEffect(()=>{
@@ -32,16 +35,20 @@ export default function Home() {
       targetUrl ? "targetUrl=" + targetUrl : ""
     }`);
     } else {
-      setCallbackUrl(`/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}`);
+      setCallbackUrl(`/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}&userId=${data?.id}`);
     }
   },[isSSO])
 
   // 如果用户已经登录，则进行续登
   useEffect(() => {
     if (status === "authenticated") {
-      // router.replace(`/login-landing-page${location.search}`);
+      if(isSSO) {
+        router.replace(`/login-landing-page${location.search}`);
+      } else {
+        router.replace(`/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}&userId=${data?.id}`);
+      }
     }
-  }, [router, status, targetUrl]);
+  }, [router, status, data, isSSO, redirect_uris, client_id, callbackUrl]);
 
   switch (status) {
     case "unauthenticated":
@@ -178,21 +185,21 @@ export default function Home() {
             <div className="w-1/2 border-b mx-auto mt-4" />
             <div className="w-full text-muted-foreground font-normal text-center mt-4">
               By continuing with any of the options above, you agree to our{" "}
-              <Link
-                href="https://terms.alicdn.com/legal-agreement/terms/b_platform_service_agreement/20231110160335349/20231110160335349.html"
+             {tos_doc && <Link
+                href={tos_doc}
                 isExternal
                 underline="always"
               >
                 Terms of Service
-              </Link>{" "}
+              </Link>}{" "}
               and have read our{" "}
-              <Link
-                href="https://terms.alicdn.com/legal-agreement/terms/privacy_policy_full/20231109180939630/20231109180939630.html"
+              {pp_doc && <Link
+                href={pp_doc}
                 isExternal
                 underline="always"
               >
                 Privacy Policy
-              </Link>{" "}
+              </Link>}{" "}
               .
             </div>
           </div>

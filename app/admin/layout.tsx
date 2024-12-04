@@ -16,11 +16,11 @@ export default function RootLayout({
   const router = useRouter();
   const { data } = useSession();
   
-  // useEffect(() => {
-  //   if (data && (!data?.user?.email || !whiteList.includes(data?.user?.email))) {
-  //     router.replace(`/`)
-  //   }
-  // }, [data?.user?.email]);
+  useEffect(() => {
+    if (data && (!data?.user?.email || !whiteList.includes(data?.user?.email))) {
+      router.replace(`/`)
+    }
+  }, [data?.user?.email]);
 
   return (
     <div className="min-h-screen">
@@ -31,6 +31,10 @@ export default function RootLayout({
             label: "Client Manage",
             key: "/admin/list",
           },
+          {
+            label: "Business Domain Manage",
+            key: "/admin/businessDomain",
+          }
         ]}
       />
       <main className="pt-20 ml-64">

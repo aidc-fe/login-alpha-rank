@@ -48,6 +48,9 @@ export type ClientDataType = {
 export type BusinessDomainDataType = {
   id: string;
   name: string;
+  description: string | null;
+  created_at: Date;
+  updated_at: Date;
   active: boolean;
   sso: boolean;
 }

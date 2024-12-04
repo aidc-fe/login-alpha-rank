@@ -516,7 +516,6 @@ export async function createBusinessDomain(
 export async function getAllBusinessDomains() {
   try {
     const allBusinessDomains = await prisma.businessDomain.findMany();
-    console.log("All BusinessDomains:", allBusinessDomains);
     return allBusinessDomains;
   } catch (error) {
     console.error("Error fetching BusinessDomains:", error);
@@ -526,22 +525,47 @@ export async function getAllBusinessDomains() {
   }
 };
 
-// 根据id查询businessDomain数据
+// 通过id查询businessDomain详情
 export async function getBusinessDomainById(id: string) {
   try {
     const businessDomain = await prisma.businessDomain.findUnique({
       where: {
-        id: id,
+        id,
       },
     });
 
     if (!businessDomain) {
-      throw new Error(`BusinessDomain with id: ${id} not found`);
+      throw new Error("Business domain not found");
     }
 
     return businessDomain;
   } catch (error) {
-    console.error("Error fetching BusinessDomain by id:", error);
+    console.error("Error fetching business domain:", error);
+    throw error;
+  }
+}
+
+// 修改businessDomain
+export async function updateBusinessDomain(
+  id: string,
+  data: {
+    name?: string;
+    description?: string;
+    active?: boolean;
+    sso?: boolean;
+  }
+) {
+  try {
+    const updatedBusinessDomain = await prisma.businessDomain.update({
+      where: {
+        id,
+      },
+      data,
+    });
+
+    return updatedBusinessDomain;
+  } catch (error) {
+    console.error("Error updating business domain:", error);
     throw error;
   }
 }

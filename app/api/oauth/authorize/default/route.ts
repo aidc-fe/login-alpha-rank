@@ -9,7 +9,6 @@ export async function GET(request: NextRequest) {
   //  const state = request.nextUrl.searchParams.get("state") || "";
   const userId = request.nextUrl.searchParams.get("userId") || "";
 
-  console.log({client_id, redirect_uri, userId});
    // 参数校验
    if (!client_id) {
     return NextResponse.json(

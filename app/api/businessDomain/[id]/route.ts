@@ -1,25 +1,68 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { getBusinessDomainById } from '@/lib/database';
-import { formatSuccess } from '@/lib/request';
+import { getBusinessDomainById, updateBusinessDomain } from "@/lib/database";
+import { formateError, formatSuccess } from "@/lib/request";
+import { NextRequest, NextResponse } from "next/server";
 
+// 获取详情
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const { id } = params;
-
-  if (!id || typeof id !== 'string') {
-    return NextResponse.json({ error: 'Invalid or missing id' }, { status: 400 });
-  }
-
   try {
-    const businessDomain = await getBusinessDomainById(id);
-    if (!businessDomain) {
-      return NextResponse.json({ error: 'Business domain not found' }, { status: 404 });
+    const businessDomain = await getBusinessDomainById(params.id);
+    return NextResponse.json(
+      formatSuccess({
+        data: businessDomain,
+      })
+    );
+  } catch (error: any) {
+    return NextResponse.json(
+      formateError({
+        message: error.message || "Failed to fetch business domain",
+      })
+    );
+  }
+}
+
+// 更新
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const data = await request.json();
+    const { name, description, active, sso } = data;
+
+    // 添加基本验证
+    const errors: Record<string, string[]> = {};
+    if (name !== undefined && !name?.trim()) {
+      errors.name = ["Name is required"];
     }
-    return NextResponse.json(formatSuccess({ data: businessDomain }));
-  } catch (error) {
-    console.error('Error fetching business domain:', error);
-    return NextResponse.json({ error: 'Failed to fetch business domain' }, { status: 500 });
+
+    if (Object.keys(errors).length > 0) {
+      return NextResponse.json(
+        formateError({
+          message: "Validation failed",
+        })
+      );
+    }
+
+    const updatedBusinessDomain = await updateBusinessDomain(params.id, {
+      name,
+      description,
+      active,
+      sso,
+    });
+
+    return NextResponse.json(
+      formatSuccess({
+        data: updatedBusinessDomain,
+      })
+    );
+  } catch (error: any) {
+    return NextResponse.json(
+      formateError({
+        message: error.message || "Failed to update business domain",
+      })
+    );
   }
 }
