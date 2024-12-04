@@ -45,11 +45,11 @@ export default function Home() {
     if (status === "authenticated") {
       if(isSSO) {
         router.replace(`/login-landing-page${location.search}`);
-      } else {
-        router.replace(`/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}&userId=${data?.id}`);
+      } else if(callbackUrl) {
+        router.replace(`${callbackUrl}&userId=${data?.id}`);
       }
     }
-  }, [router, status, data, isSSO, redirect_uris, client_id, callbackUrl]);
+  }, [router, status, data, isSSO, callbackUrl]);
 
   switch (status) {
     case "unauthenticated":
