@@ -12,7 +12,9 @@ import { Session } from "next-auth";
 import PasswordInput from "@/components/PasswordInput";
 
 export default function Home() {
-  const { status, data } = useSession() as { status: 'loading'|'authenticated'|'unauthenticated', data: Session & { id: string } | null };
+  const { status, data } = useSession() as { 
+    status: 'loading'|'authenticated'|'unauthenticated', 
+    data: Session & { id: string } | null };
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [emailLoading, setEmailLoading] = useState(false);
@@ -47,7 +49,7 @@ export default function Home() {
         router.replace(`/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}&userId=${data?.id}`);
       }
     }
-  }, [router, status, data, isSSO, redirect_uris, client_id]);
+  }, [router, status, data, isSSO, redirect_uris, client_id, callbackUrl]);
 
   switch (status) {
     case "unauthenticated":
@@ -70,7 +72,7 @@ export default function Home() {
                   body: JSON.stringify({ email, password, businessDomainId }),
                 })
                   .then((user) => {
-                    signIn("password", { ...user, callbackUrl:`${callbackUrl}&userId=${user.sub}` ,businessDomainId});
+                    signIn("password", { ...user, callbackUrl:`${callbackUrl}&userId=${user.sub}`, businessDomainId});
                   })
                   .finally(() => {
                     setLoading(false);
@@ -183,7 +185,7 @@ export default function Home() {
             <div className="w-1/2 border-b mx-auto mt-4" />
             <div className="w-full text-muted-foreground font-normal text-center mt-4">
               By continuing with any of the options above, you agree to our{" "}
-             {tos_doc &&  <Link
+             {tos_doc && <Link
                 href={tos_doc}
                 isExternal
                 underline="always"
