@@ -4,11 +4,13 @@ import { Button } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import { isGmail } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
+import { useClient } from "@/providers/client-provider";
 
 export default function EmailSent() {
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const type = searchParams.get("type") || "login";
+  const { support_email } = useClient();
 
   useEffect(() => {
     setEmail(
@@ -67,14 +69,14 @@ export default function EmailSent() {
           <Button
             onClick={() => {
               window.open(
-                "https://mail.google.com/mail/u/0/?fs=1&to=support@alpha-rank.com&tf=cm"
+                `https://mail.google.com/mail/u/0/?fs=1&to=${support_email}&tf=cm`
               );
             }}
             className="p-0 ml-2 h-auto !bg-transparent w-auto min-w-0"
             color="primary"
             variant="light"
           >
-            support@alpha-rank
+           {support_email}
           </Button>
           .
         </p>

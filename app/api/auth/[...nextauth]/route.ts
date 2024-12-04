@@ -126,11 +126,11 @@ const authOptions: NextAuthOptions = {
       },
       from: process.env.EMAIL_FROM,
       async sendVerificationRequest({ identifier: email, url }) {
-        await sendVerificationEmail(email, url, "AlphaRank - Login", {
-          title: "Login to AlphaRank",
-          description: `<p>You can login to AlphaRank by clicking the button below.</p> 
+        await sendVerificationEmail(email, url, "Login", {
+          title: "Login",
+          description: `<p>You can login by clicking the button below.</p> 
             <p>
-            Good news!  You and your team can use username/password to login your Alpha-Rank account now. Just set your password with the following link: <a style='color:#7c3aed' href='${
+            Good news!  You and your team can use username/password to login your account now. Just set your password with the following link: <a style='color:#7c3aed' href='${
               process.env.NEXT_PUBLIC_NEXT_AUTH_URL
             }/password/emailVerify?email=${encodeURIComponent(
             email
