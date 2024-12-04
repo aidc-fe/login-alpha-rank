@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   const params = await request.json();
-  const user = await getUser({ email: params.email });
+  const user = await getUser({ email: params.email, businessDomainId: params.businessDomainId });
 
   if (!user) {
     return NextResponse.json(formateError(ERROR_CONFIG.SIGNIN));
