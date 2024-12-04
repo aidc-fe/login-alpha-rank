@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { FormEventHandler, useState } from "react";
 import { Input, Button, Link } from "@nextui-org/react";
 import { useClient } from "@/providers/client-provider";
+import PasswordInput from "@/components/PasswordInput";
 
 export default function Page() {
   const searchParams = useSearchParams();
@@ -68,17 +69,15 @@ export default function Page() {
           }}
         />
 
-        <Input
+        <PasswordInput
           name="password"
           required
           label="Password"
-          type="password"
         />
 
-        <Input
+        <PasswordInput
           name="check_password"
           required
-          type="password"
           label="Re-enter password"
         />
         <Button

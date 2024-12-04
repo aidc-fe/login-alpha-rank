@@ -9,6 +9,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useClient } from "@/providers/client-provider";
 import { Session } from "next-auth";
+import PasswordInput from "@/components/PasswordInput";
 
 export default function Home() {
   const { status, data } = useSession() as { 
@@ -44,11 +45,11 @@ export default function Home() {
     if (status === "authenticated") {
       if(isSSO) {
         router.replace(`/login-landing-page${location.search}`);
-      } else {
-        router.replace(`/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}&userId=${data?.id}`);
+      } else if(callbackUrl) {
+        router.replace(`${callbackUrl}&userId=${data?.id}`);
       }
     }
-  }, [router, status, data, isSSO, redirect_uris, client_id, callbackUrl]);
+  }, [router, status, data, isSSO, callbackUrl]);
 
   switch (status) {
     case "unauthenticated":
@@ -71,7 +72,7 @@ export default function Home() {
                   body: JSON.stringify({ email, password, businessDomainId }),
                 })
                   .then((user) => {
-                    signIn("password", { ...user, callbackUrl:`${callbackUrl}&userId=${user.sub}` ,businessDomainId});
+                    signIn("password", { ...user, callbackUrl:`${callbackUrl}&userId=${user.sub}`, businessDomainId});
                   })
                   .finally(() => {
                     setLoading(false);
@@ -88,11 +89,10 @@ export default function Home() {
                   setEmail(e.target.value);
                 }}
               />
-              <Input
+              <PasswordInput
                 name="password"
                 label="Password"
                 required
-                type="password"
               />
 
               <div className="flex justify-between">
