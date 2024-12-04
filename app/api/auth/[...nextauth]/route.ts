@@ -55,7 +55,7 @@ const authOptions: NextAuthOptions = {
         const email = credentials?.email || "";
         const from = credentials?.from || "";
         const image = credentials?.image || "";
-        const businessDomainId = credentials?.businessDomainId || "";
+        const businessDomainId = credentials?.businessDomainId || "";      
         // 在数据库中查找用户
         let user = await prisma.user.findUnique({
           where: { 
