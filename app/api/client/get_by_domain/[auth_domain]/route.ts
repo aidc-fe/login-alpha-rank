@@ -17,7 +17,7 @@ export async function GET(
     const client = await getClientByAuthDomain(auth_domain);
 
     // 如果客户端不存在，返回错误
-    if (!client) {
+    if (!client) { 
       return NextResponse.json(formateError({ message: "Client not found" }), {
         status: 404,
       });

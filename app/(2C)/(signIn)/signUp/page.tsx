@@ -13,7 +13,7 @@ export default function SignUpPage() {
   const [email, setEmail] = useState(
     decodeURIComponent(searchParams.get("email") || "")
   );
-  const { businessDomainId } = useClient();
+  const { businessDomainId, pp_doc, tos_doc } = useClient();
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
@@ -84,23 +84,21 @@ export default function SignUpPage() {
         <div className="text-muted-foreground font-normal flex flex-col gap-3 items-center">
           <div className="text-center">
             By continuing with any of the options above, you agree to our{" "}
-            <Link
+            {tos_doc && <Link
               underline="always"
               isExternal
-              href={
-                "https://terms.alicdn.com/legal-agreement/terms/b_platform_service_agreement/20231110160335349/20231110160335349.html"
-              }
+              href={tos_doc}
             >
               Terms of Service
-            </Link>{" "}
+            </Link>}{" "}
             and have read our{" "}
-            <Link
+           {pp_doc && <Link
               underline="always"
               isExternal
-              href={"https://terms.alicdn.com/legal-agreement/terms/privacy_policy_full/20231109180939630/20231109180939630.html"}
+              href={pp_doc}
             >
               Privacy Policy
-            </Link>{" "}
+            </Link>}
             .
           </div>
           <div className="flex gap-1 items-center">

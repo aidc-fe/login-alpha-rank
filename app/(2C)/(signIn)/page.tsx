@@ -2,7 +2,7 @@
 
 import request from "@/lib/request";
 import { ArrowUpRight } from "lucide-react";
-import { signIn, useSession } from "next-auth/react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import { Button, Input, Link } from '@nextui-org/react'
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -20,22 +20,28 @@ export default function Home() {
   const [jumpEmail, setJumpEmail] = useState("");
   const targetUrl = decodeURIComponent(searchParams.get("targetUrl") || "");
   const router = useRouter();
-  const callbackUrl = `/login-landing-page?${
-    targetUrl ? "targetUrl=" + targetUrl : ""
-  }`;
- const { businessDomainId } = useClient();
+  const [callbackUrl, setCallbackUrl]=useState("");
+  const { businessDomainId, isSSO, redirect_uris,client_id} = useClient();
+
+  // 根据是否是单点登录，判断登录后跳转的页面
+  useEffect(()=>{
+    if(isSSO === undefined){ 
+      return;
+    } else if(isSSO){
+      setCallbackUrl(`/login-landing-page?${
+      targetUrl ? "targetUrl=" + targetUrl : ""
+    }`);
+    } else {
+      setCallbackUrl(`/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}`);
+    }
+  },[isSSO])
 
   // 如果用户已经登录，则进行续登
   useEffect(() => {
     if (status === "authenticated") {
-      router.replace(`/login-landing-page${location.search}`);
+      // router.replace(`/login-landing-page${location.search}`);
     }
   }, [router, status, targetUrl]);
-
-  // 处理用户成功发送邮件后返回
-  useEffect(() => {
-    setEmailLoading(false);
-  }, []);
 
   switch (status) {
     case "unauthenticated":
@@ -55,10 +61,10 @@ export default function Home() {
                 // 登录
                 request("/api/signIn", {
                   method: "POST",
-                  body: JSON.stringify({ email, password }),
+                  body: JSON.stringify({ email, password, businessDomainId }),
                 })
                   .then((user) => {
-                    signIn("password", { ...user, callbackUrl ,businessDomainId});
+                    signIn("password", { ...user, callbackUrl:`${callbackUrl}&userId=${user.sub}` ,businessDomainId});
                   })
                   .finally(() => {
                     setLoading(false);
