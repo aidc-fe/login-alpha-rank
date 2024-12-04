@@ -28,11 +28,11 @@ export async function POST(request: NextRequest) {
       await sendVerificationEmail(
         userInfo.email,
         verificationLink,
-        "AlphaRank - Verify your email ",
+        "Verify your email ",
         {
           title: "Verify your email address",
           description:
-            "To continue setting up your AlphaRank account, please verify your email address.",
+            "To continue setting up your account, please verify your email address.",
           btnContent: "Verify Email Address",
         }
       );

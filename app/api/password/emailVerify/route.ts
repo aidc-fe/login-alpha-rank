@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
     await sendVerificationEmail(
       email,
       verificationLink,
-      "Set AlphaRank's password ",
+      "Set password ",
       {
         title: "Set Password",
         description:

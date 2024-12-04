@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
   } catch (e: any) {
     console.error("Error during authorization:", e.message);
     return NextResponse.json(
-      { message: e.message || "AlphaRank Login Authorize failed" },
+      { message: e.message || "Login Authorize failed" },
       { status: 401 }
     );
   }
