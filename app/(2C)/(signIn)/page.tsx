@@ -9,6 +9,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useClient } from "@/providers/client-provider";
 import { Session } from "next-auth";
+import PasswordInput from "@/components/PasswordInput";
 
 export default function Home() {
   const { status, data } = useSession() as { status: 'loading'|'authenticated'|'unauthenticated', data: Session & { id: string } | null };
@@ -86,11 +87,10 @@ export default function Home() {
                   setEmail(e.target.value);
                 }}
               />
-              <Input
+              <PasswordInput
                 name="password"
                 label="Password"
                 required
-                type="password"
               />
 
               <div className="flex justify-between">

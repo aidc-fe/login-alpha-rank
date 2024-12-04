@@ -3,6 +3,7 @@ import { CornerUpLeft, Loader, Send } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { Button, Input, Link } from "@nextui-org/react";
+import PasswordInput from "@/components/PasswordInput";
 
 export default function Page() {
   const searchParams = useSearchParams();
@@ -27,19 +28,17 @@ export default function Page() {
         {email}
       </div>
 
-      <Input
+      <PasswordInput
         name="password"
         label="password"
         required
         placeholder="Please enter your password"
-        type="password"
       />
-      <Input
+      <PasswordInput
         name="check_password"
         label="Check password"
         required
         placeholder="Please enter your password again"
-        type="password"
       />
       <div className="flex flex-col lg:grid lg:grid-cols-3 w-full items-center mt-8 gap-4">
         <Button

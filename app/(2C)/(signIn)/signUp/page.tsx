@@ -5,6 +5,7 @@ import request from "@/lib/request";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEventHandler, useState } from "react";
 import { useClient } from "@/providers/client-provider";
+import PasswordInput from "@/components/PasswordInput";
 
 export default function SignUpPage() {
   const searchParams = useSearchParams();
@@ -65,12 +66,11 @@ export default function SignUpPage() {
           label="E-mail"
           required
         ></Input>
-        <Input
+        <PasswordInput
           name="password"
-          type="password"
           label="Password"
           required
-        ></Input>
+        />
         <Button
           className="w-full"
           color="primary"
