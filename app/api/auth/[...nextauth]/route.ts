@@ -9,7 +9,6 @@ import { sendVerificationEmail } from "@/lib/email";
 import { CookieOpt } from "@/lib/auth";
 
 const authOptions: NextAuthOptions = {
-  // debug: true,
   adapter: PrismaAdapter(prisma),
   session: {
     strategy: "jwt",
@@ -35,7 +34,7 @@ const authOptions: NextAuthOptions = {
 
   callbacks: {
     async session({ session, token }) {
-      return { ...session, jwtToken: token?.jwtToken };
+      return { ...session, jwtToken: token?.jwtToken, id: token?.sub };
     },
   },
   secret: process.env.NEXT_AUTH_SECRET!,
@@ -64,7 +63,8 @@ const authOptions: NextAuthOptions = {
               email,
               businessDomainId
             }
-          },         });
+          },
+        });
 
         // 如果用户不存在，创建新用户
         if (!user) {
@@ -125,7 +125,7 @@ const authOptions: NextAuthOptions = {
         secure: true,
       },
       from: process.env.EMAIL_FROM,
-      async sendVerificationRequest({ identifier: email, url, provider }) {
+      async sendVerificationRequest({ identifier: email, url }) {
         await sendVerificationEmail(email, url, "AlphaRank - Login", {
           title: "Login to AlphaRank",
           description: `<p>You can login to AlphaRank by clicking the button below.</p> 
