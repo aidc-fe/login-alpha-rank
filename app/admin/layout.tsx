@@ -29,7 +29,7 @@ export default function RootLayout({
         items={[
           {
             label: "Client Manage",
-            key: "/admin/list",
+            key: "/admin/client",
           },
           {
             label: "Business Domain Manage",

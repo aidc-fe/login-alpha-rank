@@ -23,6 +23,8 @@ export const scopeOptions = [
 export type ClientDataType = {
   businessDomainId:string;
   active?: boolean;
+  title?: string;
+  favicon?: string;
   client_id?: string;
   client_secret?: string;
   created_at?: string;
