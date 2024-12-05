@@ -2,7 +2,7 @@
 
 import request from "@/lib/request";
 import { ArrowUpRight } from "lucide-react";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signIn, useSession } from "next-auth/react";
 import { Button, Input, Link } from '@nextui-org/react'
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
@@ -36,7 +36,7 @@ export default function Home() {
       targetUrl ? "targetUrl=" + targetUrl : ""
     }`);
     } else {
-      setCallbackUrl(`/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}&userId=${data?.id}`);
+      setCallbackUrl(`/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}`);
     }
   },[isSSO])
 
@@ -46,9 +46,7 @@ export default function Home() {
       if(isSSO) {
         router.replace(`/login-landing-page${location.search}`);
       } else if(callbackUrl) {
-        console.log({data})
-        signOut();
-        // router.replace(`${callbackUrl}&userId=${data?.id}`);
+        router.replace(`${callbackUrl}&userId=${data?.id}`);
       }
     }
   }, [router, status, data, isSSO, callbackUrl]);
@@ -74,9 +72,7 @@ export default function Home() {
                   body: JSON.stringify({ email, password, businessDomainId }),
                 })
                   .then((user) => {
-                    console.log({user,callbackUrl:`${callbackUrl}&userId=${user.sub}`})
-
-                    // signIn("password", { ...user, callbackUrl:`${callbackUrl}&userId=${user.sub}`, businessDomainId});
+                    signIn("password", { ...user, callbackUrl:`${callbackUrl}&userId=${user.sub}`, businessDomainId});
                   })
                   .finally(() => {
                     setLoading(false);
