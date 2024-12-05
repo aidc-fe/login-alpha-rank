@@ -3,7 +3,7 @@
 import request from "@/lib/request";
 import { ArrowUpRight } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { Button, Input, Link } from '@nextui-org/react'
+import { Button, Input, Link, user } from '@nextui-org/react'
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -24,7 +24,7 @@ export default function Home() {
   const [jumpEmail, setJumpEmail] = useState("");
   const targetUrl = decodeURIComponent(searchParams.get("targetUrl") || "");
   const router = useRouter();
-  const [callbackUrl, setCallbackUrl]=useState("");
+  const [callbackUrl, setCallbackUrl] = useState("");
   const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc} = useClient();
 
   // 根据是否是单点登录，判断登录后跳转的页面
@@ -46,6 +46,7 @@ export default function Home() {
       if(isSSO) {
         router.replace(`/login-landing-page${location.search}`);
       } else if(callbackUrl) {
+        console.log({data})
         router.replace(`${callbackUrl}&userId=${data?.id}`);
       }
     }
@@ -72,6 +73,7 @@ export default function Home() {
                   body: JSON.stringify({ email, password, businessDomainId }),
                 })
                   .then((user) => {
+                    console.log({user})
                     signIn("password", { ...user, callbackUrl:`${callbackUrl}&userId=${user.sub}`, businessDomainId});
                   })
                   .finally(() => {
