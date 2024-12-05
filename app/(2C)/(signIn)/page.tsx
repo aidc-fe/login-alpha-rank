@@ -74,8 +74,9 @@ export default function Home() {
                   body: JSON.stringify({ email, password, businessDomainId }),
                 })
                   .then((user) => {
-                    console.log({user})
-                    signIn("password", { ...user, callbackUrl:`${callbackUrl}&userId=${user.sub}`, businessDomainId});
+                    console.log({user,callbackUrl:`${callbackUrl}&userId=${user.sub}`})
+
+                    // signIn("password", { ...user, callbackUrl:`${callbackUrl}&userId=${user.sub}`, businessDomainId});
                   })
                   .finally(() => {
                     setLoading(false);
