@@ -15,7 +15,7 @@ export default function ClientProvider({ children }: { children: React.ReactNode
   const [client, setClient] = useState<ClientWithBusinessDomainType>();
 
   useEffect(() => {
-    request(`/api/client/get_by_domain/pre-login.text2go.ai`)
+    request(`/api/client/get_by_domain/${window.location.hostname}`)
       .then((clientRes) => {
         return  request(`/api/businessDomain/${clientRes.businessDomainId}`)
           .then((businessDomainRes) => {
