@@ -36,7 +36,7 @@ export default function Home() {
       targetUrl ? "targetUrl=" + targetUrl : ""
     }`);
     } else {
-      setCallbackUrl(`/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}&userId=${data?.id}`);
+      setCallbackUrl(`/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}`);
     }
   },[isSSO])
 
