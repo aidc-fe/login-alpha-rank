@@ -108,7 +108,7 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
     >
       <div className="flex flex-col gap-4">
         <Select
-          label="Business Domain ID"
+          label="Business Domain"
           className="max-w-xs"
           name="businessDomainId"
           isDisabled={isReadOnly}
