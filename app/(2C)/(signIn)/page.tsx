@@ -3,7 +3,7 @@
 import request from "@/lib/request";
 import { ArrowUpRight } from "lucide-react";
 import { signIn, signOut, useSession } from "next-auth/react";
-import { Button, Input, Link, user } from '@nextui-org/react'
+import { Button, Input, Link } from '@nextui-org/react'
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -47,7 +47,8 @@ export default function Home() {
         router.replace(`/login-landing-page${location.search}`);
       } else if(callbackUrl) {
         console.log({data})
-        router.replace(`${callbackUrl}&userId=${data?.id}`);
+        signOut();
+        // router.replace(`${callbackUrl}&userId=${data?.id}`);
       }
     }
   }, [router, status, data, isSSO, callbackUrl]);
