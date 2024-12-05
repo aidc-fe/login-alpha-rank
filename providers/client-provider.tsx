@@ -1,9 +1,8 @@
 'use client'
 
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 import { createContext } from "react";
 import { Client } from "@prisma/client";
-import request from "@/lib/request";
 
 type ClientWithBusinessDomainType = Client & {  
   isSSO: boolean;
@@ -11,21 +10,7 @@ type ClientWithBusinessDomainType = Client & {
 };
 const ClientContext = createContext<ClientWithBusinessDomainType | undefined>(undefined);
 
-export default function ClientProvider({ children }: { children: React.ReactNode }) {
-  const [client, setClient] = useState<ClientWithBusinessDomainType>();
-
-  useEffect(() => {
-    request(`/api/client/get_by_domain/${window.location.hostname}`)
-      .then((clientRes) => {
-        return  request(`/api/businessDomain/${clientRes.businessDomainId}`)
-          .then((businessDomainRes) => {
-            setClient({ ...clientRes, isSSO: businessDomainRes.sso });
-          });
-      }).catch(e=>{
-        console.error("Error in API requests:", e);
-      });
-  }, []);
-
+export default function ClientProvider({ children, client }: { children: React.ReactNode, client?: ClientWithBusinessDomainType }) {
   return <ClientContext.Provider value={client}>{children}</ClientContext.Provider>;
 }
 

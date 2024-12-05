@@ -143,6 +143,20 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
           defaultValue={initialData?.auth_domain}
         />
 
+        <Input
+          name="title"
+          label="Title"
+          isReadOnly={isReadOnly}
+          defaultValue={initialData?.title}
+        />
+
+        <Input
+          name="favicon"
+          label="Favicon"
+          isReadOnly={isReadOnly}
+          defaultValue={initialData?.favicon}
+        />
+
         <div className="flex w-full items-center gap-2">
           <span className="capitalize text-sm">Brand Color:</span>
           <label
