@@ -7,9 +7,30 @@ import { prisma } from "@/lib/database";
 import { decodeJwt, encodeJwt } from "@/lib/secret";
 import { sendVerificationEmail } from "@/lib/email";
 import { CookieOpt } from "@/lib/auth";
+import { NextApiRequest, NextApiResponse } from "next/types";
 
 const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  adapter: {
+    ...PrismaAdapter(prisma),
+    getUserByEmail: async (email: string) => {
+      // 从请求中获取 businessDomainId
+      // 注意：这里需要访问请求上下文来获取 businessDomainId
+      const req = (global as any).req;
+      const businessDomainId =
+        req?.query?.businessDomainId || req?.body?.businessDomainId || "";
+
+      const user = await prisma.user.findUnique({
+        where: {
+          email_businessDomainId: {
+            email,
+            businessDomainId,
+          },
+        },
+      });
+
+      return user;
+    },
+  },
   session: {
     strategy: "jwt",
   },
@@ -55,14 +76,14 @@ const authOptions: NextAuthOptions = {
         const email = credentials?.email || "";
         const from = credentials?.from || "";
         const image = credentials?.image || "";
-        const businessDomainId = credentials?.businessDomainId || "";      
+        const businessDomainId = credentials?.businessDomainId || "";
         // 在数据库中查找用户
         let user = await prisma.user.findUnique({
-          where: { 
+          where: {
             email_businessDomainId: {
               email,
-              businessDomainId
-            }
+              businessDomainId,
+            },
           },
         });
 
@@ -89,17 +110,23 @@ const authOptions: NextAuthOptions = {
     CredentialsProvider({
       id: "password",
       name: "Password",
-      credentials: { id: {}, password: {}, name: {}, email: {}, businessDomainId: {} },
+      credentials: {
+        id: {},
+        password: {},
+        name: {},
+        email: {},
+        businessDomainId: {},
+      },
       async authorize(credentials) {
         const email = credentials?.email || "";
         const businessDomainId = credentials?.businessDomainId || "";
         // 在数据库中查找用户
         let user = await prisma.user.findUnique({
-          where: { 
+          where: {
             email_businessDomainId: {
               email,
-              businessDomainId
-            }
+              businessDomainId,
+            },
           },
         });
 
@@ -148,6 +175,16 @@ const authOptions: NextAuthOptions = {
     error: "/", // Error code passed in query string as ?error=
   },
 };
+
+// 添加中间件来保存请求上下文
+export function middleware(
+  req: NextApiRequest,
+  res: NextApiResponse,
+  next: () => void
+) {
+  (global as any).req = req;
+  next();
+}
 
 const handler = NextAuth(authOptions);
 

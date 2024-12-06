@@ -134,7 +134,7 @@ export default function Home() {
             <Button
               className="w-full"
               radius="sm"
-              onClick={() => signIn("google", { callbackUrl })}
+              onClick={() => signIn("google", { callbackUrl, businessDomainId })}
             >
               <Image
                 height="24"
@@ -161,7 +161,8 @@ export default function Home() {
                     sessionStorage.setItem("verifyEmail", email as string);
                     signIn("email", { 
                       email, 
-                      callbackUrl: `${window.location.origin}${callbackUrl}`,
+                      callbackUrl,
+                      businessDomainId,
                     });
                   })
                   .finally(() => {
