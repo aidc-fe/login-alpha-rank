@@ -47,7 +47,7 @@ const updateBusinessDomain = async (id: string, data: Partial<BusinessDomainData
 
 // 表格列定义
 const columns = [
-  { key: "name", label: "Name", width: "w-40" },
+  { key: "name", label: "Name" },
   { key: "id", label: "Business Domain Id" },
   { key: "active", label: "Activate" },
   { key: "sso", label: "Enable SSO" },

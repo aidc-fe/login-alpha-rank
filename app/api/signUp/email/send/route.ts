@@ -1,11 +1,15 @@
 import { ERROR_CONFIG } from "@/lib/errors";
-import { createVerificationToken, getUser } from "@/lib/database";
+import { createVerificationToken, findClientByClientId, getUser } from "@/lib/database";
 import { sendVerificationEmail } from "@/lib/email";
 import { formateError, formatSuccess } from "@/lib/request";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   const userInfo = await request.json();
+  // 获取当前请求的 host
+  const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
+  const host = request.headers.get('host');
+  const baseUrl = `${protocol}://${host}`;
 
   if (!userInfo.email) {
     return NextResponse.json(formateError(ERROR_CONFIG.AUTH.NEED_EMAIL));
@@ -22,7 +26,8 @@ export async function POST(request: NextRequest) {
         targetUrl: userInfo?.targetUrl,
         type: "signUp", // 可选
       });
-      const verificationLink = `${process.env.NEXT_AUTH_URL}/api/signUp/email/verify?token=${newToken.token}&businessDomainId=${userInfo?.businessDomainId}`;
+      const verificationLink = `${baseUrl}/api/signUp/email/verify?token=${newToken.token}&businessDomainId=${userInfo?.businessDomainId}`;
+      const client = await findClientByClientId(userInfo?.client_id);
 
       // 发送验证邮件
       await sendVerificationEmail(
@@ -34,7 +39,8 @@ export async function POST(request: NextRequest) {
           description:
             "To continue setting up your account, please verify your email address.",
           btnContent: "Verify Email Address",
-        }
+        },
+        client?.brand_color ?? '#7c3aed'
       );
       return NextResponse.json(
         formatSuccess({

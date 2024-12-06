@@ -23,7 +23,7 @@ export default function Page() {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const checkPassword = formData.get("check_password") as string;
-    const { businessDomainId} = useClient();
+    const { businessDomainId,client_id } = useClient();
 
     // 校验新旧密码
     if (checkPassword !== password) {
@@ -34,7 +34,7 @@ export default function Page() {
     setLoading(true);
     request("/api/password/emailVerify", {
       method: "POST",
-      body: JSON.stringify({ email, password, businessDomainId }),
+      body: JSON.stringify({ email, password, businessDomainId, client_id }),
     })
       .then(() => {
         router.push(

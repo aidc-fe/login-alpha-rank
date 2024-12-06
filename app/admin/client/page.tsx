@@ -101,7 +101,7 @@ export default function List() {
           type="button"
           className="inline-flex items-center gap-1"
           onClick={() => {
-            router.push("/admin/list/add");
+            router.push("/admin/client/add");
           }}
         >
           Add
@@ -112,7 +112,7 @@ export default function List() {
         <Loader className="top-12" loading={loading}>
           <Table removeWrapper>
             <TableHeader>
-              <TableColumn className="w-40">Name</TableColumn>
+              <TableColumn>Name</TableColumn>
               <TableColumn>Client Id</TableColumn>
               <TableColumn>Activate</TableColumn>
               <TableColumn className="w-40">Action</TableColumn>
@@ -123,7 +123,7 @@ export default function List() {
                   <TableCell>
                     <Link
                       className="hover:underline hover:text-primary"
-                      href={`/admin/list/detail?clientId=${item.client_id}`}
+                      href={`/admin/client/detail/${item.client_id}`}
                     >
                       {item.name}
                     </Link>
@@ -158,7 +158,7 @@ export default function List() {
                   <TableCell>
                     <Link
                       className="p-1 text-primary hover:text-primary/90"
-                      href={`/admin/list/update?clientId=${item.client_id}`}
+                      href={`/admin/client/detail/${item.client_id}`}
                     >
                       Edit
                     </Link>

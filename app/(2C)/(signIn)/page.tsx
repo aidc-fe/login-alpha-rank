@@ -159,7 +159,10 @@ export default function Home() {
                   .then(() => {
                     // email验证页面展示
                     sessionStorage.setItem("verifyEmail", email as string);
-                    signIn("email", { email, callbackUrl });
+                    signIn("email", { 
+                      email, 
+                      callbackUrl: `${window.location.origin}${callbackUrl}`,
+                    });
                   })
                   .finally(() => {
                     setEmailLoading(false);
