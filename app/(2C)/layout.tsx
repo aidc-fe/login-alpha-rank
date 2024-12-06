@@ -4,10 +4,11 @@ import { headers } from "next/headers";
 
 async function getClient() {
   const hostname = headers().get("host");
-  const client = await request(`http://${hostname}/api/client/get_by_domain/${`pre-login.text2go.ai`}`, {
+  const baseUrl = `${process.env.NODE_ENV === 'development' ? 'http' : 'https'}://${hostname}`;
+  const client = await request(`${baseUrl}/api/client/get_by_domain/${process.env.NODE_ENV === 'development' ? `pre-login.text2go.ai` : hostname}`, {
     cache: "force-cache"
   });
-  const businessDomainRes = await request(`http://${hostname}/api/businessDomain/${client.businessDomainId}`, {
+  const businessDomainRes = await request(`${baseUrl}/api/businessDomain/${client.businessDomainId}`, {
     cache: "force-cache"
   });
   return { ...client, isSSO: businessDomainRes.sso };

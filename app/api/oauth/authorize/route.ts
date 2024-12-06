@@ -3,6 +3,7 @@ import { generateAuthorizationCode, generateHmac } from "@/lib/secret";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
+  let client_name;
   try {
     // 解构查询参数
     const client_id = request.nextUrl.searchParams.get("client_id");
@@ -21,6 +22,7 @@ export async function GET(request: NextRequest) {
 
     // 查询 client_id 对应的 client 信息
     const client = await findClientByClientId(client_id);
+    client_name = client?.name ?? '';
 
     // 验证 redirect_uri 是否有效
     if (!redirect_uri || !client?.redirect_uris?.includes(redirect_uri)) {
@@ -66,7 +68,7 @@ export async function GET(request: NextRequest) {
   } catch (e: any) {
     console.error("Error during authorization:", e.message);
     return NextResponse.json(
-      { message: e.message || "Login Authorize failed" },
+      { message: e.message || `${client_name} Login Authorize failed` },
       { status: 401 }
     );
   }

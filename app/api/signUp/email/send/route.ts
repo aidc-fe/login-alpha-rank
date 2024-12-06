@@ -1,5 +1,5 @@
 import { ERROR_CONFIG } from "@/lib/errors";
-import { createVerificationToken, getUser } from "@/lib/database";
+import { createVerificationToken, findClientByClientId, getUser } from "@/lib/database";
 import { sendVerificationEmail } from "@/lib/email";
 import { formateError, formatSuccess } from "@/lib/request";
 import { NextRequest, NextResponse } from "next/server";
@@ -27,6 +27,7 @@ export async function POST(request: NextRequest) {
         type: "signUp", // 可选
       });
       const verificationLink = `${baseUrl}/api/signUp/email/verify?token=${newToken.token}&businessDomainId=${userInfo?.businessDomainId}`;
+      const client = await findClientByClientId(userInfo?.client_id);
 
       // 发送验证邮件
       await sendVerificationEmail(
@@ -38,7 +39,8 @@ export async function POST(request: NextRequest) {
           description:
             "To continue setting up your account, please verify your email address.",
           btnContent: "Verify Email Address",
-        }
+        },
+        client?.brand_color ?? '#7c3aed'
       );
       return NextResponse.json(
         formatSuccess({

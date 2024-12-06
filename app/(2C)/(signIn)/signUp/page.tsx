@@ -14,7 +14,7 @@ export default function SignUpPage() {
   const [email, setEmail] = useState(
     decodeURIComponent(searchParams.get("email") || "")
   );
-  const { businessDomainId, pp_doc, tos_doc } = useClient();
+  const { businessDomainId, client_id, pp_doc, tos_doc } = useClient();
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
@@ -32,7 +32,8 @@ export default function SignUpPage() {
         email,
         password,
         targetUrl: searchParams.get("targetUrl"),
-        businessDomainId
+        businessDomainId,
+        client_id
       }),
     })
       .then(() => {
