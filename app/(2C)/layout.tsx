@@ -4,8 +4,9 @@ import { headers } from "next/headers";
 
 async function getClient() {
   const hostname = headers().get("host");
-  const baseUrl = `${process.env.NODE_ENV === 'development' ? 'http' : 'https'}://${hostname}`;
-  const client = await request(`${baseUrl}/api/client/get_by_domain/${process.env.NODE_ENV === 'development' ? `pre-login.text2go.ai` : hostname}`, {
+  // 本地开发需要将这里写死地址
+  const baseUrl = `https://${hostname}`;
+  const client = await request(`${baseUrl}/api/client/get_by_domain/${hostname}`, {
     cache: "force-cache"
   });
   const businessDomainRes = await request(`${baseUrl}/api/businessDomain/${client.businessDomainId}`, {

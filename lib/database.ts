@@ -7,6 +7,7 @@ import {
 } from "./secret";
 import { ClientDataType } from "./admin";
 import { ERROR_CONFIG } from "@/lib/errors";
+import { headers } from "next/headers";
 
 export const prisma = new PrismaClient();
 
@@ -353,6 +354,52 @@ export async function getClientByAuthDomain(authDomain: string) {
     await prisma.$disconnect();
   }
 }
+
+// 根据auth_domain查询businessDomainId
+export const getBusinessDomainIdByAuthDomain = async () => {
+  try {
+    const headersList = headers();
+    const host = headersList.get('host')!;
+    
+    const client = await getClientByAuthDomain(host);
+    return client.businessDomainId;
+  } catch (error) {
+    console.error("Error fetching businessDomainId by auth_domain:", error);
+    throw error;
+  }
+};
+
+// 根据email查询userId
+export const getUserIdByEmail = async (email: string) => {
+  try {
+    const headersList = headers();
+    const host = headersList.get('host')!;
+    const businessDomainId = await getBusinessDomainIdByAuthDomain();
+
+    const user = await prisma.user.findUnique({
+      where: {
+        email_businessDomainId: {
+          email,
+          businessDomainId,
+        },
+      },
+    });
+    return user?.id;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// 查询当前服务器的client信息
+export const getCurrentServerClient = async () => {
+  try {
+    const headersList = headers();
+    const host = headersList.get('host')!;
+    return await getClientByAuthDomain(host);
+  } catch (error) {
+    throw error;
+  }
+};
 
 // 创建一条AuthorizationCode数据
 export const createAuthorizationCode = async (data: {

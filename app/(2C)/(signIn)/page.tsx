@@ -161,7 +161,7 @@ export default function Home() {
                     sessionStorage.setItem("verifyEmail", email as string);
                     signIn("email", { 
                       email, 
-                      callbackUrl,
+                      callbackUrl: `${window.location.origin}${callbackUrl}`,
                       businessDomainId,
                     });
                   })
