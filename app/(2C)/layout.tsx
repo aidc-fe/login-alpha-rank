@@ -2,16 +2,17 @@ import request from "@/lib/request";
 import ClientProvider from "@/providers/client-provider";
 import { headers } from "next/headers";
 
+const isDev = process.env.NODE_ENV === 'development';
+
 async function getClient() {
-  const hostname = headers().get("host");
+  const header = headers()
+  // 在 HTTP/2 以及 HTTP/3 中，以一个伪头 :authority 代替 所以需要做一层兼容
+  const hostname = header.get("host") || header.get(':authority');
+
   // 本地开发需要将这里写死地址
-  const baseUrl = `https://${hostname}`;
-  const client = await request(`${baseUrl}/api/client/get_by_domain/${hostname}`, {
-    cache: "force-cache"
-  });
-  const businessDomainRes = await request(`${baseUrl}/api/businessDomain/${client.businessDomainId}`, {
-    cache: "force-cache"
-  });
+  const baseUrl = isDev ? `http://${hostname}` : `https://${hostname}`;
+  const client = await request(`${baseUrl}/api/client/get_by_domain/${isDev ? 'pre-login.text2go.ai' : hostname}`);
+  const businessDomainRes = await request(`${baseUrl}/api/businessDomain/${client.businessDomainId}`);
   return { ...client, isSSO: businessDomainRes.sso };
 }
 
