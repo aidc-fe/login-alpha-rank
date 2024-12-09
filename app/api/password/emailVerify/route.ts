@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
 
   if (!email) {
     return NextResponse.json(formateError(ERROR_CONFIG.AUTH.NEED_EMAIL));
-  } else if (!(await getUser({ email }))) {
+  } else if (!(await getUser({ email, businessDomainId }))) {
     return NextResponse.json(formateError(ERROR_CONFIG.AUTH.USER_NOT_EXIST));
   } else {
     const newToken = await createVerificationToken({

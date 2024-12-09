@@ -10,6 +10,7 @@ import { useClient } from "@/providers/client-provider";
 import PasswordInput from "@/components/PasswordInput";
 
 export default function Page() {
+  const { businessDomainId,client_id } = useClient();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState<string>(
     decodeURIComponent(searchParams.get("email") || "")
@@ -23,7 +24,6 @@ export default function Page() {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const checkPassword = formData.get("check_password") as string;
-    const { businessDomainId,client_id } = useClient();
 
     // 校验新旧密码
     if (checkPassword !== password) {
