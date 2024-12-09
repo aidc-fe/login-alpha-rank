@@ -7,8 +7,6 @@ import { getBusinessDomainIdByAuthDomain, getCurrentServerClient, getUserIdByEma
 import { decodeJwt, encodeJwt } from "@/lib/secret";
 import { sendVerificationEmail } from "@/lib/email";
 import { CookieOpt } from "@/lib/auth";
-import { NextApiRequest, NextApiResponse } from "next/types";
-import { headers } from "next/headers";
 
 const authOptions: NextAuthOptions = {
   adapter: {
@@ -206,16 +204,6 @@ const authOptions: NextAuthOptions = {
     error: "/", // Error code passed in query string as ?error=
   },
 };
-
-// 添加中间件来保存请求上下文
-export function middleware(
-  req: NextApiRequest,
-  res: NextApiResponse,
-  next: () => void
-) {
-  (global as any).req = req;
-  next();
-}
 
 const handler = NextAuth(authOptions);
 
