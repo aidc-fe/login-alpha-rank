@@ -26,8 +26,7 @@ export default function Home() {
   const targetUrl = decodeURIComponent(searchParams.get("targetUrl") || "");
   const router = useRouter();
   const [callbackUrl, setCallbackUrl] = useState("");
-  const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc } =
-    useClient();
+  const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc} = useClient();
 
   // 根据是否是单点登录，判断登录后跳转的页面
   useEffect(() => {
