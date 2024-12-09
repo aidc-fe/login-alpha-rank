@@ -30,10 +30,12 @@ export async function GET(request: NextRequest) {
     };
     const user = await createOrUpdateUser(userInfo);
 
+    const host = request.headers.get('host') || request.headers.get(':authority');
+
     const response = NextResponse.redirect(
       !businessDomain.sso
-        ? `http://${request.headers.get('host')}/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}&userId=${user.id}`
-        : `http://${request.headers.get('host')}/login-landing-page?targetUrl=${info.targetUrl}`,
+        ? `http://${host}/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}&userId=${user.id}`
+        : `http://${host}/login-landing-page?targetUrl=${info.targetUrl}`,
       {
         status: 302,
       }

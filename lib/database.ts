@@ -359,8 +359,12 @@ export async function getClientByAuthDomain(authDomain: string) {
 export const getBusinessDomainIdByAuthDomain = async () => {
   try {
     const headersList = headers();
-    const host = headersList.get('host')!;
-    
+    const host = headersList.get('host') || headersList.get(':authority');
+
+    if (!host) {
+      throw new Error("Host not found");
+    }
+
     const client = await getClientByAuthDomain(host);
     return client.businessDomainId;
   } catch (error) {
@@ -372,8 +376,6 @@ export const getBusinessDomainIdByAuthDomain = async () => {
 // 根据email查询userId
 export const getUserIdByEmail = async (email: string) => {
   try {
-    const headersList = headers();
-    const host = headersList.get('host')!;
     const businessDomainId = await getBusinessDomainIdByAuthDomain();
 
     const user = await prisma.user.findUnique({
@@ -394,7 +396,12 @@ export const getUserIdByEmail = async (email: string) => {
 export const getCurrentServerClient = async () => {
   try {
     const headersList = headers();
-    const host = headersList.get('host')!;
+    const host = headersList.get('host') || headersList.get(':authority');
+
+    if (!host) {
+      throw new Error("Host not found");
+    }
+
     return await getClientByAuthDomain(host);
   } catch (error) {
     throw error;
