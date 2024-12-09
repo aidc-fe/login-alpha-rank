@@ -4,6 +4,11 @@ import { formateError } from "@/lib/request";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
+  // 获取当前请求的 host
+  const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
+  const host = request.headers.get('host') || request.headers.get(':authority');
+  const baseUrl = `${protocol}://${host}`;
+  
   const token = request.nextUrl.searchParams.get("token");
   const businessDomainId = request.nextUrl.searchParams.get("businessDomainId");
   const newToken = await validateMagicLink(token || "");
@@ -15,7 +20,7 @@ export async function GET(request: NextRequest) {
     password: newToken.password!,
     businessDomainId,
   });
-  return NextResponse.redirect(process.env.NEXT_AUTH_URL!, {
+  return NextResponse.redirect(baseUrl, {
     status: 302,
   });
 }

@@ -8,7 +8,7 @@ import { decodeJwt, encodeJwt } from "@/lib/secret";
 import { sendVerificationEmail } from "@/lib/email";
 import { CookieOpt } from "@/lib/auth";
 
-const authOptions: NextAuthOptions = {
+export const authOptions: NextAuthOptions = {
   adapter: {
     ...PrismaAdapter(prisma),
     getUserByEmail: async (email: string) => {

@@ -1,5 +1,8 @@
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { createAuthorizationCode, findClientByClientId } from "@/lib/database";
 import { generateAuthorizationCode } from "@/lib/secret";
+import { Session } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
@@ -7,7 +10,12 @@ export async function GET(request: NextRequest) {
   const client_id = request.nextUrl.searchParams.get("client_id");
   const redirect_uri = request.nextUrl.searchParams.get("redirect_uri");
   //  const state = request.nextUrl.searchParams.get("state") || "";
-  const userId = request.nextUrl.searchParams.get("userId") || "";
+  let userId = request.nextUrl.searchParams.get("userId") || "";
+  
+  if(!userId){
+    const session = await getServerSession(authOptions) as Session & { id: string, jwtToken: string };
+    userId = session?.id;
+  }
 
    // 参数校验
    if (!client_id) {

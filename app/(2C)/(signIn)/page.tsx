@@ -134,7 +134,7 @@ export default function Home() {
             <Button
               className="w-full"
               radius="sm"
-              onClick={() => signIn("google", { callbackUrl, businessDomainId })}
+              onClick={() => signIn("google", { callbackUrl })}
             >
               <Image
                 height="24"

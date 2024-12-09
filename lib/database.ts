@@ -9,6 +9,13 @@ import { ClientDataType } from "./admin";
 import { ERROR_CONFIG } from "@/lib/errors";
 import { headers } from "next/headers";
 
+const getHost = () => {
+  const headersList = headers();
+  const host = headersList.get('host') || headersList.get(':authority');
+
+  return process.env.NODE_ENV === 'development' ? 'pre-login.text2go.ai' : host;
+}
+
 export const prisma = new PrismaClient();
 
 // 查询用户信息
@@ -358,8 +365,7 @@ export async function getClientByAuthDomain(authDomain: string) {
 // 根据auth_domain查询businessDomainId
 export const getBusinessDomainIdByAuthDomain = async () => {
   try {
-    const headersList = headers();
-    const host = headersList.get('host') || headersList.get(':authority');
+    const host = getHost();
 
     if (!host) {
       throw new Error("Host not found");
@@ -395,8 +401,7 @@ export const getUserIdByEmail = async (email: string) => {
 // 查询当前服务器的client信息
 export const getCurrentServerClient = async () => {
   try {
-    const headersList = headers();
-    const host = headersList.get('host') || headersList.get(':authority');
+    const host = getHost();
 
     if (!host) {
       throw new Error("Host not found");
