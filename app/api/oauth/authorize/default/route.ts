@@ -1,4 +1,4 @@
-import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { authOptions } from "@/lib/authOptions";
 import { createAuthorizationCode, findClientByClientId } from "@/lib/database";
 import { generateAuthorizationCode } from "@/lib/secret";
 import { Session } from "next-auth";
