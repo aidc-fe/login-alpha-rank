@@ -79,9 +79,12 @@ export default function Home() {
                       ...user,
                       callbackUrl: `${callbackUrl}&userId=${user.sub}`,
                       businessDomainId,
+                    })
+                    .finally(() => {
+                      setLoading(false);
                     });
                   })
-                  .finally(() => {
+                  .catch(() => {
                     setLoading(false);
                   });
               }}
