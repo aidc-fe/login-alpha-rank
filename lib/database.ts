@@ -13,7 +13,7 @@ const getHost = () => {
   const headersList = headers();
   const host = headersList.get('host') || headersList.get(':authority');
 
-  return process.env.NODE_ENV === 'development' ? 'pre-login.text2go.ai' : host;
+  return host;
 }
 
 export const prisma = new PrismaClient();

@@ -20,7 +20,7 @@ export async function sendVerificationEmail(
     description: string;
     btnContent: string;
   },
-  color: string = '#7c3aed'
+  color?: string | null
 ) {
   const mailOptions = {
     from: process.env.EMAIL_FROM, // 发件人
@@ -31,7 +31,7 @@ export async function sendVerificationEmail(
       <span style="font-size: 20px; line-height: 24px;"> ${displayContent.description}</span>
     <p style="margin: 24px 0px 0px; text-align: left;"> 
     <a href=${verificationLink}
-    style="display: inline-block; text-decoration: none; background: ${color}; border-radius: 6px; color: white;  font-size: 16px; line-height: 24px; font-weight: 500; padding: 12px 20px 11px; margin: 0px;" target="_blank">${displayContent.btnContent}</a>
+    style="display: inline-block; text-decoration: none; background: ${color}; border-radius: 6px; color: ${color ? 'white' : ''};  font-size: 16px; line-height: 24px; font-weight: 500; padding: 12px 20px 11px; margin: 0px;" target="_blank">${displayContent.btnContent}</a>
     </p>
     <a href=${verificationLink} style="display: inline-block; font-size: 14px; line-height: 20px; color: ${color}; margin-top: 2px; word-break: break-all;" target="_blank">${verificationLink}</a>
     `,
