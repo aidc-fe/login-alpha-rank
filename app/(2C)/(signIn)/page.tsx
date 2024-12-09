@@ -3,7 +3,7 @@
 import request from "@/lib/request";
 import { ArrowUpRight } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
-import { Button, Input, Link } from '@nextui-org/react'
+import { Button, Input, Link } from "@nextui-org/react";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -12,9 +12,10 @@ import { Session } from "next-auth";
 import PasswordInput from "@/components/PasswordInput";
 
 export default function Home() {
-  const { status, data } = useSession() as { 
-    status: 'loading'|'authenticated'|'unauthenticated', 
-    data: Session & { id: string } | null };
+  const { status, data } = useSession() as {
+    status: "loading" | "authenticated" | "unauthenticated";
+    data: (Session & { id: string }) | null;
+  };
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [emailLoading, setEmailLoading] = useState(false);
@@ -24,28 +25,31 @@ export default function Home() {
   const [jumpEmail, setJumpEmail] = useState("");
   const targetUrl = decodeURIComponent(searchParams.get("targetUrl") || "");
   const router = useRouter();
-  const [callbackUrl, setCallbackUrl]=useState("");
-  const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc} = useClient();
+  const [callbackUrl, setCallbackUrl] = useState("");
+  const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc } =
+    useClient();
 
   // 根据是否是单点登录，判断登录后跳转的页面
-  useEffect(()=>{
-    if(isSSO === undefined){ 
+  useEffect(() => {
+    if (isSSO === undefined) {
       return;
-    } else if(isSSO){
-      setCallbackUrl(`/login-landing-page?${
-      targetUrl ? "targetUrl=" + targetUrl : ""
-    }`);
+    } else if (isSSO) {
+      setCallbackUrl(
+        `/login-landing-page?${targetUrl ? "targetUrl=" + targetUrl : ""}`
+      );
     } else {
-      setCallbackUrl(`/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}`);
+      setCallbackUrl(
+        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}`
+      );
     }
-  },[isSSO])
+  }, [isSSO]);
 
   // 如果用户已经登录，则进行续登
   useEffect(() => {
     if (status === "authenticated") {
-      if(isSSO) {
+      if (isSSO) {
         router.replace(`/login-landing-page${location.search}`);
-      } else if(callbackUrl) {
+      } else if (callbackUrl) {
         router.replace(`${callbackUrl}&userId=${data?.id}`);
       }
     }
@@ -72,7 +76,11 @@ export default function Home() {
                   body: JSON.stringify({ email, password, businessDomainId }),
                 })
                   .then((user) => {
-                    signIn("password", { ...user, callbackUrl:`${callbackUrl}&userId=${user.sub}`, businessDomainId});
+                    signIn("password", {
+                      ...user,
+                      callbackUrl: `${callbackUrl}&userId=${user.sub}`,
+                      businessDomainId,
+                    });
                   })
                   .finally(() => {
                     setLoading(false);
@@ -96,12 +104,19 @@ export default function Home() {
               />
 
               <div className="flex justify-between">
-                <Link showAnchorIcon anchorIcon={<ArrowUpRight
-                  className="group-hover:rotate-45 duration-150"
-                  size={20}
-                  />} 
-                className="group" 
-                href={`/password/emailVerify?email=${encodeURIComponent(email)}`}>
+                <Link
+                  showAnchorIcon
+                  anchorIcon={
+                    <ArrowUpRight
+                      className="group-hover:rotate-45 duration-150"
+                      size={20}
+                    />
+                  }
+                  className="group"
+                  href={`/password/emailVerify?email=${encodeURIComponent(
+                    email
+                  )}`}
+                >
                   Forgot your password{" "}
                 </Link>
                 <div className="text-muted-foreground">
@@ -159,13 +174,15 @@ export default function Home() {
                   .then(() => {
                     // email验证页面展示
                     sessionStorage.setItem("verifyEmail", email as string);
-                    signIn("email", { 
-                      email, 
+                    signIn("email", {
+                      email,
                       callbackUrl: `${window.location.origin}${callbackUrl}`,
                       businessDomainId,
+                    }).finally(() => {
+                      setEmailLoading(false);
                     });
                   })
-                  .finally(() => {
+                  .catch(() => {
                     setEmailLoading(false);
                   });
               }}
@@ -173,37 +190,36 @@ export default function Home() {
               <Input
                 name="email"
                 required
-                label={
-                  "Enter email address for Magic Link Authentication"
-                }
+                label={"Enter email address for Magic Link Authentication"}
                 type="email"
                 value={jumpEmail}
                 onChange={(e) => {
                   setJumpEmail(e.target.value);
                 }}
               />
-              <Button color="primary" type="submit" isLoading={emailLoading} isDisabled={loading}>
+              <Button
+                color="primary"
+                type="submit"
+                isLoading={emailLoading}
+                isDisabled={loading}
+              >
                 Sign in
               </Button>
             </form>
             <div className="w-1/2 border-b mx-auto mt-4" />
             <div className="w-full text-muted-foreground font-normal text-center mt-4">
               By continuing with any of the options above, you agree to our{" "}
-             {tos_doc && <Link
-                href={tos_doc}
-                isExternal
-                underline="always"
-              >
-                Terms of Service
-              </Link>}{" "}
+              {tos_doc && (
+                <Link href={tos_doc} isExternal underline="always">
+                  Terms of Service
+                </Link>
+              )}{" "}
               and have read our{" "}
-              {pp_doc && <Link
-                href={pp_doc}
-                isExternal
-                underline="always"
-              >
-                Privacy Policy
-              </Link>}{" "}
+              {pp_doc && (
+                <Link href={pp_doc} isExternal underline="always">
+                  Privacy Policy
+                </Link>
+              )}{" "}
               .
             </div>
           </div>

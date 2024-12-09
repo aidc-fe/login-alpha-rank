@@ -194,7 +194,7 @@ export const authOptions: NextAuthOptions = {
             </p>
             `,
           btnContent: "Login",
-        });
+        }, client.brand_color ?? '#7c3aed');
       },
     }),
   ],
