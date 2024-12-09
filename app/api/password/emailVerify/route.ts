@@ -7,9 +7,8 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   const { email, password, businessDomainId, client_id } = (await request.json()) || {};
   // 获取当前请求的 host
-  const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
   const host = request.headers.get('host') || request.headers.get(':authority');
-  const baseUrl = `${protocol}://${host}`;
+  const baseUrl = `https://${host}`;
 
   if (!email) {
     return NextResponse.json(formateError(ERROR_CONFIG.AUTH.NEED_EMAIL));

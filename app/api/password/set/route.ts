@@ -5,9 +5,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   // 获取当前请求的 host
-  const protocol = process.env.NODE_ENV === 'development' ? 'http' : 'https';
   const host = request.headers.get('host') || request.headers.get(':authority');
-  const baseUrl = `${protocol}://${host}`;
+  const baseUrl = `https://${host}`;
   
   const token = request.nextUrl.searchParams.get("token");
   const businessDomainId = request.nextUrl.searchParams.get("businessDomainId");
