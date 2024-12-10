@@ -407,7 +407,7 @@ export const getUserIdByEmail = async (email: string) => {
       where: {
         email_businessDomainId: {
           email,
-          businessDomainId,
+          businessDomainId: businessDomainId || '',
         },
       },
     });
