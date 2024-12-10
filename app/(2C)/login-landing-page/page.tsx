@@ -62,7 +62,7 @@ function PageContent() {
   }, [jwtToken, targetUrl, shopDomain, router, status, searchParams]);
 
   return (
-    <main className="h-full flex justify-center items-center w-full">
+    <main className="min-h-svh flex justify-center items-center w-full">
       <Loader size={60} className="text-primary animate-spin" />
     </main>
   );
