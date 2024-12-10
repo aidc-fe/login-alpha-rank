@@ -10,7 +10,7 @@ export default function RootLayout({
 }>) {
 
   return (
-    <main className="grid h-screen items-center md:grid-cols-2 relative">
+    <main className="max-w-7xl mx-auto grid h-screen items-center md:grid-cols-2 relative">
       <div className="h-full bg-circle-gradient hidden justify-center md:flex">
         <LoginCarousel className="justify-center items-center hidden md:flex" />
       </div>
