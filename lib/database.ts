@@ -8,6 +8,7 @@ import {
 import { ClientDataType } from "./admin";
 import { ERROR_CONFIG } from "@/lib/errors";
 import { headers } from "next/headers";
+import { v4 as uuidv4 } from 'uuid';
 
 const getHost = () => {
   const headersList = headers();
