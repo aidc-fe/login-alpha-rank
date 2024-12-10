@@ -27,7 +27,7 @@ export const authOptions: NextAuthOptions = {
 
       return user;
     },
-    createUser: async (data) => {
+    createUser: async (data: any) => {
       // 从请求中获取 businessDomainId
       // 注意：这里需要访问请求上下文来获取 businessDomainId
       const businessDomainId = await getBusinessDomainIdByAuthDomain();
@@ -35,7 +35,7 @@ export const authOptions: NextAuthOptions = {
       const user = await prisma.user.create({
         data: {
           ...data,
-          businessDomainId,
+          businessDomainId: businessDomainId || '',
         },
       });
 
