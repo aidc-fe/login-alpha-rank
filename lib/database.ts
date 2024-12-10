@@ -8,6 +8,7 @@ import {
 import { ClientDataType } from "./admin";
 import { ERROR_CONFIG } from "@/lib/errors";
 import { headers } from "next/headers";
+import { v4 as uuidv4 } from 'uuid';
 
 const getHost = () => {
   const headersList = headers();
@@ -69,12 +70,16 @@ export const createOrUpdateUser = async (data: {
           businessDomainId: data.businessDomainId,
         },
       },
-      create: data,
+      create: {
+        ...data,
+        updated_at: new Date(), // 添加 updated_at 字段
+      },
       update: {
         name: data.name,
         emailVerified: data.emailVerified,
         image: data.image,
         password: data.password,
+        updated_at: new Date(), // 更新时也添加 updated_at 字段
       },
     });
 
@@ -554,10 +559,12 @@ export async function createBusinessDomain(
   try {
     const newBusinessDomain = await prisma.businessDomain.create({
       data: {
+        id: uuidv4(),
         name,
         description,
         active,
         sso,
+        updated_at: new Date(), // 添加 updated_at 字段
       },
     });
 
