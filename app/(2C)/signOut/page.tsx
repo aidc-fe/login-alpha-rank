@@ -23,7 +23,7 @@ export default function SignOutPage() {
   }, [router, status]);
 
   return (
-    <main className="h-full flex justify-center items-center w-full">
+    <main className="h-svh flex justify-center items-center w-full">
       <Loader size={60} className="text-primary animate-spin" />
     </main>
   );
