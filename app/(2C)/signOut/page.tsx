@@ -26,7 +26,7 @@ export default function SignOutPage() {
       // 登录
       router.replace(`/${location.search}`);
     }
-  }, [router, status]);
+  }, [router, status, isSSO]);
 
   return (
     <main className="h-svh flex justify-center items-center w-full">
