@@ -69,6 +69,8 @@ async function getShopInfo(
 }
 
 export async function GET(request: NextRequest) {
+  // const user = await createOrUpdateUser({ email:'123', from: "shoplazza", businessDomainId: '13883979-d8ac-41db-a930-2a152f8b3c90' });
+  // console.log({user})
   try {
     const code = request.nextUrl.searchParams.get("code");
     const state = request.nextUrl.searchParams.get("state") || "";
@@ -125,6 +127,7 @@ export async function GET(request: NextRequest) {
       user_name: shopInfo.name,
     };
 
+    console.log({userInfo,accountInfo})
     // 创建或更新用户信息和oAuth账号信息
     const user = await createOrUpdateUser({ ...userInfo, from: "shoplazza", businessDomainId: '13883979-d8ac-41db-a930-2a152f8b3c90	' });
     await createOrUpdateAccount({
