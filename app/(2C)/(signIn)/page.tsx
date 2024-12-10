@@ -142,10 +142,10 @@ export default function Home() {
               </Button>
             </form>
 
-            <div className="w-full flex items-center">
-              <div className="bg-gradient-to-r from-transparent to-neutral-300 dark:to-neutral-700 my-4 h-[1px] w-full" />
+            <div className="w-full flex items-center text-foreground-500">
+              <div className="bg-gradient-to-r from-transparent to-foreground-500 my-4 h-[1px] w-full" />
               <span className="py-4 px-8 text-input text-sm">or</span>
-              <div className="bg-gradient-to-r from-neutral-300 dark:from-neutral-700 to-transparent my-4 h-[1px] w-full" />
+              <div className="bg-gradient-to-r from-foreground-500 to-transparent my-4 h-[1px] w-full" />
             </div>
 
             <Button
@@ -209,7 +209,7 @@ export default function Home() {
               </Button>
             </form>
             <div className="w-1/2 border-b mx-auto mt-4" />
-            <div className="w-full text-muted-foreground font-normal text-center mt-4">
+            <div className="w-full text-foreground-500 font-normal text-center mt-4">
               By continuing with any of the options above, you agree to our{" "}
               {tos_doc && (
                 <Link href={tos_doc} isExternal underline="always">
