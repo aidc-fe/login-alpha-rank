@@ -2,11 +2,12 @@
 
 import Header from "@/components/admin/Layouts/Header";
 import Sider from "@/components/admin/Layouts/Sider";
+import { Loader } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-const whiteList = ['hedyli1018+39@gmail.com', 'yuyuqueenlovemyself@gmail.com'];
+const whiteList = ['yuyuqueenlovemyself@gmail.com'];
 
 export default function RootLayout({
   children,
@@ -14,13 +15,28 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const router = useRouter();
-  const { data } = useSession();
+  const { data: session, status } = useSession();
   
   useEffect(() => {
-    if (data && (!data?.user?.email || !whiteList.includes(data?.user?.email))) {
-      router.replace(`/`)
+    // 检查是否在加载中
+    if (status === 'loading') return;
+
+    if (status === 'unauthenticated' || !whiteList.includes(session?.user?.email || '')) {
+      router.replace('/');
     }
-  }, [data?.user?.email]);
+  }, [status, session?.user?.email]);
+
+  if (status === 'loading') {
+    return (
+      <main className="h-full flex justify-center items-center w-full">
+        <Loader size={60} className="text-primary animate-spin" />
+      </main>
+    )
+  }
+
+  if (status === 'unauthenticated' || !whiteList.includes(session?.user?.email || '')) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen">
