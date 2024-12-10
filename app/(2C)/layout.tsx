@@ -19,16 +19,16 @@ async function getClient() {
   return { ...client, isSSO: businessDomainRes.sso };
 }
 
-// export async function generateMetadata() {
-//   const client = await getClient();
-//   return {
-//     title: client.title,
-//     description: client.description,
-//     icons: {
-//       icon: client.favicon,
-//     },
-//   };
-// }
+export async function generateMetadata() {
+  const client = await getClient();
+  return {
+    title: client.title || '',
+    description: client.description || '',
+    icons: {
+      icon: client.favicon || '',
+    },
+  };
+}
 
 export default async function RootLayout({
   children,

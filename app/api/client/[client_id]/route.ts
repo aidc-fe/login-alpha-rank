@@ -23,6 +23,7 @@ export async function GET(
       });
     }
 
+    console.log("client", client);
     // 返回客户端详情
     return NextResponse.json(formatSuccess({ data: client }));
   } catch (error) {
