@@ -1,15 +1,18 @@
 import { ERROR_CONFIG } from "@/lib/errors";
-import { createVerificationToken, getUser } from "@/lib/database";
+import { createVerificationToken, findClientByClientId, getUser } from "@/lib/database";
 import { sendVerificationEmail } from "@/lib/email";
 import { formateError, formatSuccess } from "@/lib/request";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   const userInfo = await request.json();
+  // 获取当前请求的 host
+  const host = request.headers.get('host') || request.headers.get(':authority');
+  const baseUrl = `https://${host}`;
 
   if (!userInfo.email) {
     return NextResponse.json(formateError(ERROR_CONFIG.AUTH.NEED_EMAIL));
-  } else if (await getUser({ email: userInfo.email })) {
+  } else if (await getUser({ email: userInfo.email, businessDomainId: userInfo.businessDomainId })) {
     return NextResponse.json(formateError(ERROR_CONFIG.AUTH.USER_EXIST));
   } else {
     // 生成验证链接（你需要实现生成实际的链接）
@@ -22,19 +25,21 @@ export async function POST(request: NextRequest) {
         targetUrl: userInfo?.targetUrl,
         type: "signUp", // 可选
       });
-      const verificationLink = `${process.env.NEXT_AUTH_URL}/api/signUp/email/verify?token=${newToken.token}`;
+      const verificationLink = `${baseUrl}/api/signUp/email/verify?token=${newToken.token}&businessDomainId=${userInfo?.businessDomainId}`;
+      const client = await findClientByClientId(userInfo?.client_id);
 
       // 发送验证邮件
       await sendVerificationEmail(
         userInfo.email,
         verificationLink,
-        "AlphaRank - Verify your email ",
+        "Verify your email ",
         {
           title: "Verify your email address",
           description:
-            "To continue setting up your AlphaRank account, please verify your email address.",
+            "To continue setting up your account, please verify your email address.",
           btnContent: "Verify Email Address",
-        }
+        },
+        client?.brand_color
       );
       return NextResponse.json(
         formatSuccess({

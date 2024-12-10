@@ -1,7 +1,7 @@
 "use client";
 
 import { Alert, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+import { Button } from "@nextui-org/react";
 import { RocketIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 

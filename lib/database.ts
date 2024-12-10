@@ -5,26 +5,40 @@ import {
   generateClientSecret,
   hashToken,
 } from "./secret";
+import { ClientDataType } from "./admin";
 import { ERROR_CONFIG } from "@/lib/errors";
+import { headers } from "next/headers";
+
+const getHost = () => {
+  const headersList = headers();
+  const host = headersList.get('host') || headersList.get(':authority');
+
+  return host;
+}
 
 export const prisma = new PrismaClient();
 
 // 查询用户信息
-export const getUser = async (search: { email?: string; id?: string }) => {
-  // Validate input: ensure either email or id is provided
-  if (!search.email && !search.id) {
+export const getUser = async (search: { email?: string; businessDomainId?: string; id?: string }) => {
+  // Validate input: ensure either email and businessDomainId or id is provided
+  if ((!search.email || !search.businessDomainId) && !search.id) {
     throw new Error(
-      "You must provide either an email or id to search for a user."
+      "You must provide either an email and businessDomainId or an id to search for a user."
     );
   }
 
   try {
-    // Find user by either email or id
+    // Find user by either email and businessDomainId or id
     const user = await prisma.user.findFirst({
       where: {
         OR: [
-          { email: search.email ?? undefined }, // Only include if email is defined
-          { id: search.id ?? undefined }, // Only include if id is defined
+          { 
+            AND: [
+              { email: search.email },
+              { businessDomainId: search.businessDomainId }
+            ]
+          },
+          { id: search.id },
         ],
       },
     });
@@ -45,10 +59,16 @@ export const createOrUpdateUser = async (data: {
   image?: string;
   from?: string;
   password?: string;
+  businessDomainId: string;
 }) => {
   try {
     const user = await prisma.user.upsert({
-      where: { email: data.email }, // 依据 email 作为唯一字段进行查询
+      where: {
+        email_businessDomainId: {
+          email: data.email,
+          businessDomainId: data.businessDomainId,
+        },
+      },
       create: data,
       update: {
         name: data.name,
@@ -68,11 +88,16 @@ export const createOrUpdateUser = async (data: {
 // 通过邮箱查找用户，更新用户信息
 export const updateUserByEmail = async (
   email: string,
-  data: { password?: string }
+  data: { password?: string; businessDomainId: string }
 ) => {
   try {
     const updatedUser = await prisma.user.update({
-      where: { email },
+      where: {
+        email_businessDomainId: {
+          email: email,
+          businessDomainId: data.businessDomainId,
+        },
+      },
       data,
     });
 
@@ -203,38 +228,91 @@ export const validateMagicLink = async (token?: string) => {
 };
 
 // 插入一条client数据
-export async function createClient(data: {
-  redirect_uris: string[]; // 数组
-  scope: string[]; // 数组
-  name: string;
-  description: string;
-  signout_uri: string;
-  owner_email: string; // 用户的email
-}) {
-  const {
-    redirect_uris, // 数组
-    scope, // 数组
-  } = data;
-
-  // 生成 client_id 和 client_secret
-  const client_id = generateClientId();
-  const client_secret = generateClientSecret();
+export async function createClient(data: ClientDataType) {
+  const { redirect_uris, scope, materials, ...restData } = data;
 
   // 插入数据到 Client 表
   const newClient = await prisma.client.create({
     data: {
-      ...data,
-      client_id,
-      client_secret,
-      redirect_uris: redirect_uris.join(","), // 使用逗号连接数组
-      scope: scope.join(","), // 使用逗号连接数组
-      active: true, // 默认为active
+      ...restData,
+      client_id: generateClientId(),
+      client_secret: generateClientSecret(),
+      redirect_uris: redirect_uris.join(","),
+      scope: scope.join(","),
+      materials: JSON.stringify(materials || []), // 将 materials 转换为 JSON 字符串
+      active: true,
       grant_types: "authorization_code",
     },
   });
 
-  return newClient;
+  return {
+    ...newClient,
+    redirect_uris: newClient.redirect_uris?.split(",") ?? [],
+    scope: newClient.scope?.split(",") ?? [],
+    materials: newClient.materials
+      ? JSON.parse(newClient.materials as string)
+      : [], // 解析 JSON 字符串
+  };
 }
+
+// 获取所有client数据
+export const getClients = async ({
+  skip,
+  itemsPerPage,
+}: {
+  email?: string;
+  skip: number;
+  itemsPerPage: number;
+}) => {
+  const clients = await prisma.client.findMany({
+    skip,
+    take: itemsPerPage,
+  });
+
+  const totalClients = await prisma.client.count();
+
+  return { clients, totalClients };
+};
+
+// 修改一条client数据
+export const updateClient = async ({
+  client_id,
+  ...data
+}: Partial<Omit<ClientDataType, "client_id">> & { client_id: string }) => {
+  try {
+    const editData = Object.entries(data).reduce((acc, [key, value]) => {
+      if (value !== null && value !== undefined) {
+        if (key === "materials") {
+          acc[key] = JSON.stringify(value);
+        } else if (["redirect_uris", "scope"].includes(key)) {
+          acc[key] = (value as string[]).join(",");
+        } else {
+          acc[key] = value;
+        }
+      }
+      return acc;
+    }, {} as Record<string, any>);
+
+    const updatedClient = await prisma.client.update({
+      where: {
+        client_id: client_id,
+      },
+      data: editData,
+    });
+
+    return {
+      ...updatedClient,
+      redirect_uris: updatedClient.redirect_uris?.split(",") ?? [],
+      scope: updatedClient.scope?.split(",") ?? [],
+      materials: updatedClient.materials
+        ? JSON.parse(updatedClient.materials as string)
+        : [],
+    };
+  } catch (error) {
+    console.error("Error updating client:", error);
+    throw error;
+  }
+};
 
 // 根据client_id查询client信息
 export const findClientByClientId = async (client_id: string) => {
@@ -252,7 +330,87 @@ export const findClientByClientId = async (client_id: string) => {
     ...client,
     redirect_uris: client.redirect_uris?.split(","),
     scope: client.scope?.split(","),
+    materials: client.materials ? JSON.parse(client.materials as string) : [],
   };
+};
+
+// 根据auth_domain查询client信息
+export async function getClientByAuthDomain(authDomain: string) {
+  try {
+    // 使用 Prisma ORM 查询 Client 表，使用 findFirst 来根据 auth_domain 查询
+    const client = await prisma.client.findFirst({
+      where: {
+        auth_domain: authDomain,
+      },
+    });
+
+    if (!client) {
+      throw new Error("Client not found");
+    }
+
+    return {
+      ...client,
+      redirect_uris: client.redirect_uris?.split(","),
+      scope: client.scope?.split(","),
+      materials: client.materials ? JSON.parse(client.materials as string) : [],
+    };
+  } catch (error) {
+    console.error("Error fetching client by auth_domain:", error);
+    throw error;
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+// 根据auth_domain查询businessDomainId
+export const getBusinessDomainIdByAuthDomain = async () => {
+  try {
+    const host = getHost();
+
+    if (!host) {
+      throw new Error("Host not found");
+    }
+
+    const client = await getClientByAuthDomain(host);
+    return client.businessDomainId;
+  } catch (error) {
+    console.error("Error fetching businessDomainId by auth_domain:", error);
+    throw error;
+  }
+};
+
+// 根据email查询userId
+export const getUserIdByEmail = async (email: string) => {
+  try {
+    const businessDomainId = await getBusinessDomainIdByAuthDomain();
+
+    const user = await prisma.user.findUnique({
+      where: {
+        email_businessDomainId: {
+          email,
+          businessDomainId,
+        },
+      },
+    });
+    return user?.id;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// 查询当前服务器的client信息
+export const getCurrentServerClient = async () => {
+  try {
+    const host = getHost();
+
+    if (!host) {
+      throw new Error("Host not found");
+    }
+
+    return await getClientByAuthDomain(host);
+  } catch (error) {
+    throw error;
+  }
 };
 
 // 创建一条AuthorizationCode数据
@@ -385,3 +543,87 @@ export const createRefreshToken = async (data: {
     throw error;
   }
 };
+
+// 创建一条businessDomain数据
+export async function createBusinessDomain(
+  name: string,
+  description: string,
+  active: boolean,
+  sso: boolean
+) {
+  try {
+    const newBusinessDomain = await prisma.businessDomain.create({
+      data: {
+        name,
+        description,
+        active,
+        sso,
+      },
+    });
+
+    return newBusinessDomain;
+  } catch (error) {
+    console.error("Error creating BusinessDomain:", error);
+    throw error;
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
+// 查询全量的BusinessDomain数据
+export async function getAllBusinessDomains() {
+  try {
+    const allBusinessDomains = await prisma.businessDomain.findMany();
+    return allBusinessDomains;
+  } catch (error) {
+    console.error("Error fetching BusinessDomains:", error);
+    throw error;
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
+// 通过id查询businessDomain详情
+export async function getBusinessDomainById(id: string) {
+  try {
+    const businessDomain = await prisma.businessDomain.findUnique({
+      where: {
+        id,
+      },
+    });
+
+    if (!businessDomain) {
+      throw new Error("Business domain not found");
+    }
+
+    return businessDomain;
+  } catch (error) {
+    console.error("Error fetching business domain:", error);
+    throw error;
+  }
+}
+
+// 修改businessDomain
+export async function updateBusinessDomain(
+  id: string,
+  data: {
+    name?: string;
+    description?: string;
+    active?: boolean;
+    sso?: boolean;
+  }
+) {
+  try {
+    const updatedBusinessDomain = await prisma.businessDomain.update({
+      where: {
+        id,
+      },
+      data,
+    });
+
+    return updatedBusinessDomain;
+  } catch (error) {
+    console.error("Error updating business domain:", error);
+    throw error;
+  }
+}

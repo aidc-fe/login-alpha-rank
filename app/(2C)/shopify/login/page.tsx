@@ -1,6 +1,7 @@
 "use client";
 
 import SuspenseWrapper from "@/components/suspend-wrapper";
+import { useClient } from "@/providers/client-provider";
 import { Loader } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
@@ -8,7 +9,7 @@ import { useEffect } from "react";
 
 function PageContent() {
   const searchParams = useSearchParams();
-
+  const { businessDomainId } = useClient();
   // 从searchParams提取用户信息
   useEffect(() => {
     const userData = Array.from(searchParams.keys()).reduce(
@@ -46,6 +47,7 @@ function PageContent() {
 
     signIn("thirdParty", {
       ...userData,
+      businessDomainId,
       callbackUrl: `/login-landing-page?targetUrl=${
         sessionStorage.getItem("shopifyTargetUrl") ||
         searchParams.get("targetUrl")

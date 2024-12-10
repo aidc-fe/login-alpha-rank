@@ -1,15 +1,11 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import { Analytics } from "@vercel/analytics/react";
 import SessionProvider from "@/providers/session-provider";
-import { cn } from "@/lib/utils";
-import { ThemeProvider } from "@/components/theme/provider";
-import "./globals.css";
+import "@/styles/globals.css";
 import SuspenseWrapper from "@/components/suspend-wrapper";
 import { Toaster } from "@/components/ui/toaster";
 import { GoogleTagManager } from "@next/third-parties/google";
-
-const inter = Inter({ subsets: ["latin"] });
+import { NextUIProviderWrapper } from "@/providers/nextui-provider";
 
 export const metadata: Metadata = {
   title: "Alpha Rank Login",
@@ -41,19 +37,14 @@ export default function RootLayout({
           }}
         ></script>
       </head>
-      <body className={cn(inter.className, "h-screen")}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="light"
-          // enableSystem
-          disableTransitionOnChange
-        >
+      <body className={"h-screen"}>
+        <NextUIProviderWrapper>
           <SuspenseWrapper>
             <SessionProvider>{children}</SessionProvider>
           </SuspenseWrapper>
-        </ThemeProvider>
-        <Analytics />
-        <Toaster />
+          <Analytics />
+          <Toaster />
+        </NextUIProviderWrapper>
       </body>
     </html>
   );

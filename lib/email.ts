@@ -19,7 +19,8 @@ export async function sendVerificationEmail(
     title: string;
     description: string;
     btnContent: string;
-  }
+  },
+  color?: string | null
 ) {
   const mailOptions = {
     from: process.env.EMAIL_FROM, // 发件人
@@ -30,15 +31,14 @@ export async function sendVerificationEmail(
       <span style="font-size: 20px; line-height: 24px;"> ${displayContent.description}</span>
     <p style="margin: 24px 0px 0px; text-align: left;"> 
     <a href=${verificationLink}
-    style="display: inline-block; text-decoration: none; background: #7c3aed; border-radius: 6px; color: white;  font-size: 16px; line-height: 24px; font-weight: 500; padding: 12px 20px 11px; margin: 0px;" target="_blank">${displayContent.btnContent}</a>
+    style="display: inline-block; text-decoration: none; background: ${color}; border-radius: 6px; color: ${color ? 'white' : ''};  font-size: 16px; line-height: 24px; font-weight: 500; padding: 12px 20px 11px; margin: 0px;" target="_blank">${displayContent.btnContent}</a>
     </p>
-    <a href=${verificationLink} style="display: inline-block; font-size: 14px; line-height: 20px; color: #7c3aed; margin-top: 2px; word-break: break-all;" target="_blank">${verificationLink}</a>
+    <a href=${verificationLink} style="display: inline-block; font-size: 14px; line-height: 20px; color: ${color}; margin-top: 2px; word-break: break-all;" target="_blank">${verificationLink}</a>
     `,
   };
 
   try {
     await transporter.sendMail(mailOptions);
-    console.log("Verification email sent");
   } catch (error) {
     console.error("Error sending email:", error);
   }

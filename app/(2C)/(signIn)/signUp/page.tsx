@@ -1,11 +1,11 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input, Button, Link } from "@nextui-org/react";
 import request from "@/lib/request";
-import { CornerUpLeft, Loader } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEventHandler, useState } from "react";
+import { useClient } from "@/providers/client-provider";
+import PasswordInput from "@/components/PasswordInput";
 
 export default function SignUpPage() {
   const searchParams = useSearchParams();
@@ -14,6 +14,7 @@ export default function SignUpPage() {
   const [email, setEmail] = useState(
     decodeURIComponent(searchParams.get("email") || "")
   );
+  const { businessDomainId, client_id, pp_doc, tos_doc } = useClient();
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
@@ -31,6 +32,8 @@ export default function SignUpPage() {
         email,
         password,
         targetUrl: searchParams.get("targetUrl"),
+        businessDomainId,
+        client_id
       }),
     })
       .then(() => {
@@ -46,14 +49,14 @@ export default function SignUpPage() {
       });
   };
   return (
-    <div className="flex items-center justify-center bg-background h-full w-full">
+    <div className="flex items-center justify-center h-full w-full">
       <form
         className="flex flex-col items-center justify-center gap-4 w-full max-w-lg"
         onSubmit={handleSubmit}
       >
         <h1 className="font-bold text-3xl mb-12">Sign up</h1>
 
-        <Input name="name" placeholder="Username" required></Input>
+        <Input name="name" label="Username" required></Input>
         <Input
           name="email"
           type="email"
@@ -61,65 +64,51 @@ export default function SignUpPage() {
           onChange={(e) => {
             setEmail(e.target.value);
           }}
-          placeholder="E-mail"
+          label="E-mail"
           required
         ></Input>
-        <Input
+        <PasswordInput
           name="password"
-          type="password"
-          placeholder="Password"
+          label="Password"
           required
-        ></Input>
+        />
         <Button
-          className="group w-full"
-          variant={"default"}
+          className="w-full"
+          color="primary"
           type="submit"
           disabled={loading}
+          isLoading={loading}
         >
-          {loading && <Loader className="animate-spin" />}
           Sign up
         </Button>
         <div className="w-1/2 border-b mx-auto mt-4" />
-        <div className="text-sm text-muted-foreground font-normal flex flex-col gap-3 items-center">
+        <div className="text-muted-foreground font-normal flex flex-col gap-3 items-center">
           <div className="text-center">
             By continuing with any of the options above, you agree to our{" "}
-            <Button
-              onClick={() => {
-                window.open(
-                  "https://terms.alicdn.com/legal-agreement/terms/b_platform_service_agreement/20231110160335349/20231110160335349.html"
-                );
-              }}
-              variant="link"
-              className="p-0 h-fit"
+            {tos_doc && <Link
+              underline="always"
+              isExternal
+              href={tos_doc}
             >
               Terms of Service
-            </Button>{" "}
+            </Link>}{" "}
             and have read our{" "}
-            <Button
-              onClick={() => {
-                window.open(
-                  "https://terms.alicdn.com/legal-agreement/terms/privacy_policy_full/20231109180939630/20231109180939630.html"
-                );
-              }}
-              variant="link"
-              className="p-0 h-fit"
+           {pp_doc && <Link
+              underline="always"
+              isExternal
+              href={pp_doc}
             >
               Privacy Policy
-            </Button>{" "}
+            </Link>}
             .
           </div>
-          <div className="flex gap-1">
+          <div className="flex gap-1 items-center">
             <span>Already have an account?</span>
-            <Button
-              variant={"link"}
-              onClick={(e) => {
-                e.preventDefault();
-                router.replace(`/?email=${encodeURIComponent(email)}`);
-              }}
-              className="flex items-center gap-1 p-0 h-auto"
-            >
+            <Link
+              href={`/?email=${encodeURIComponent(email)}`}
+              >
               sign in
-            </Button>
+            </Link>
           </div>
         </div>
       </form>

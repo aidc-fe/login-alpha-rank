@@ -1,16 +1,21 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import request from "@/lib/request";
 import { ArrowUpRight } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
+import { Button, Input, Link } from "@nextui-org/react";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useClient } from "@/providers/client-provider";
+import { Session } from "next-auth";
+import PasswordInput from "@/components/PasswordInput";
 
 export default function Home() {
-  const { status } = useSession();
+  const { status, data } = useSession() as {
+    status: "loading" | "authenticated" | "unauthenticated";
+    data: (Session & { id: string }) | null;
+  };
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [emailLoading, setEmailLoading] = useState(false);
@@ -20,26 +25,39 @@ export default function Home() {
   const [jumpEmail, setJumpEmail] = useState("");
   const targetUrl = decodeURIComponent(searchParams.get("targetUrl") || "");
   const router = useRouter();
-  const callbackUrl = `/login-landing-page?${
-    targetUrl ? "targetUrl=" + targetUrl : ""
-  }`;
+  const [callbackUrl, setCallbackUrl] = useState("");
+  const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc} = useClient();
+
+  // 根据是否是单点登录，判断登录后跳转的页面
+  useEffect(() => {
+    if (isSSO === undefined) {
+      return;
+    } else if (isSSO) {
+      setCallbackUrl(
+        `/login-landing-page?${targetUrl ? "targetUrl=" + targetUrl : ""}`
+      );
+    } else {
+      setCallbackUrl(
+        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}`
+      );
+    }
+  }, [isSSO]);
 
   // 如果用户已经登录，则进行续登
   useEffect(() => {
     if (status === "authenticated") {
-      router.replace(`/login-landing-page${location.search}`);
+      if (isSSO) {
+        router.replace(`/login-landing-page${location.search}`);
+      } else if (callbackUrl) {
+        router.replace(`${callbackUrl}&userId=${data?.id}`);
+      }
     }
-  }, [router, status, targetUrl]);
-
-  // 处理用户成功发送邮件后返回
-  useEffect(() => {
-    setEmailLoading(false);
-  }, []);
+  }, [router, status, data, isSSO, callbackUrl]);
 
   switch (status) {
     case "unauthenticated":
       return (
-        <div className="flex items-center justify-center w-full h-full px-8 -mr-4 space-y-6 bg-white">
+        <div className="flex items-center justify-center w-full h-full px-8 -mr-4 space-y-6">
           <div className="max-w-lg">
             <h1 className="font-bold text-3xl mb-12 text-center">Sign in</h1>
             <form
@@ -54,85 +72,85 @@ export default function Home() {
                 // 登录
                 request("/api/signIn", {
                   method: "POST",
-                  body: JSON.stringify({ email, password }),
+                  body: JSON.stringify({ email, password, businessDomainId }),
                 })
                   .then((user) => {
-                    signIn("password", { ...user, callbackUrl });
+                    signIn("password", {
+                      ...user,
+                      callbackUrl: `${callbackUrl}&userId=${user.sub}`,
+                      businessDomainId,
+                    })
+                    .finally(() => {
+                      setLoading(false);
+                    });
                   })
-                  .finally(() => {
+                  .catch(() => {
                     setLoading(false);
                   });
               }}
             >
               <Input
                 name="email"
+                label="E-mail"
                 required
-                placeholder="E-mail"
                 type="email"
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
                 }}
               />
-              <Input
+              <PasswordInput
                 name="password"
+                label="Password"
                 required
-                placeholder="Password"
-                type="password"
               />
 
               <div className="flex justify-between">
-                <Button
-                  className="group p-0 h-auto"
-                  variant={"link"}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    router.push(
-                      `/password/emailVerify?email=${encodeURIComponent(email)}`
-                    );
-                  }}
+                <Link
+                  showAnchorIcon
+                  anchorIcon={
+                    <ArrowUpRight
+                      className="group-hover:rotate-45 duration-150"
+                      size={20}
+                    />
+                  }
+                  className="group"
+                  href={`/password/emailVerify?email=${encodeURIComponent(
+                    email
+                  )}`}
                 >
                   Forgot your password{" "}
-                  <ArrowUpRight
-                    className="group-hover:rotate-45 duration-150"
-                    size={16}
-                  />
-                </Button>
-                <div className="text-sm text-muted-foreground">
+                </Link>
+                <div className="text-muted-foreground">
                   Not a member?{" "}
-                  <Button
-                    className="p-0 h-auto"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      router.push(`/signUp?email=${encodeURIComponent(email)}`);
-                    }}
-                    variant={"link"}
-                    disabled={loading || emailLoading}
+                  <Link
+                    href={`/signUp?email=${encodeURIComponent(email)}`}
+                    isDisabled={loading || emailLoading}
                   >
                     Sign up
-                  </Button>
+                  </Link>
                 </div>
               </div>
 
               <Button
-                variant={"default"}
+                color="primary"
                 type="submit"
-                loading={loading}
+                isLoading={loading}
                 disabled={emailLoading}
               >
                 Sign in
               </Button>
             </form>
 
-            <div className="w-full flex items-center">
-              <div className="bg-gradient-to-r from-transparent to-neutral-300 dark:to-neutral-700 my-4 h-[1px] w-full" />
+            <div className="w-full flex items-center text-foreground-500">
+              <div className="bg-gradient-to-r from-transparent to-foreground-500/60 my-4 h-[1px] w-full" />
               <span className="py-4 px-8 text-input text-sm">or</span>
-              <div className="bg-gradient-to-r from-neutral-300 dark:from-neutral-700 to-transparent my-4 h-[1px] w-full" />
+              <div className="bg-gradient-to-r from-foreground-500/60 to-transparent my-4 h-[1px] w-full" />
             </div>
 
             <Button
-              variant={"outline"}
-              size={"lg"}
+              className="w-full"
+              radius="sm"
               onClick={() => signIn("google", { callbackUrl })}
             >
               <Image
@@ -144,7 +162,7 @@ export default function Home() {
               Google
             </Button>
             <form
-              className="flex py-4 gap-3"
+              className="flex py-4 gap-3 items-center"
               onSubmit={(e) => {
                 e.preventDefault();
                 setEmailLoading(true);
@@ -158,56 +176,52 @@ export default function Home() {
                   .then(() => {
                     // email验证页面展示
                     sessionStorage.setItem("verifyEmail", email as string);
-                    signIn("email", { email, callbackUrl });
+                    signIn("email", {
+                      email,
+                      callbackUrl: `${window.location.origin}${callbackUrl}`,
+                      businessDomainId,
+                    }).finally(() => {
+                      setEmailLoading(false);
+                    });
                   })
-                  .finally(() => {
+                  .catch(() => {
                     setEmailLoading(false);
                   });
               }}
             >
               <Input
-                className="flex-1"
                 name="email"
                 required
-                placeholder={
-                  "Enter email address for Magic Link Authentication"
-                }
+                label={"Enter email address for Magic Link Authentication"}
                 type="email"
                 value={jumpEmail}
                 onChange={(e) => {
                   setJumpEmail(e.target.value);
                 }}
               />
-              <Button type="submit" loading={emailLoading} disabled={loading}>
-                <span>Sign in</span>
+              <Button
+                color="primary"
+                type="submit"
+                isLoading={emailLoading}
+                isDisabled={loading}
+              >
+                Sign in
               </Button>
             </form>
             <div className="w-1/2 border-b mx-auto mt-4" />
-            <div className="w-full text-muted-foreground text-sm font-normal text-center mt-4">
+            <div className="w-full text-foreground-500 font-normal text-center mt-4">
               By continuing with any of the options above, you agree to our{" "}
-              <Button
-                onClick={() => {
-                  window.open(
-                    "https://terms.alicdn.com/legal-agreement/terms/b_platform_service_agreement/20231110160335349/20231110160335349.html"
-                  );
-                }}
-                variant="link"
-                className="p-0 h-fit"
-              >
-                Terms of Service
-              </Button>{" "}
+              {tos_doc && (
+                <Link href={tos_doc} isExternal underline="always">
+                  Terms of Service
+                </Link>
+              )}{" "}
               and have read our{" "}
-              <Button
-                onClick={() => {
-                  window.open(
-                    "https://terms.alicdn.com/legal-agreement/terms/privacy_policy_full/20231109180939630/20231109180939630.html"
-                  );
-                }}
-                variant="link"
-                className="p-0 h-fit"
-              >
-                Privacy Policy
-              </Button>{" "}
+              {pp_doc && (
+                <Link href={pp_doc} isExternal underline="always">
+                  Privacy Policy
+                </Link>
+              )}{" "}
               .
             </div>
           </div>
