@@ -561,7 +561,6 @@ export async function createBusinessDomain(
       },
     });
 
-    console.log("New BusinessDomain created:", newBusinessDomain);
     return newBusinessDomain;
   } catch (error) {
     console.error("Error creating BusinessDomain:", error);
