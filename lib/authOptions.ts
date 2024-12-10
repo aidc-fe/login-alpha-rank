@@ -107,6 +107,7 @@ export const authOptions: NextAuthOptions = {
               from,
               businessDomainId,
               image,
+              updated_at: new Date(),
             },
           });
         }
