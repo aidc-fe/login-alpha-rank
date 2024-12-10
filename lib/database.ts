@@ -62,7 +62,6 @@ export const createOrUpdateUser = async (data: {
   password?: string;
   businessDomainId: string;
 }) => {
-  console.log(222,{data})
   try {
     // Step 1: 查找用户
     const existingUser = await prisma.user.findFirst({
@@ -71,8 +70,6 @@ export const createOrUpdateUser = async (data: {
         businessDomainId: data.businessDomainId,
       },
     });
-
-    console.log({existingUser})
 
     let user;
 
@@ -92,7 +89,6 @@ export const createOrUpdateUser = async (data: {
       });
     } else {
       // Step 3: 用户不存在，执行创建操作
-      console.log('step3',{data})
       user = await prisma.user.create({
         data: {
           ...data,

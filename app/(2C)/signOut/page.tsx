@@ -5,17 +5,23 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Loader } from "lucide-react";
 import { thirdPartySignOut } from "@/lib/auth";
+import { useClient } from "@/providers/client-provider";
 
 export default function SignOutPage() {
   const { status } = useSession();
   const router = useRouter();
+  const { isSSO } = useClient();
 
   useEffect(() => {
     if (status === "authenticated") {
-      // 登出并清除登录态
-      thirdPartySignOut().then(() => {
+      if(isSSO){
+        // 登出并清除登录态
+        thirdPartySignOut().then(() => {
+          signOut();
+        });
+      }else{
         signOut();
-      });
+      }
     } else if (status === "unauthenticated") {
       // 登录
       router.replace(`/${location.search}`);
