@@ -7,6 +7,7 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
+    "postinstall": "rm -rf node_modules/.prisma && npx prisma generate",
     "db:pull": "dotenv -e .env.development.local -- npx prisma db pull",
     "db:push": "dotenv -e .env.development.local -- npx prisma db push",
     "db:migrate": "dotenv -e .env.development.local -- npx prisma migrate dev --name init",
