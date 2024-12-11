@@ -40,8 +40,11 @@ export async function POST(request: NextRequest) {
         btnContent: "Set Password",
       },
       {
-        emailServer: client.email_server,
-        emailForm: client.email_form,
+        mail_server_host: client.mail_server_host,
+        mail_server_port: client.mail_server_port,
+        mail_server_user: client.mail_server_user,
+        mail_server_password: client.mail_server_password,
+        mail_template_image: client.mail_template_image,
       },
       client.brand_color
     );
