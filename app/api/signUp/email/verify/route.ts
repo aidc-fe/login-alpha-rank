@@ -12,7 +12,8 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get("token");
   const businessDomainId = request.nextUrl.searchParams.get("businessDomainId");
-
+  const _domain = `http${process.env.ENV==='development' ? '' : 's'}://${request.headers.get('host') || request.headers.get(':authority')}`
+  
   if (!businessDomainId) {
     return NextResponse.json(
       formateError(ERROR_CONFIG.AUTH.NEED_BUSINESS_DOMAIN_ID)
@@ -30,12 +31,10 @@ export async function GET(request: NextRequest) {
     };
     const user = await createOrUpdateUser(userInfo);
 
-    const host = request.headers.get('host') || request.headers.get(':authority');
-
     const response = NextResponse.redirect(
       !businessDomain.sso
-        ? `http://${host}/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}&userId=${user.id}`
-        : `http://${host}/login-landing-page?targetUrl=${info.targetUrl}`,
+        ? `${_domain}/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}&userId=${user.id}`
+        : `${_domain}/login-landing-page?targetUrl=${info.targetUrl}`,
       {
         status: 302,
       }
@@ -44,6 +43,6 @@ export async function GET(request: NextRequest) {
 
     return response;
   } catch {
-    return NextResponse.redirect(process.env.NEXT_AUTH_URL!, { status: 302 });
+    return NextResponse.redirect(_domain, { status: 302 });
   }
 }
