@@ -39,7 +39,8 @@ export async function POST(request: NextRequest) {
             "To continue setting up your account, please verify your email address.",
           btnContent: "Verify Email Address",
         },
-        client?.brand_color
+        client?.brand_color,
+        client.support_email,
       );
       return NextResponse.json(
         formatSuccess({

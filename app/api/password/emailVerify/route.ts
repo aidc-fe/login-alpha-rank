@@ -34,7 +34,8 @@ export async function POST(request: NextRequest) {
           "We've received your new password setting requirement. If you did not request it, please just ignore it. Otherwise, finish setting your new password by the link below.",
         btnContent: "Set Password",
       },
-      client?.brand_color ?? '#7c3aed'
+      client?.brand_color,
+      client.support_email,
     );
     return NextResponse.json(
       formatSuccess({

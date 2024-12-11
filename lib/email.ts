@@ -1,16 +1,6 @@
 // lib/mail.js
 import nodemailer from "nodemailer";
 
-export const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_SERVER_HOST,
-  port: Number(process.env.EMAIL_SERVER_PORT),
-  secure: true, // 使用SSL/TLS
-  auth: {
-    user: process.env.EMAIL_SERVER_USER,
-    pass: process.env.EMAIL_SERVER_PASSWORD,
-  },
-});
-
 export async function sendVerificationEmail(
   to: string,
   verificationLink: string,
@@ -20,10 +10,21 @@ export async function sendVerificationEmail(
     description: string;
     btnContent: string;
   },
-  color?: string | null
+  color?: string | null,
+  supportEmail?: string | null,
 ) {
+  const transporter = nodemailer.createTransport({
+    host: process.env.EMAIL_SERVER_HOST,
+    port: Number(process.env.EMAIL_SERVER_PORT),
+    secure: true, // 使用SSL/TLS
+    auth: {
+      user: supportEmail || process.env.EMAIL_SERVER_USER,
+      pass: process.env.EMAIL_SERVER_PASSWORD,
+    },
+  });
+
   const mailOptions = {
-    from: process.env.EMAIL_FROM, // 发件人
+    from: supportEmail || process.env.EMAIL_FROM, // 发件人
     to, // 收件人
     subject,
     html: `
