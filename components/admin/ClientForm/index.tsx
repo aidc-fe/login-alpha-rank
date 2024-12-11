@@ -89,6 +89,9 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
       signout_uri: formData.get("signout_uri"),
       title: formData.get("title"),
       favicon: formData.get("favicon"),
+      email_server: formData.get("email_server"),
+      email_form: formData.get("email_form"),
+      email_img: formData.get("email_img"),
       materials,
       scope,
       redirect_uris,
@@ -144,6 +147,30 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
         />
 
         <Input
+          name="email_server"
+          label="SMTP Email Server: username:password@smtp.example.com:587"
+          isReadOnly={isReadOnly}
+          required
+          defaultValue={initialData?.email_server}
+        />
+
+        <Input
+          name="email_form"
+          label="Email Form"
+          isReadOnly={isReadOnly}
+          required
+          defaultValue={initialData?.email_form}
+        />
+
+        <Input
+          name="email_img"
+          label="Email Img"
+          isReadOnly={isReadOnly}
+          required
+          defaultValue={initialData?.email_img}
+        />
+
+        <Input
           name="title"
           label="Title"
           isReadOnly={isReadOnly}
@@ -153,6 +180,7 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
         <Input
           name="favicon"
           label="Favicon"
+          required
           isReadOnly={isReadOnly}
           defaultValue={initialData?.favicon}
         />

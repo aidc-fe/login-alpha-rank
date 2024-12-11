@@ -45,6 +45,9 @@ export type ClientDataType = {
   }[];
   tos_doc?: string;
   pp_doc?: string;
+  email_server?: string;
+  email_form?: string;
+  email_img?: string;
 }
 
 export type BusinessDomainDataType = {

@@ -10,21 +10,23 @@ export async function sendVerificationEmail(
     description: string;
     btnContent: string;
   },
-  color?: string | null,
-  supportEmail?: string | null,
+  emailConfig: {
+    emailServer: string | null;
+    emailForm: string | null;
+  },
+  color?: string | null
 ) {
-  const transporter = nodemailer.createTransport({
-    host: process.env.EMAIL_SERVER_HOST,
-    port: Number(process.env.EMAIL_SERVER_PORT),
-    secure: true, // 使用SSL/TLS
-    auth: {
-      user: supportEmail || process.env.EMAIL_SERVER_USER,
-      pass: process.env.EMAIL_SERVER_PASSWORD,
-    },
-  });
+  console.log("supportEmail", emailConfig);
+
+  if (!emailConfig.emailServer || !emailConfig.emailForm) {
+    throw new Error("Email server or email form is not set");
+  }
+
+  const transporter = nodemailer.createTransport(`smtps://${emailConfig.emailServer}`);
+
 
   const mailOptions = {
-    from: supportEmail || process.env.EMAIL_FROM, // 发件人
+    from: emailConfig.emailForm, // 发件人
     to, // 收件人
     subject,
     html: `
