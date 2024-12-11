@@ -20,6 +20,7 @@ import {
   Select,
   SelectItem,
 } from "@nextui-org/react";
+import PasswordInput from "@/components/PasswordInput";
 
 export type FormMode = "create" | "edit" | "view";
 
@@ -89,6 +90,11 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
       signout_uri: formData.get("signout_uri"),
       title: formData.get("title"),
       favicon: formData.get("favicon"),
+      mail_server_host: formData.get("mail_server_host"),
+      mail_server_port: formData.get("mail_server_port"),
+      mail_server_user: formData.get("mail_server_user"),
+      mail_server_password: formData.get("mail_server_password"),
+      mail_template_image: formData.get("mail_template_image"),
       materials,
       scope,
       redirect_uris,
@@ -153,6 +159,7 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
         <Input
           name="favicon"
           label="Favicon"
+          required
           isReadOnly={isReadOnly}
           defaultValue={initialData?.favicon}
         />
@@ -178,6 +185,52 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
               style={{ backgroundColor: brandColor }}
             />
           </label>
+        </div>
+
+        <div className="w-full flex flex-col gap-1">
+          <span className="capitalize text-sm">Email Config:</span>
+          <div
+            className={cn("flex flex-col gap-4 border border-border rounded-xl px-4 py-6")}
+          >
+            <Input
+              name="mail_server_host"
+              label="Email Server Host"
+              isReadOnly={isReadOnly}
+              required
+              defaultValue={initialData?.mail_server_host}
+            />
+    
+            <Input
+              name="mail_server_port"
+              label="Email Server Port"
+              isReadOnly={isReadOnly}
+              required
+              defaultValue={initialData?.mail_server_port}
+            />
+    
+            <Input
+              name="mail_server_user"
+              label="Email Server User"
+              isReadOnly={isReadOnly}
+              required
+              defaultValue={initialData?.mail_server_user}
+            />
+    
+            <PasswordInput
+              name="mail_server_password"
+              label="Email Server Password"
+              isReadOnly={isReadOnly}
+              required
+              defaultValue={initialData?.mail_server_password}
+            />
+    
+            <Input
+              name="mail_template_image"
+              label="Email Template Image"
+              isReadOnly={isReadOnly}
+              defaultValue={initialData?.mail_template_image}
+            />
+          </div>
         </div>
 
         <div className="flex flex-col gap-1">

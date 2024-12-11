@@ -45,6 +45,11 @@ export type ClientDataType = {
   }[];
   tos_doc?: string;
   pp_doc?: string;
+  mail_server_host: string;
+  mail_server_port: string;
+  mail_server_user: string;
+  mail_server_password: string;
+  mail_template_image?: string;
 }
 
 export type BusinessDomainDataType = {

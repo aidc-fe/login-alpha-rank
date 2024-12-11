@@ -3,7 +3,12 @@ import GoogleProvider from "next-auth/providers/google";
 import EmailProvider from "next-auth/providers/email";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { getBusinessDomainIdByAuthDomain, getCurrentServerClient, getUserIdByEmail, prisma } from "@/lib/database";
+import {
+  getBusinessDomainIdByAuthDomain,
+  getCurrentServerClient,
+  getUserIdByEmail,
+  prisma,
+} from "@/lib/database";
 import { decodeJwt, encodeJwt } from "@/lib/secret";
 import { sendVerificationEmail } from "@/lib/email";
 import { CookieOpt } from "@/lib/auth";
@@ -20,22 +25,22 @@ export const authOptions: NextAuthOptions = {
         where: {
           email_businessDomainId: {
             email,
-            businessDomainId,
+            businessDomainId: businessDomainId || '',
           },
         },
       });
 
       return user;
     },
-    createUser: async (data) => {
+    createUser: async (data: any) => {
       // 从请求中获取 businessDomainId
       // 注意：这里需要访问请求上下文来获取 businessDomainId
       const businessDomainId = await getBusinessDomainIdByAuthDomain();
-
+     
       const user = await prisma.user.create({
         data: {
           ...data,
-          businessDomainId,
+          businessDomainId: businessDomainId || '',
         },
       });
 
@@ -107,6 +112,7 @@ export const authOptions: NextAuthOptions = {
               from,
               businessDomainId,
               image,
+              updated_at: new Date(),
             },
           });
         }
@@ -167,34 +173,53 @@ export const authOptions: NextAuthOptions = {
         const userId = await getUserIdByEmail(email);
         const client = await getCurrentServerClient();
         const urlObj = new URL(url);
-        let callbackUrl = urlObj.searchParams.get('callbackUrl');
+        let callbackUrl = urlObj.searchParams.get("callbackUrl");
         if (callbackUrl && userId) {
           // 解码 callbackUrl
           callbackUrl = decodeURIComponent(callbackUrl);
-          
+
           // 直接将 userId 添加到 callbackUrl
-          const separator = callbackUrl.includes('?') ? '&' : '?';
+          const separator = callbackUrl.includes("?") ? "&" : "?";
           const updatedCallbackUrl = `${callbackUrl}${separator}userId=${userId}`;
-          
+
           // 设置回原始 URL，只编码一次
-          urlObj.searchParams.set('callbackUrl', updatedCallbackUrl);
+          urlObj.searchParams.set("callbackUrl", updatedCallbackUrl);
         }
 
         const finalUrl = urlObj.toString();
 
-        await sendVerificationEmail(email, finalUrl, `${client.name} - Login`, {
-          title: `Login to ${client.name}`,
-          description: `<p>You can login to ${client.name} by clicking the button below.</p> 
+        await sendVerificationEmail(
+          email,
+          finalUrl,
+          `${client.name} - Login`,
+          {
+            title: `Login to ${client.name}`,
+            description: `<p>You can login to ${
+              client.name
+            } by clicking the button below.</p> 
             <p>
-            Good news!  You and your team can use username/password to login your ${client.name} account now. Just set your password with the following link: <a style='color:${client.brand_color}' href='${
+            Good news!  You and your team can use username/password to login your ${
+              client.name
+            } account now. Just set your password with the following link: <a style='color:${
+              client.brand_color
+            }' href='${
               process.env.NEXT_PUBLIC_NEXT_AUTH_URL
             }/password/emailVerify?email=${encodeURIComponent(
-            email
-          )}'>setting your password.</a>.
+              email
+            )}'>setting your password.</a>.
             </p>
             `,
-          btnContent: "Login",
-        }, client.brand_color);
+            btnContent: "Login",
+          },
+          {
+            mail_server_host: client.mail_server_host,
+            mail_server_port: client.mail_server_port,
+            mail_server_user: client.mail_server_user,
+            mail_server_password: client.mail_server_password,
+            mail_template_image: client.mail_template_image,
+          },
+          client.brand_color
+        );
       },
     }),
   ],

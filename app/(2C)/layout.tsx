@@ -22,10 +22,10 @@ async function getClient() {
 export async function generateMetadata() {
   const client = await getClient();
   return {
-    title: client.title,
-    description: client.description,
+    title: client.title || '',
+    description: client.description || '',
     icons: {
-      icon: client.favicon,
+      icon: client.favicon || '',
     },
   };
 }

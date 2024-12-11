@@ -2,7 +2,6 @@
 import LoginCarousel from "@/components/login-carousel";
 import Image from "next/image";
 
-
 export default function RootLayout({
   children,
 }: Readonly<{

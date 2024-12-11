@@ -10,16 +10,16 @@ import { useClient } from "@/providers/client-provider";
 export default function SignOutPage() {
   const { status } = useSession();
   const router = useRouter();
-  const { isSSO } = useClient()
+  const { isSSO } = useClient();
 
   useEffect(() => {
     if (status === "authenticated") {
-      if(isSSO) {
-         // 登出并清除登录态
+      if(isSSO){
+        // 登出并清除登录态
         thirdPartySignOut().then(() => {
           signOut();
         });
-      } else {
+      }else{
         signOut();
       }
     } else if (status === "unauthenticated") {
@@ -29,7 +29,7 @@ export default function SignOutPage() {
   }, [router, status, isSSO]);
 
   return (
-    <main className="h-full flex justify-center items-center w-full">
+    <main className="h-svh flex justify-center items-center w-full">
       <Loader size={60} className="text-primary animate-spin" />
     </main>
   );
