@@ -649,3 +649,4 @@ export async function updateBusinessDomain(
     throw error;
   }
 }
+
