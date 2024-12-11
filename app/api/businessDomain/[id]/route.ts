@@ -9,6 +9,7 @@ export async function GET(
 ) {
   try {
     const businessDomain = await getBusinessDomainById(params.id);
+
     return NextResponse.json(
       formatSuccess({
         data: businessDomain,

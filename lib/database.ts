@@ -8,6 +8,7 @@ import {
 import { ClientDataType } from "./admin";
 import { ERROR_CONFIG } from "@/lib/errors";
 import { headers } from "next/headers";
+import { v4 as uuidv4 } from 'uuid';
 
 const getHost = () => {
   const headersList = headers();
@@ -62,21 +63,39 @@ export const createOrUpdateUser = async (data: {
   businessDomainId: string;
 }) => {
   try {
-    const user = await prisma.user.upsert({
+    // Step 1: 查找用户
+    const existingUser = await prisma.user.findFirst({
       where: {
-        email_businessDomainId: {
-          email: data.email,
-          businessDomainId: data.businessDomainId,
-        },
-      },
-      create: data,
-      update: {
-        name: data.name,
-        emailVerified: data.emailVerified,
-        image: data.image,
-        password: data.password,
+        email: data.email,
+        businessDomainId: data.businessDomainId,
       },
     });
+
+    let user;
+
+    if (existingUser) {
+      // Step 2: 用户存在，执行更新操作
+      user = await prisma.user.update({
+        where: {
+          id: existingUser.id, // 使用主键进行更新
+        },
+        data: {
+          name: data.name,
+          emailVerified: data.emailVerified,
+          image: data.image,
+          password: data.password,
+          updated_at: new Date(), // 添加 updated_at 字段
+        },
+      });
+    } else {
+      // Step 3: 用户不存在，执行创建操作
+      user = await prisma.user.create({
+        data: {
+          ...data,
+          updated_at: new Date(), // 添加 updated_at 字段
+        },
+      });
+    }
 
     return user;
   } catch (error) {
@@ -84,6 +103,7 @@ export const createOrUpdateUser = async (data: {
     throw error;
   }
 };
+
 
 // 通过邮箱查找用户，更新用户信息
 export const updateUserByEmail = async (
@@ -388,7 +408,7 @@ export const getUserIdByEmail = async (email: string) => {
       where: {
         email_businessDomainId: {
           email,
-          businessDomainId,
+          businessDomainId: businessDomainId || '',
         },
       },
     });
@@ -554,10 +574,12 @@ export async function createBusinessDomain(
   try {
     const newBusinessDomain = await prisma.businessDomain.create({
       data: {
+        id: uuidv4(),
         name,
         description,
         active,
         sso,
+        updated_at: new Date(), // 添加 updated_at 字段
       },
     });
 

@@ -1,18 +1,20 @@
 {
-  "name": "nextjs",
+  "name": "User Center",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "dotenv -e .env.development.local -- next dev",
+    "dev": "dotenv -e .env.production.local -- next dev",
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
+    "postinstall": "rm -rf node_modules/.prisma && npx prisma generate",
     "db:pull": "dotenv -e .env.development.local -- npx prisma db pull",
     "db:push": "dotenv -e .env.development.local -- npx prisma db push",
     "db:migrate": "dotenv -e .env.development.local -- npx prisma migrate dev --name init",
     "db:generate": "dotenv -e .env.development.local -- npx prisma generate",
-    "db:migrate.prod": "dotenv -e .env.production.local -- npx prisma migrate deploy --name init",
-    "db:generate.prod": "dotenv -e .env.production.local -- npx prisma generate"
+    "db:migrate.prod": "dotenv -e .env.production.local -- npx prisma migrate dev --name init",
+    "db:generate.prod": "dotenv -e .env.production.local -- npx prisma generate",
+    "db:pull.prod": "dotenv -e .env.production.local -- npx prisma db pull"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.4.1",
