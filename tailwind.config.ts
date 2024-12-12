@@ -17,11 +17,28 @@ module.exports = {
   },
   darkMode: "class",
   plugins: [nextui({
+    layout: {
+      radius: {
+        small: "6px",
+        medium: "8px",
+        large: "10px",
+      },
+    },
     themes: {
       light: {
         colors: {
+          default: {
+            DEFAULT: "#f5f5f5",
+          },
           primary:{
             DEFAULT: "#04BBF1",
+            foreground: "#ffffff",
+          },
+          foreground: {
+            '500': "#BFBFBF",
+          },
+          muted: {
+            DEFAULT: "#BFBFBF",
             foreground: "#ffffff",
           },
         },
