@@ -12,6 +12,7 @@ import {
 import { decodeJwt, encodeJwt } from "@/lib/secret";
 import { sendVerificationEmail } from "@/lib/email";
 import { CookieOpt } from "@/lib/auth";
+import { getHost } from "@/lib/database";
 
 export const authOptions: NextAuthOptions = {
   adapter: {
@@ -186,6 +187,8 @@ export const authOptions: NextAuthOptions = {
           urlObj.searchParams.set("callbackUrl", updatedCallbackUrl);
         }
 
+        const host = getHost();
+
         const finalUrl = urlObj.toString();
 
         await sendVerificationEmail(
@@ -202,8 +205,8 @@ export const authOptions: NextAuthOptions = {
               client.name
             } account now. Just set your password with the following link: <a style='color:${
               client.brand_color
-            }' href='${
-              process.env.NEXT_PUBLIC_NEXT_AUTH_URL
+            }' href='https://${
+              host
             }/password/emailVerify?email=${encodeURIComponent(
               email
             )}'>setting your password.</a>.
