@@ -1,4 +1,4 @@
-import { toastApi } from "@/components/ui/toaster";
+import { toast } from "react-toastify";
 
 const isBrowser = typeof window !== 'undefined';
 
@@ -15,7 +15,7 @@ export default function request(
         return res.data;
       } else {
         if (res.message && isBrowser) {
-          toastApi.error(res.message);
+          toast.error(res.message);
         }
         throw res;
       }

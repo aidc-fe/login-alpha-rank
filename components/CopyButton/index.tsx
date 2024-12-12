@@ -5,7 +5,7 @@ import React, { useState } from "react";
 import { Copy, CopyCheck } from "lucide-react";
 import { Button } from "@nextui-org/react";
 import { cn } from "@/lib/utils";
-import { toastApi } from "@/components/ui/toaster";
+import { toast } from "react-toastify";
 
 export interface CopyButtonProps {
   textToCopy?: string;
@@ -18,13 +18,13 @@ const CopyButton: React.FC<CopyButtonProps> = ({ textToCopy = "" }) => {
     navigator.clipboard
       .writeText(textToCopy)
       .then(() => {
-        toastApi.success("Copied to clipboard");
+        toast.success("Copied to clipboard");
         setCopied(true);
         setTimeout(() => setCopied(false), 2000); // 2秒后恢复初始状态
       })
       .catch((err) => {
         console.error("Could not copy text: ", err);
-        toastApi.error("Failed to copy to clipboard");
+        toast.error("Failed to copy to clipboard");
       });
   };
 
