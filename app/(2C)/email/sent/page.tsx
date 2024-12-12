@@ -59,10 +59,10 @@ export default function EmailSent() {
         </div>
 
         <hr />
-        <p className="text-muted-foreground text-xs my-4">
+        <p className="text-muted text-xs my-4">
           Please open this email to complete your {type.replace("_", " ")}.
         </p>
-        <p className="text-muted-foreground text-xs">
+        <p className="text-muted text-xs">
           If you don’t see the email in your inbox within 10 minutes, please
           check your spam folder. If you find it there, mark it as “Not Spam.”
           If you continue to experience login issues, contact us at support

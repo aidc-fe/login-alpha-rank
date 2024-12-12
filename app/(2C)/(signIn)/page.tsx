@@ -3,7 +3,7 @@
 import request from "@/lib/request";
 import { ArrowUpRight } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
-import { Button, Input, Link } from "@nextui-org/react";
+import { Button, Input, Link, Spinner } from "@nextui-org/react";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -93,19 +93,13 @@ export default function Home() {
                 name="email"
                 label="E-mail"
                 required
-                size="sm"
                 type="email"
                 value={email}
                 onChange={(e) => {
                   setEmail(e.target.value);
                 }}
               />
-              <PasswordInput
-                name="password"
-                label="Password"
-                size="sm"
-                required
-              />
+              <PasswordInput name="password" label="Password" required />
 
               <div className="flex justify-between mb-3">
                 <Link
@@ -140,6 +134,7 @@ export default function Home() {
                 color="primary"
                 type="submit"
                 size="lg"
+                spinner={<Spinner color="default" size="sm" />}
                 isLoading={loading}
                 disabled={emailLoading}
               >
@@ -199,7 +194,6 @@ export default function Home() {
                 required
                 label={"Enter email address for Magic Link Authentication"}
                 type="email"
-                size="sm"
                 value={jumpEmail}
                 onChange={(e) => {
                   setJumpEmail(e.target.value);
@@ -209,6 +203,7 @@ export default function Home() {
                 color="primary"
                 type="submit"
                 size="lg"
+                spinner={<Spinner color="default" size="sm" />}
                 isLoading={emailLoading}
                 isDisabled={loading}
               >

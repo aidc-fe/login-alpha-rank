@@ -39,7 +39,6 @@ module.exports = {
           },
           muted: {
             DEFAULT: "#BFBFBF",
-            foreground: "#ffffff",
           },
         },
       },

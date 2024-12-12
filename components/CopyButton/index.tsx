@@ -37,7 +37,7 @@ const CopyButton: React.FC<CopyButtonProps> = ({ textToCopy = "" }) => {
       variant="light"
       isIconOnly
     >
-      <Icon className="text-muted-foreground" size={16} />
+      <Icon className="text-muted" size={16} />
     </Button>
   );
 };

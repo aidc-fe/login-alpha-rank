@@ -4,7 +4,7 @@ import request from "@/lib/request";
 import { Send } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEventHandler, useState } from "react";
-import { Input, Button, Link } from "@nextui-org/react";
+import { Input, Button, Link, Spinner } from "@nextui-org/react";
 import { useClient } from "@/providers/client-provider";
 import PasswordInput from "@/components/PasswordInput";
 import { toast } from "react-toastify";
@@ -62,7 +62,6 @@ export default function Page() {
           name="email"
           required
           label="E-mail"
-          size="sm"
           type="email"
           value={email}
           onChange={(e) => {
@@ -74,20 +73,19 @@ export default function Page() {
           name="password"
           required
           label="Password"
-          size="sm"
         />
 
         <PasswordInput
           name="check_password"
           required
           label="Re-enter password"
-          size="sm"
         />
         <Button
           className="group w-full"
           color="primary"
           type="submit"
           size="lg"
+          spinner={<Spinner color="default" size="sm" />}
           startContent={
             !loading && <Send size={20} className="group-hover:rotate-45 duration-150" />
           }
@@ -99,9 +97,8 @@ export default function Page() {
         <div className="flex items-center text-muted gap-2">
           <span>Back to</span>
           <Link
-           underline="always"
+            underline="always"
             href={`/?email=${encodeURIComponent(email)}`}
-            className="flex items-center gap-1 p-0 h-auto !bg-transparent w-auto min-w-0"
           >
             Sign in
           </Link>
