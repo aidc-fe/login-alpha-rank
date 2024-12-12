@@ -3,9 +3,11 @@ import { Analytics } from "@vercel/analytics/react";
 import SessionProvider from "@/providers/session-provider";
 import "@/styles/globals.css";
 import SuspenseWrapper from "@/components/suspend-wrapper";
-import { Toaster } from "@/components/ui/toaster";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { NextUIProviderWrapper } from "@/providers/nextui-provider";
+import { ToastContainer } from "react-toastify";
+
+import "react-toastify/dist/ReactToastify.css";
 
 export const metadata: Metadata = {
   title: "Alpha Rank Login",
@@ -43,7 +45,7 @@ export default function RootLayout({
             <SessionProvider>{children}</SessionProvider>
           </SuspenseWrapper>
           <Analytics />
-          <Toaster />
+          <ToastContainer bodyClassName="items-start [&_div:first-child]:mt-0.5" />
         </NextUIProviderWrapper>
       </body>
     </html>

@@ -1,6 +1,6 @@
 "use client";
 
-import { toastApi } from "@/components/ui/toaster";
+import { toast } from "react-toastify";
 import request from "@/lib/request";
 import { FormEventHandler, useState } from "react";
 import {
@@ -35,10 +35,10 @@ export default function EditClient() {
         method: "POST",
         body: JSON.stringify(data),
       });
-      toastApi.success("Created successfully");
+      toast.success("Created successfully");
       router.push("/admin/businessDomain");
     } catch (error) {
-      toastApi.error("Creation failed");
+      toast.error("Creation failed");
     } finally {
       setLoading(false);
     }

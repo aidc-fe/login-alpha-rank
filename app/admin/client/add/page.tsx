@@ -1,6 +1,6 @@
 "use client";
 
-import { toastApi } from "@/components/ui/toaster";
+import { toast } from "react-toastify";
 import request from "@/lib/request";
 import { Breadcrumbs, BreadcrumbItem } from "@nextui-org/react";
 import Link from "next/link";
@@ -15,7 +15,7 @@ export default function CreateClient() {
       method: "POST",
       body: JSON.stringify(data),
     }).then(() => {
-      toastApi.success("Create Success");
+      toast.success("Create Success");
       router.push("/admin/client");
     });
   };
