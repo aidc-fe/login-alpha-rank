@@ -1,6 +1,5 @@
 "use client";
 
-import { toastApi } from "@/components/ui/toaster";
 import request from "@/lib/request";
 import { Send } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -8,6 +7,7 @@ import { FormEventHandler, useState } from "react";
 import { Input, Button, Link } from "@nextui-org/react";
 import { useClient } from "@/providers/client-provider";
 import PasswordInput from "@/components/PasswordInput";
+import { toast } from "react-toastify";
 
 export default function Page() {
   const { businessDomainId,client_id } = useClient();
@@ -27,7 +27,7 @@ export default function Page() {
 
     // 校验新旧密码
     if (checkPassword !== password) {
-      toastApi.error("Password does not match.");
+      toast.error("Password does not match.");
       return;
     }
 

@@ -1,13 +1,18 @@
 import { ERROR_CONFIG } from "@/lib/errors";
-import { createVerificationToken, findClientByClientId, getUser } from "@/lib/database";
+import {
+  createVerificationToken,
+  findClientByClientId,
+  getUser,
+} from "@/lib/database";
 import { sendVerificationEmail } from "@/lib/email";
 import { formateError, formatSuccess } from "@/lib/request";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
-  const { email, password, businessDomainId, client_id } = (await request.json()) || {};
+  const { email, password, businessDomainId, client_id } =
+    (await request.json()) || {};
   // 获取当前请求的 host
-  const host = request.headers.get('host') || request.headers.get(':authority');
+  const host = request.headers.get("host") || request.headers.get(":authority");
   const baseUrl = `https://${host}`;
 
   if (!email) {
@@ -34,7 +39,14 @@ export async function POST(request: NextRequest) {
           "We've received your new password setting requirement. If you did not request it, please just ignore it. Otherwise, finish setting your new password by the link below.",
         btnContent: "Set Password",
       },
-      client?.brand_color ?? '#7c3aed'
+      {
+        mail_server_host: client.mail_server_host,
+        mail_server_port: client.mail_server_port,
+        mail_server_user: client.mail_server_user,
+        mail_server_password: client.mail_server_password,
+        mail_template_image: client.mail_template_image,
+      },
+      client.brand_color
     );
     return NextResponse.json(
       formatSuccess({

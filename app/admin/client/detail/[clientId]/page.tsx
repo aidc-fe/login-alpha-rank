@@ -1,6 +1,6 @@
 "use client";
 
-import { toastApi } from "@/components/ui/toaster";
+import { toast } from "react-toastify";
 import request from "@/lib/request";
 import { ClientDataType } from "@/lib/admin";
 import { useEffect, useState } from "react";
@@ -40,7 +40,7 @@ export default function ClientDetail({
       method: "POST",
       body: JSON.stringify(data),
     }).then((res) => {
-      toastApi.success("Update Success");
+      toast.success("Update Success");
       setDetails(res);
       setMode("view");
     });

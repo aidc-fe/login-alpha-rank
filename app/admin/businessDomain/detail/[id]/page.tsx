@@ -1,6 +1,6 @@
 "use client";
 
-import { toastApi } from "@/components/ui/toaster";
+import { toast } from "react-toastify";
 import request from "@/lib/request";
 import { FormEventHandler, useEffect, useState } from "react";
 import {
@@ -46,7 +46,7 @@ export default function BusinessDomainDetail({
       const response = await request(`/api/businessDomain/${params.id}`);
       setData(response);
     } catch (error: any) {
-      toastApi.error(error.message || "Failed to fetch data");
+      toast.error(error.message || "Failed to fetch data");
     } finally {
       setPageLoading(false);
     }
@@ -71,10 +71,10 @@ export default function BusinessDomainDetail({
       });
       setData(response);
       setIsEdit(false);
-      toastApi.success("Update success");
+      toast.success("Update success");
 
     } catch (error: any) {
-      toastApi.error(error.message || "Update failed");
+      toast.error(error.message || "Update failed");
     } finally {
       setLoading(false);
     }

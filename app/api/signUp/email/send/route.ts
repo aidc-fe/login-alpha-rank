@@ -1,5 +1,9 @@
 import { ERROR_CONFIG } from "@/lib/errors";
-import { createVerificationToken, findClientByClientId, getUser } from "@/lib/database";
+import {
+  createVerificationToken,
+  findClientByClientId,
+  getUser,
+} from "@/lib/database";
 import { sendVerificationEmail } from "@/lib/email";
 import { formateError, formatSuccess } from "@/lib/request";
 import { NextRequest, NextResponse } from "next/server";
@@ -7,12 +11,17 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   const userInfo = await request.json();
   // 获取当前请求的 host
-  const host = request.headers.get('host') || request.headers.get(':authority');
+  const host = request.headers.get("host") || request.headers.get(":authority");
   const baseUrl = `https://${host}`;
 
   if (!userInfo.email) {
     return NextResponse.json(formateError(ERROR_CONFIG.AUTH.NEED_EMAIL));
-  } else if (await getUser({ email: userInfo.email, businessDomainId: userInfo.businessDomainId })) {
+  } else if (
+    await getUser({
+      email: userInfo.email,
+      businessDomainId: userInfo.businessDomainId,
+    })
+  ) {
     return NextResponse.json(formateError(ERROR_CONFIG.AUTH.USER_EXIST));
   } else {
     // 生成验证链接（你需要实现生成实际的链接）
@@ -39,7 +48,14 @@ export async function POST(request: NextRequest) {
             "To continue setting up your account, please verify your email address.",
           btnContent: "Verify Email Address",
         },
-        client?.brand_color
+        {
+          mail_server_host: client.mail_server_host,
+          mail_server_port: client.mail_server_port,
+          mail_server_user: client.mail_server_user,
+          mail_server_password: client.mail_server_password,
+          mail_template_image: client.mail_template_image,
+        },
+        client.brand_color
       );
       return NextResponse.json(
         formatSuccess({
