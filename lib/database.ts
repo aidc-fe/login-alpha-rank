@@ -10,7 +10,7 @@ import { ERROR_CONFIG } from "@/lib/errors";
 import { headers } from "next/headers";
 import { v4 as uuidv4 } from 'uuid';
 
-const getHost = () => {
+export const getHost = () => {
   const headersList = headers();
   const host = headersList.get('host') || headersList.get(':authority');
 
