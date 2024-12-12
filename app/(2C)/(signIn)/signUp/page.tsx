@@ -33,7 +33,7 @@ export default function SignUpPage() {
         password,
         targetUrl: searchParams.get("targetUrl"),
         businessDomainId,
-        client_id
+        client_id,
       }),
     })
       .then(() => {
@@ -56,10 +56,11 @@ export default function SignUpPage() {
       >
         <h1 className="font-bold text-3xl mb-12">Sign up</h1>
 
-        <Input name="name" label="Username" required></Input>
+        <Input name="name" label="Username" size="sm" required></Input>
         <Input
           name="email"
           type="email"
+          size="sm"
           value={email}
           onChange={(e) => {
             setEmail(e.target.value);
@@ -67,48 +68,37 @@ export default function SignUpPage() {
           label="E-mail"
           required
         ></Input>
-        <PasswordInput
-          name="password"
-          label="Password"
-          required
-        />
+        <PasswordInput name="password" label="Password" size="sm" required />
         <Button
           className="w-full"
           color="primary"
           type="submit"
+          size="lg"
           disabled={loading}
           isLoading={loading}
         >
           Sign up
         </Button>
         <div className="w-1/2 border-b mx-auto mt-4" />
-        <div className="text-muted-foreground font-normal flex flex-col gap-3 items-center">
+        <div className="text-muted font-normal flex flex-col gap-3 items-center">
           <div className="text-center">
             By continuing with any of the options above, you agree to our{" "}
-            {tos_doc && <Link
-              underline="always"
-              isExternal
-              href={tos_doc}
-            >
-              Terms of Service
-            </Link>}{" "}
+            {tos_doc && (
+              <Link underline="always" isExternal href={tos_doc}>
+                Terms of Service
+              </Link>
+            )}{" "}
             and have read our{" "}
-           {pp_doc && <Link
-              underline="always"
-              isExternal
-              href={pp_doc}
-            >
-              Privacy Policy
-            </Link>}
+            {pp_doc && (
+              <Link underline="always" isExternal href={pp_doc}>
+                Privacy Policy
+              </Link>
+            )}
             .
           </div>
           <div className="flex gap-1 items-center">
             <span>Already have an account?</span>
-            <Link
-              href={`/?email=${encodeURIComponent(email)}`}
-              >
-              sign in
-            </Link>
+            <Link underline="always" href={`/?email=${encodeURIComponent(email)}`}>sign in</Link>
           </div>
         </div>
       </form>

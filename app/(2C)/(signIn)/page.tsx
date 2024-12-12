@@ -26,7 +26,8 @@ export default function Home() {
   const targetUrl = decodeURIComponent(searchParams.get("targetUrl") || "");
   const router = useRouter();
   const [callbackUrl, setCallbackUrl] = useState("");
-  const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc} = useClient();
+  const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc } =
+    useClient();
 
   // 根据是否是单点登录，判断登录后跳转的页面
   useEffect(() => {
@@ -79,8 +80,7 @@ export default function Home() {
                       ...user,
                       callbackUrl: `${callbackUrl}&userId=${user.sub}`,
                       businessDomainId,
-                    })
-                    .finally(() => {
+                    }).finally(() => {
                       setLoading(false);
                     });
                   })
@@ -93,6 +93,7 @@ export default function Home() {
                 name="email"
                 label="E-mail"
                 required
+                size="sm"
                 type="email"
                 value={email}
                 onChange={(e) => {
@@ -102,10 +103,11 @@ export default function Home() {
               <PasswordInput
                 name="password"
                 label="Password"
+                size="sm"
                 required
               />
 
-              <div className="flex justify-between">
+              <div className="flex justify-between mb-3">
                 <Link
                   showAnchorIcon
                   anchorIcon={
@@ -114,16 +116,18 @@ export default function Home() {
                       size={20}
                     />
                   }
-                  className="group"
+                  underline="always"
+                  className="group text-muted"
                   href={`/password/emailVerify?email=${encodeURIComponent(
                     email
                   )}`}
                 >
                   Forgot your password{" "}
                 </Link>
-                <div className="text-muted-foreground">
+                <div className="text-muted">
                   Not a member?{" "}
                   <Link
+                    underline="always"
                     href={`/signUp?email=${encodeURIComponent(email)}`}
                     isDisabled={loading || emailLoading}
                   >
@@ -135,6 +139,7 @@ export default function Home() {
               <Button
                 color="primary"
                 type="submit"
+                size="lg"
                 isLoading={loading}
                 disabled={emailLoading}
               >
@@ -142,15 +147,15 @@ export default function Home() {
               </Button>
             </form>
 
-            <div className="w-full flex items-center text-foreground-500">
-              <div className="bg-gradient-to-r from-transparent to-foreground-500/60 my-4 h-[1px] w-full" />
+            <div className="w-full flex items-center text-muted">
+              <div className="bg-muted my-4 h-[1px] w-full" />
               <span className="py-4 px-8 text-input text-sm">or</span>
-              <div className="bg-gradient-to-r from-foreground-500/60 to-transparent my-4 h-[1px] w-full" />
+              <div className="bg-muted my-4 h-[1px] w-full" />
             </div>
 
             <Button
               className="w-full"
-              radius="sm"
+              size="lg"
               onClick={() => signIn("google", { callbackUrl })}
             >
               <Image
@@ -194,6 +199,7 @@ export default function Home() {
                 required
                 label={"Enter email address for Magic Link Authentication"}
                 type="email"
+                size="sm"
                 value={jumpEmail}
                 onChange={(e) => {
                   setJumpEmail(e.target.value);
@@ -202,6 +208,7 @@ export default function Home() {
               <Button
                 color="primary"
                 type="submit"
+                size="lg"
                 isLoading={emailLoading}
                 isDisabled={loading}
               >

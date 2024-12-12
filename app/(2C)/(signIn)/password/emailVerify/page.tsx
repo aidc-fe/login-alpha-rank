@@ -62,6 +62,7 @@ export default function Page() {
           name="email"
           required
           label="E-mail"
+          size="sm"
           type="email"
           value={email}
           onChange={(e) => {
@@ -73,29 +74,33 @@ export default function Page() {
           name="password"
           required
           label="Password"
+          size="sm"
         />
 
         <PasswordInput
           name="check_password"
           required
           label="Re-enter password"
+          size="sm"
         />
         <Button
           className="group w-full"
           color="primary"
           type="submit"
+          size="lg"
           startContent={
-            <Send size={20} className="group-hover:rotate-45 duration-150" />
+            !loading && <Send size={20} className="group-hover:rotate-45 duration-150" />
           }
           isLoading={loading}
         >
           Send set instructions
         </Button>
         <div className="w-1/2 border-b mx-auto mt-4" />
-        <div className="flex items-center text-muted-foreground gap-2">
+        <div className="flex items-center text-muted gap-2">
           <span>Back to</span>
           <Link
-           href={`/?email=${encodeURIComponent(email)}`}
+           underline="always"
+            href={`/?email=${encodeURIComponent(email)}`}
             className="flex items-center gap-1 p-0 h-auto !bg-transparent w-auto min-w-0"
           >
             Sign in

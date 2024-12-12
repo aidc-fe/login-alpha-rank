@@ -67,9 +67,9 @@ export default function PasswordInput(props: Omit<InputProps, "type" | "endConte
       endContent={
         <button className="focus:outline-none" type="button" onClick={toggleVisibility} aria-label="toggle password visibility">
           {isVisible ? (
-            <EyeSlashFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+            <EyeSlashFilledIcon className="text-xl text-default-400 pointer-events-none" />
           ) : (
-            <EyeFilledIcon className="text-2xl text-default-400 pointer-events-none" />
+            <EyeFilledIcon className="text-xl text-default-400 pointer-events-none" />
           )}
         </button>
       }
