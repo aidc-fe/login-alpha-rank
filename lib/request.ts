@@ -12,9 +12,6 @@ export default function request(
     })
     .then((res) => {
       if (res.success) {
-        if (res.message && isBrowser) {
-          toast.success(res.message);
-        }
         return res.data;
       } else {
         if (res.message && isBrowser) {
