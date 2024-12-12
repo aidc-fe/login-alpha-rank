@@ -1,6 +1,6 @@
 "use client";
 
-import { Input, Button, Link } from "@nextui-org/react";
+import { Input, Button, Link, Spinner } from "@nextui-org/react";
 import request from "@/lib/request";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEventHandler, useState } from "react";
@@ -56,11 +56,10 @@ export default function SignUpPage() {
       >
         <h1 className="font-bold text-3xl mb-12">Sign up</h1>
 
-        <Input name="name" label="Username" size="sm" required></Input>
+        <Input name="name" label="Username" required></Input>
         <Input
           name="email"
           type="email"
-          size="sm"
           value={email}
           onChange={(e) => {
             setEmail(e.target.value);
@@ -68,11 +67,12 @@ export default function SignUpPage() {
           label="E-mail"
           required
         ></Input>
-        <PasswordInput name="password" label="Password" size="sm" required />
+        <PasswordInput name="password" label="Password" required />
         <Button
           className="w-full"
           color="primary"
           type="submit"
+          spinner={<Spinner color="default" size="sm" />}
           size="lg"
           disabled={loading}
           isLoading={loading}
@@ -98,7 +98,12 @@ export default function SignUpPage() {
           </div>
           <div className="flex gap-1 items-center">
             <span>Already have an account?</span>
-            <Link underline="always" href={`/?email=${encodeURIComponent(email)}`}>sign in</Link>
+            <Link
+              underline="always"
+              href={`/?email=${encodeURIComponent(email)}`}
+            >
+              sign in
+            </Link>
           </div>
         </div>
       </form>

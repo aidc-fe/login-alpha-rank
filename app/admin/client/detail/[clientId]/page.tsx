@@ -90,7 +90,7 @@ export default function ClientDetail({
               <div className="text-base text-foreground flex items-center">
                 Client Id
               </div>
-              <div className="text-sm leading-none text-muted-foreground break-all">
+              <div className="text-sm leading-none text-muted break-all">
                 <span className="leading-5">{details?.client_id}</span>
                 <CopyButton textToCopy={details?.client_id} />
               </div>
@@ -99,7 +99,7 @@ export default function ClientDetail({
               <div className="text-base text-foreground flex items-center">
                 Client Secret
               </div>
-              <div className="text-sm leading-none text-muted-foreground break-all">
+              <div className="text-sm leading-none text-muted break-all">
                 <span className="leading-5">{details?.client_secret}</span>
                 <CopyButton textToCopy={details?.client_secret} />
               </div>
@@ -108,7 +108,7 @@ export default function ClientDetail({
               <div className="text-base text-foreground flex items-center">
                 Create Time
               </div>
-              <div className="text-sm text-muted-foreground break-all">
+              <div className="text-sm text-muted break-all">
                 {dayjs(details?.created_at).format("YYYY-MM-DD HH:mm:ss")}
               </div>
             </div>
@@ -116,7 +116,7 @@ export default function ClientDetail({
               <div className="text-base text-foreground flex items-center">
                 Update Time
               </div>
-              <div className="text-sm text-muted-foreground break-all">
+              <div className="text-sm text-muted break-all">
                 {dayjs(details?.updated_at).format("YYYY-MM-DD HH:mm:ss")}
               </div>
             </div>

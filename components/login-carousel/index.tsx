@@ -21,7 +21,7 @@ export default function LoginCarousel({ className }: { className?: string }) {
             >
               <Image src={image} width={550} height={380} alt={title} />
               <div className="text-xl font-semibold mt-10">{title}</div>
-              <div className="mt-4 text-center text-muted-foreground max-w-3/5">
+              <div className="mt-4 text-center text-muted max-w-3/5">
                 {description}
               </div>
             </div>
