@@ -21,9 +21,9 @@ export default function RootLayout({
     // 检查是否在加载中
     if (status === 'loading') return;
 
-    // if (status === 'unauthenticated' || !whiteList.includes(session?.user?.email || '')) {
-    //   router.replace('/');
-    // }
+    if (status === 'unauthenticated' || !whiteList.includes(session?.user?.email || '')) {
+      router.replace('/');
+    }
   }, [status, session?.user?.email]);
 
   if (status === 'loading') {
