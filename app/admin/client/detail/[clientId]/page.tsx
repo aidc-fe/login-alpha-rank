@@ -11,13 +11,15 @@ import Loader from "@/components/ui/loader";
 import ClientForm, { FormMode } from "@/components/admin/ClientForm";
 import CopyButton from "@/components/CopyButton";
 import dayjs from "dayjs";
+import { useSearchParams } from "next/navigation";
 
 export default function ClientDetail({
   params: { clientId },
 }: {
   params: { clientId: string };
 }) {
-  const [mode, setMode] = useState<FormMode>("view");
+  const searchParams = useSearchParams();
+  const [mode, setMode] = useState<FormMode>(searchParams.get("mode") as FormMode || "view");
   const [loading, setLoading] = useState(true);
   const [details, setDetails] = useState<ClientDataType>();
 

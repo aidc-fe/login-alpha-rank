@@ -1,5 +1,5 @@
 "use client";
-import { Copy, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 
 import {
   Modal,
@@ -58,8 +58,8 @@ export default function List() {
     client_id,
     active,
   }: {
-    client_id?: string;
-    active?: boolean;
+    client_id: string;
+    active: boolean;
   } = currentData) => {
     setLoading(true);
 
@@ -158,7 +158,7 @@ export default function List() {
                   <TableCell>
                     <Link
                       className="p-1 text-primary hover:text-primary/90"
-                      href={`/admin/client/detail/${item.client_id}`}
+                      href={`/admin/client/detail/${item.client_id}?mode=edit`}
                     >
                       Edit
                     </Link>
