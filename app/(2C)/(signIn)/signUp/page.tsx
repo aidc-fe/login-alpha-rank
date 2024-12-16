@@ -1,9 +1,11 @@
 "use client";
 
 import { Input, Button, Link } from "@nextui-org/react";
+import Image from "next/image";
 import request from "@/lib/request";
+import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FormEventHandler, useState } from "react";
+import { FormEventHandler, useEffect, useState } from "react";
 import { useClient } from "@/providers/client-provider";
 import PasswordInput from "@/components/PasswordInput";
 
@@ -14,7 +16,24 @@ export default function SignUpPage() {
   const [email, setEmail] = useState(
     decodeURIComponent(searchParams.get("email") || "")
   );
-  const { businessDomainId, client_id, pp_doc, tos_doc } = useClient();
+  const targetUrl = decodeURIComponent(searchParams.get("targetUrl") || "");
+  const [callbackUrl, setCallbackUrl] = useState("");
+  const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc } = useClient();
+
+  // 根据是否是单点登录，判断登录后跳转的页面
+  useEffect(() => {
+    if (isSSO === undefined) {
+      return;
+    } else if (isSSO) {
+      setCallbackUrl(
+        `/login-landing-page?${targetUrl ? "targetUrl=" + targetUrl : ""}`
+      );
+    } else {
+      setCallbackUrl(
+        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}`
+      );
+    }
+  }, [isSSO]);
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
@@ -80,6 +99,26 @@ export default function SignUpPage() {
           isLoading={loading}
         >
           Sign up
+        </Button>
+
+        <div className="w-full flex items-center text-foreground-500">
+          <div className="bg-gradient-to-r from-transparent to-foreground-500/60 h-[1px] w-full" />
+          <span className="px-8 text-input text-sm">or</span>
+          <div className="bg-gradient-to-r from-foreground-500/60 to-transparent h-[1px] w-full" />
+        </div>
+
+        <Button
+          className="w-full"
+          radius="sm"
+          onClick={() => signIn("google", { callbackUrl })}
+        >
+          <Image
+            height="24"
+            width="24"
+            alt="provider-logo-dark"
+            src="https://authjs.dev/img/providers/google.svg"
+          ></Image>
+          Google
         </Button>
         <div className="w-1/2 border-b mx-auto mt-4" />
         <div className="text-muted-foreground font-normal flex flex-col gap-3 items-center">
