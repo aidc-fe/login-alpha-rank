@@ -19,7 +19,7 @@ export default function EmailSent() {
   }, [searchParams]);
 
   return (
-    <div className="bg-muted h-screen w-screen flex items-center justify-center">
+    <div className="bg-default-100 h-screen w-screen flex items-center justify-center">
       <div className="bg-white rounded-lg w-5/6 md:w-3/5 shadow-lg p-10">
         <div className="grid grid-cols-[auto,1fr] grid-rows-2">
           <h1 className="md:text-2xl font-medium">
