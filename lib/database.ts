@@ -52,6 +52,39 @@ export const getUser = async (search: { email?: string; businessDomainId?: strin
   }
 };
 
+// 校验用户是否存在
+export const isUserExist = async (search: { 
+  email?: string; 
+  businessDomainId?: string; 
+  id?: string 
+}): Promise<boolean> => {
+  try {
+    if ((!search.email || !search.businessDomainId) && !search.id) {
+      throw new Error("You must provide either an email and businessDomainId or an id to search for a user.");
+    }
+
+    // 因为该方法只需要判断是否存在user，使用count方法性能会更好
+    const count = await prisma.user.count({
+      where: {
+        OR: [
+          { 
+            AND: [
+              { email: search.email },
+              { businessDomainId: search.businessDomainId }
+            ]
+          },
+          { id: search.id }
+        ]
+      }
+    });
+
+    return count > 0;
+  } catch (error) {
+    console.error("Error fetching user:", error);
+    throw new Error("Failed to fetch user. Please try again later.");
+  }
+}
+
 // 新建或更新一条用户信息
 export const createOrUpdateUser = async (data: {
   name?: string;
