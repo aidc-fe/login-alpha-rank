@@ -2,7 +2,7 @@ import { ERROR_CONFIG } from "@/lib/errors";
 import {
   createVerificationToken,
   findClientByClientId,
-  getUser,
+  isUserExist,
 } from "@/lib/database";
 import { sendVerificationEmail } from "@/lib/email";
 import { formateError, formatSuccess } from "@/lib/request";
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
 
   try {
     // 检查用户是否存在
-    const existingUser = await getUser({ email, businessDomainId });
+    const existingUser = await isUserExist({ email, businessDomainId });
     if (!existingUser) {
       return NextResponse.json(formateError(ERROR_CONFIG.AUTH.USER_NOT_EXIST));
     }

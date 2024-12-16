@@ -424,8 +424,19 @@ export const getBusinessDomainIdByAuthDomain = async () => {
       throw new Error("Host not found");
     }
 
-    const client = await getClientByAuthDomain(host);
-    return client.businessDomainId;
+    // 使用select只查询需要字段达到一定的查询优化
+    const businessDomainId = await prisma.client.findFirst({
+      where: {
+        auth_domain: host,
+      },
+      select: {
+        businessDomainId: true,
+      }
+    }).then(client => {
+      return client?.businessDomainId ?? null;
+    });
+
+    return businessDomainId;
   } catch (error) {
     console.error("Error fetching businessDomainId by auth_domain:", error);
     throw error;
@@ -437,15 +448,26 @@ export const getUserIdByEmail = async (email: string) => {
   try {
     const businessDomainId = await getBusinessDomainIdByAuthDomain();
 
-    const user = await prisma.user.findUnique({
+    if (!businessDomainId) {
+      throw new Error("Business domain not found");
+    }
+
+    // 使用select只查询需要字段达到一定的查询优化
+    const userId = await prisma.user.findUnique({
       where: {
         email_businessDomainId: {
           email,
           businessDomainId: businessDomainId || '',
         },
       },
+      select: {
+        id: true,
+      }
+    }).then(user => {
+      return user?.id ?? null;
     });
-    return user?.id;
+
+    return userId;
   } catch (error) {
     throw error;
   }
