@@ -143,9 +143,9 @@ export default function Home() {
             </form>
 
             <div className="w-full flex items-center text-muted">
-              <div className="bg-muted my-4 h-[1px] w-full" />
+              <div className="bg-muted/60 my-4 h-[1px] w-full" />
               <span className="py-4 px-8 text-input text-sm">or</span>
-              <div className="bg-muted my-4 h-[1px] w-full" />
+              <div className="bg-muted/60 my-4 h-[1px] w-full" />
             </div>
 
             <Button
