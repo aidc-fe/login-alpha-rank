@@ -13,10 +13,6 @@ export default function SignOutPage() {
   const { isSSO } = useClient();
 
   useEffect(() => {
-    console.log("status", {
-      status,
-      isSSO,
-    });
     if (status === "authenticated") {
       if (isSSO) {
         // 登出并清除登录态
