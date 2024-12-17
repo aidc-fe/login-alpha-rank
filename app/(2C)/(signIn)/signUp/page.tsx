@@ -51,7 +51,9 @@ export default function SignUpPage() {
         name,
         email,
         password,
-        targetUrl: searchParams.get("targetUrl"),
+        targetUrl:isSSO
+        ? `/login-landing-page?targetUrl=${searchParams.get("targetUrl")}`
+        : `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}`,
         businessDomainId,
         client_id,
       }),
