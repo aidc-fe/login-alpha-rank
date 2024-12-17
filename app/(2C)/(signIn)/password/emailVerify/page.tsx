@@ -4,7 +4,7 @@ import request from "@/lib/request";
 import { Send } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEventHandler, useState } from "react";
-import { Input, Button, Link } from "@nextui-org/react";
+import { Input, Button, Link, Spinner } from "@nextui-org/react";
 import { useClient } from "@/providers/client-provider";
 import PasswordInput from "@/components/PasswordInput";
 import { toast } from "react-toastify";
@@ -84,19 +84,21 @@ export default function Page() {
           className="group w-full"
           color="primary"
           type="submit"
+          size="lg"
+          spinner={<Spinner color="default" size="sm" />}
           startContent={
-            <Send size={20} className="group-hover:rotate-45 duration-150" />
+            !loading && <Send size={20} className="group-hover:rotate-45 duration-150" />
           }
           isLoading={loading}
         >
           Send set instructions
         </Button>
         <div className="w-1/2 border-b mx-auto mt-4" />
-        <div className="flex items-center text-muted-foreground gap-2">
+        <div className="flex items-center text-muted gap-2">
           <span>Back to</span>
           <Link
-           href={`/?email=${encodeURIComponent(email)}`}
-            className="flex items-center gap-1 p-0 h-auto !bg-transparent w-auto min-w-0"
+            underline="always"
+            href={`/?email=${encodeURIComponent(email)}`}
           >
             Sign in
           </Link>

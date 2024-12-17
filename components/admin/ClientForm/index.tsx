@@ -416,7 +416,7 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
               ))}
             </CheckboxGroup>
           ) : (
-            <div className="text-sm text-muted-foreground leading-10">
+            <div className="text-sm text-muted leading-10">
               {initialData?.scope?.join(", ")}
             </div>
           )}

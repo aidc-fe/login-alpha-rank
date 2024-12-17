@@ -3,7 +3,7 @@
 import request from "@/lib/request";
 import { ArrowUpRight } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
-import { Button, Input, Link } from "@nextui-org/react";
+import { Button, Input, Link, Spinner } from "@nextui-org/react";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -26,7 +26,8 @@ export default function Home() {
   const targetUrl = decodeURIComponent(searchParams.get("targetUrl") || "");
   const router = useRouter();
   const [callbackUrl, setCallbackUrl] = useState("");
-  const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc} = useClient();
+  const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc } =
+    useClient();
 
   // 根据是否是单点登录，判断登录后跳转的页面
   useEffect(() => {
@@ -79,8 +80,7 @@ export default function Home() {
                       ...user,
                       callbackUrl: `${callbackUrl}&userId=${user.sub}`,
                       businessDomainId,
-                    })
-                    .finally(() => {
+                    }).finally(() => {
                       setLoading(false);
                     });
                   })
@@ -99,13 +99,9 @@ export default function Home() {
                   setEmail(e.target.value);
                 }}
               />
-              <PasswordInput
-                name="password"
-                label="Password"
-                required
-              />
+              <PasswordInput name="password" label="Password" required />
 
-              <div className="flex justify-between">
+              <div className="flex justify-between mb-3">
                 <Link
                   showAnchorIcon
                   anchorIcon={
@@ -114,16 +110,18 @@ export default function Home() {
                       size={20}
                     />
                   }
-                  className="group"
+                  underline="always"
+                  className="group text-muted"
                   href={`/password/emailVerify?email=${encodeURIComponent(
                     email
                   )}`}
                 >
                   Forgot your password{" "}
                 </Link>
-                <div className="text-muted-foreground">
+                <div className="text-muted">
                   Not a member?{" "}
                   <Link
+                    underline="always"
                     href={`/signUp?email=${encodeURIComponent(email)}`}
                     isDisabled={loading || emailLoading}
                   >
@@ -135,6 +133,8 @@ export default function Home() {
               <Button
                 color="primary"
                 type="submit"
+                size="lg"
+                spinner={<Spinner color="default" size="sm" />}
                 isLoading={loading}
                 disabled={emailLoading}
               >
@@ -142,15 +142,15 @@ export default function Home() {
               </Button>
             </form>
 
-            <div className="w-full flex items-center text-foreground-500">
-              <div className="bg-gradient-to-r from-transparent to-foreground-500/60 my-4 h-[1px] w-full" />
+            <div className="w-full flex items-center text-muted">
+              <div className="bg-muted/60 my-4 h-[1px] w-full" />
               <span className="py-4 px-8 text-input text-sm">or</span>
-              <div className="bg-gradient-to-r from-foreground-500/60 to-transparent my-4 h-[1px] w-full" />
+              <div className="bg-muted/60 my-4 h-[1px] w-full" />
             </div>
 
             <Button
               className="w-full"
-              radius="sm"
+              size="lg"
               onClick={() => signIn("google", { callbackUrl })}
             >
               <Image
@@ -202,6 +202,8 @@ export default function Home() {
               <Button
                 color="primary"
                 type="submit"
+                size="lg"
+                spinner={<Spinner color="default" size="sm" />}
                 isLoading={emailLoading}
                 isDisabled={loading}
               >

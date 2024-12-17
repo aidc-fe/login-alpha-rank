@@ -170,7 +170,7 @@ export default function BusinessDomainDetail({
                   <div className="text-base text-foreground flex items-center">
                     Business Domain Id
                   </div>
-                  <div className="text-sm leading-none text-muted-foreground break-all">
+                  <div className="text-sm leading-none text-muted break-all">
                     <span className="leading-5">{data?.id}</span>
                     <CopyButton textToCopy={data?.id} />
                   </div>
@@ -179,7 +179,7 @@ export default function BusinessDomainDetail({
                   <div className="text-base text-foreground flex items-center">
                     Create Time
                   </div>
-                  <div className="text-sm text-muted-foreground break-all">
+                  <div className="text-sm text-muted break-all">
                     {dayjs(data?.created_at).format("YYYY-MM-DD HH:mm:ss")}
                   </div>
                 </div>
@@ -187,7 +187,7 @@ export default function BusinessDomainDetail({
                   <div className="text-base text-foreground flex items-center">
                     Update Time
                   </div>
-                  <div className="text-sm text-muted-foreground break-all">
+                  <div className="text-sm text-muted break-all">
                     {dayjs(data?.updated_at).format("YYYY-MM-DD HH:mm:ss")}
                   </div>
                 </div>

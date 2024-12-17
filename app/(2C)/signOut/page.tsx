@@ -14,12 +14,12 @@ export default function SignOutPage() {
 
   useEffect(() => {
     if (status === "authenticated") {
-      if(isSSO){
+      if (isSSO) {
         // 登出并清除登录态
         thirdPartySignOut().then(() => {
           signOut();
         });
-      }else{
+      } else {
         signOut();
       }
     } else if (status === "unauthenticated") {

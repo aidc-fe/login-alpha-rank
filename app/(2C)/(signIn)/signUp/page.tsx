@@ -1,9 +1,11 @@
 "use client";
 
-import { Input, Button, Link } from "@nextui-org/react";
+import { Input, Button, Link, Spinner } from "@nextui-org/react";
+import Image from "next/image";
 import request from "@/lib/request";
+import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FormEventHandler, useState } from "react";
+import { FormEventHandler, useEffect, useState } from "react";
 import { useClient } from "@/providers/client-provider";
 import PasswordInput from "@/components/PasswordInput";
 
@@ -14,7 +16,25 @@ export default function SignUpPage() {
   const [email, setEmail] = useState(
     decodeURIComponent(searchParams.get("email") || "")
   );
-  const { businessDomainId, client_id, pp_doc, tos_doc } = useClient();
+  const targetUrl = decodeURIComponent(searchParams.get("targetUrl") || "");
+  const [callbackUrl, setCallbackUrl] = useState("");
+  const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc } =
+    useClient();
+
+  // 根据是否是单点登录，判断登录后跳转的页面
+  useEffect(() => {
+    if (isSSO === undefined) {
+      return;
+    } else if (isSSO) {
+      setCallbackUrl(
+        `/login-landing-page?${targetUrl ? "targetUrl=" + targetUrl : ""}`
+      );
+    } else {
+      setCallbackUrl(
+        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}`
+      );
+    }
+  }, [isSSO]);
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
@@ -33,7 +53,7 @@ export default function SignUpPage() {
         password,
         targetUrl: searchParams.get("targetUrl"),
         businessDomainId,
-        client_id
+        client_id,
       }),
     })
       .then(() => {
@@ -67,46 +87,59 @@ export default function SignUpPage() {
           label="E-mail"
           required
         ></Input>
-        <PasswordInput
-          name="password"
-          label="Password"
-          required
-        />
+        <PasswordInput name="password" label="Password" required />
         <Button
           className="w-full"
           color="primary"
           type="submit"
+          spinner={<Spinner color="default" size="sm" />}
+          size="lg"
           disabled={loading}
           isLoading={loading}
         >
           Sign up
         </Button>
+        <div className="w-full flex items-center text-muted">
+          <div className="bg-muted/60 my-4 h-[1px] w-full" />
+          <span className="py-4 px-8 text-input text-sm">or</span>
+          <div className="bg-muted/60 my-4 h-[1px] w-full" />
+        </div>
+        <Button
+          className="w-full"
+          size="lg"
+          onClick={() => signIn("google", { callbackUrl })}
+        >
+          <Image
+            height="24"
+            width="24"
+            alt="provider-logo-dark"
+            src="https://authjs.dev/img/providers/google.svg"
+          ></Image>
+          Google
+        </Button>
         <div className="w-1/2 border-b mx-auto mt-4" />
-        <div className="text-muted-foreground font-normal flex flex-col gap-3 items-center">
+        <div className="text-muted font-normal flex flex-col gap-3 items-center">
           <div className="text-center">
             By continuing with any of the options above, you agree to our{" "}
-            {tos_doc && <Link
-              underline="always"
-              isExternal
-              href={tos_doc}
-            >
-              Terms of Service
-            </Link>}{" "}
+            {tos_doc && (
+              <Link underline="always" isExternal href={tos_doc}>
+                Terms of Service
+              </Link>
+            )}{" "}
             and have read our{" "}
-           {pp_doc && <Link
-              underline="always"
-              isExternal
-              href={pp_doc}
-            >
-              Privacy Policy
-            </Link>}
+            {pp_doc && (
+              <Link underline="always" isExternal href={pp_doc}>
+                Privacy Policy
+              </Link>
+            )}
             .
           </div>
           <div className="flex gap-1 items-center">
             <span>Already have an account?</span>
             <Link
+              underline="always"
               href={`/?email=${encodeURIComponent(email)}`}
-              >
+            >
               sign in
             </Link>
           </div>
