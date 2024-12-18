@@ -186,6 +186,7 @@ export const createVerificationToken = async (info: {
   name?: string;
   password?: string;
   targetUrl?: string;
+  businessDomainId?: string;
   type: "signUp" | "signIn" | "passwordSet";
 }) => {
   try {

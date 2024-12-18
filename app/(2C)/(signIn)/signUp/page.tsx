@@ -51,7 +51,9 @@ export default function SignUpPage() {
         name,
         email,
         password,
-        targetUrl: searchParams.get("targetUrl"),
+        targetUrl:isSSO
+        ? `/login-landing-page?targetUrl=${searchParams.get("targetUrl")}`
+        : `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}`,
         businessDomainId,
         client_id,
       }),
@@ -100,9 +102,9 @@ export default function SignUpPage() {
           Sign up
         </Button>
         <div className="w-full flex items-center text-muted">
-          <div className="bg-muted/60 my-4 h-[1px] w-full" />
-          <span className="py-4 px-8 text-input text-sm">or</span>
-          <div className="bg-muted/60 my-4 h-[1px] w-full" />
+          <div className="bg-muted/60 h-[1px] w-full" />
+          <span className="px-8 text-input text-sm">or</span>
+          <div className="bg-muted/60 h-[1px] w-full" />
         </div>
         <Button
           className="w-full"
