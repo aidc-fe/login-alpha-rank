@@ -2,9 +2,9 @@
 
 import { useContext, useEffect } from "react";
 import { createContext } from "react";
-import { Client } from "@prisma/client";
+import { ClientDataType } from "@/lib/admin";
 
-type ClientWithBusinessDomainType = Client & {  
+type ClientWithBusinessDomainType = ClientDataType & {  
   isSSO: boolean;
   materials: {image:string,title:string,description:string}[];
 };
