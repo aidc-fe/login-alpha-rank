@@ -32,9 +32,10 @@ export async function POST(request: NextRequest) {
         name: userInfo?.name,
         password: userInfo?.password, // 可选
         targetUrl: userInfo?.targetUrl,
+        businessDomainId: userInfo?.businessDomainId,
         type: "signUp", // 可选
       });
-      const verificationLink = `${baseUrl}/api/signUp/email/verify?token=${newToken.token}&businessDomainId=${userInfo?.businessDomainId}`;
+      const verificationLink = `${baseUrl}/api/signUp/email/verify?token=${newToken.token}`;
       const client = await findClientByClientId(userInfo?.client_id);
 
       // 发送验证邮件
