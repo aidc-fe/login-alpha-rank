@@ -24,8 +24,9 @@ export async function POST(request: NextRequest) {
       identifier: email, // 你需要的 identifier
       password,
       type: "passwordSet", // 可选
+      businessDomainId
     });
-    const verificationLink = `${baseUrl}/api/password/set?token=${newToken.token}&businessDomainId=${businessDomainId}`;
+    const verificationLink = `${baseUrl}/api/password/set?token=${newToken.token}`;
     const client = await findClientByClientId(client_id);
 
     // 发送验证邮件

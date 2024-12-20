@@ -55,14 +55,15 @@ model Session {
 }
 
 model VerificationToken {
-  identifier String
-  token      String    @unique
-  expires    DateTime
-  name       String?
-  password   String?
-  type       String?
-  used       DateTime?
-  targetUrl  String?
+  identifier       String
+  token            String    @unique
+  expires          DateTime
+  name             String?
+  password         String?
+  type             String?
+  used             DateTime?
+  targetUrl        String?
+  businessDomainId String?   @db.VarChar(255)
 
   @@unique([identifier, token])
 }
