@@ -7,6 +7,7 @@ import { ClientDataType } from "@/lib/admin";
 type ClientWithBusinessDomainType = ClientDataType & {  
   isSSO: boolean;
   materials: {image:string,title:string,description:string}[];
+  url: string;
 };
 
 const ClientContext = createContext<ClientWithBusinessDomainType | undefined>(undefined);
