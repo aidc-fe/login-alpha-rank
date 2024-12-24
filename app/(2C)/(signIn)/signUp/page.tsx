@@ -18,7 +18,7 @@ export default function SignUpPage() {
   );
   const targetUrl = decodeURIComponent(searchParams.get("targetUrl") || "");
   const [callbackUrl, setCallbackUrl] = useState("");
-  const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc } =
+  const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc, url } =
     useClient();
 
   // 根据是否是单点登录，判断登录后跳转的页面
@@ -35,6 +35,20 @@ export default function SignUpPage() {
       );
     }
   }, [isSSO]);
+
+  useEffect(() => {
+    
+    // 查找或创建 canonical link 标签
+    let link = document.querySelector("link[rel='canonical']");
+    if (!link) {
+      link = document.createElement('link');
+      link.setAttribute('rel', 'canonical');
+      document.head.appendChild(link);
+    }
+    
+    // 更新 canonical URL
+    link.setAttribute('href', `${url}/signUp`);
+  }, []); // 空数组表示只有在组件挂载时运行一次
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
