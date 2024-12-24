@@ -7,6 +7,7 @@ import { Client } from "@prisma/client";
 type ClientWithBusinessDomainType = Client & {  
   isSSO: boolean;
   materials: {image:string,title:string,description:string}[];
+  url: string;
 };
 
 const ClientContext = createContext<ClientWithBusinessDomainType | undefined>(undefined);
