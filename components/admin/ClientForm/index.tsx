@@ -2,7 +2,7 @@
 
 import { Plus, Trash2 } from "lucide-react";
 import { FormEventHandler, useEffect, useState } from "react";
-import { scopeOptions, BusinessDomainDataType, ClientDataType } from "@/lib/admin";
+import { scopeOptions, BusinessDomainDataType, ClientDataType, authMethodOptions } from "@/lib/admin";
 import { cn } from "@/lib/utils";
 import request from "@/lib/request";
 import {
@@ -95,12 +95,14 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
       mail_server_user: formData.get("mail_server_user"),
       mail_server_password: formData.get("mail_server_password"),
       mail_template_image: formData.get("mail_template_image"),
+      login_methods: formData.getAll("login_methods"),
       materials,
       scope,
       redirect_uris,
     };
 
     try {
+      // console.log(params);
       await onSubmit(params);
     } finally {
       setLoading(false);
@@ -398,6 +400,29 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
           pattern="^(https?|ftp)://.+"
           defaultValue={initialData?.pp_doc || ''}
         />
+
+        <div className="flex flex-col gap-2">
+          <label className="text-sm">Login Methods:</label>
+          {!isReadOnly ? (
+            <CheckboxGroup
+              name="login_methods"
+              orientation="horizontal"
+              defaultValue={initialData?.login_methods ?? []}
+            >
+              {authMethodOptions.map((item) => (
+                <div className="inline-flex items-center gap-2" key={item.value}>
+                  <Checkbox id={item.value} value={item.value}>
+                    {item.label}
+                  </Checkbox>
+                </div>
+              ))}
+            </CheckboxGroup>
+          ) : (
+            <div className="text-sm text-muted leading-10">
+              {initialData?.login_methods?.join(", ")}
+            </div>
+          )}
+        </div>
 
         <div className="flex flex-col gap-2">
           <label className="text-sm">Scope:</label>
