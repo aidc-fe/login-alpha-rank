@@ -12,6 +12,12 @@ export enum SCOPE_OPTION {
   SHOPLAZZA = "shoplazza",
 }
 
+export enum AUTH_METHOD {
+  EMAIL = "MAGIC_LINK",
+  PASSWORD = "ACCOUNT_PASSWORD",
+  GOOGLE = "GOOGLE_OAUTH",
+}
+
 export const scopeOptions = [
   SCOPE_OPTION.EMAIL,
   SCOPE_OPTION.OPENID,
@@ -19,6 +25,21 @@ export const scopeOptions = [
   SCOPE_OPTION.SHOPIFY,
   SCOPE_OPTION.SHOPLAZZA,
 ]; //允许的权限范围。
+
+export const authMethodOptions = [
+  {
+    label: 'Magic Link',
+    value: AUTH_METHOD.EMAIL,
+  },
+  {
+    label: 'Account Password',
+    value: AUTH_METHOD.PASSWORD,
+  },
+  {
+    label: 'Google OAuth',
+    value: AUTH_METHOD.GOOGLE,
+  },
+]; //允许的登录方式
 
 export type ClientDataType = {
   businessDomainId:string;
@@ -50,6 +71,7 @@ export type ClientDataType = {
   mail_server_user: string;
   mail_server_password: string;
   mail_template_image?: string;
+  login_methods: string[];
 }
 
 export type BusinessDomainDataType = {
