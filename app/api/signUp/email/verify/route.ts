@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
       password: info.password!,
       email: info.identifier,
       name: info.name!,
-      businessDomainId: info.businessDomainId,
+      businessDomainId: info.businessDomainId || '',
     };
     const user = await createOrUpdateUser(userInfo);
 

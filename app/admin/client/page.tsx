@@ -56,7 +56,7 @@ export default function List() {
 
   const handleConfirm = ({
     client_id,
-    active,
+    active = false,
   }: {
     client_id?: string;
     active?: boolean;

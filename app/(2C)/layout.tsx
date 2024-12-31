@@ -23,8 +23,14 @@ async function getClient() {
     throw new Error("Hostname not found");
   }
   const client = await getClientWithCache(hostname);
+
+  if (!client?.businessDomainId) {
+    throw new Error("Client not found");
+  }
+
   const businessDomain = await getBusinessDomainWithCache(client.businessDomainId);
-  return { ...client, isSSO: businessDomain.sso };
+
+  return { ...client, isSSO: businessDomain.sso, url: `https://${hostname}` };
 }
 
 export async function generateMetadata() {
@@ -34,6 +40,9 @@ export async function generateMetadata() {
     description: client.description || '',
     icons: {
       icon: client.favicon || '',
+    },
+    alternates: {
+      canonical: client.url,
     },
   };
 }
