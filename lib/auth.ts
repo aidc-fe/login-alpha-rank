@@ -21,7 +21,7 @@ export function thirdPartySignIn(jwt: string, shopDomain?: string | null) {
       credentials: "include", // 确保 cookie 被发送
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${jwt}` ?? "",
+        Authorization: `Bearer ${jwt}`,
       },
       body: JSON.stringify({
         shopifyShopDomain: shopDomain,
