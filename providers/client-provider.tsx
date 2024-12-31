@@ -5,7 +5,7 @@ import { createContext } from "react";
 import { ClientDataType } from "@/lib/admin";
 
 type ClientWithBusinessDomainType = ClientDataType & {  
-  isSSO: boolean;
+  isSSO: boolean | null;
   materials: {image:string,title:string,description:string}[];
   url: string;
 };
