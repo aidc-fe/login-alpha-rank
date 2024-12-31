@@ -24,7 +24,7 @@ async function getClient() {
   }
   const client = await getClientWithCache(hostname);
   const businessDomain = await getBusinessDomainWithCache(client.businessDomainId);
-  return { ...client, isSSO: businessDomain.sso };
+  return { ...client, isSSO: businessDomain.sso, url: `https://${hostname}` };
 }
 
 export async function generateMetadata() {
@@ -34,6 +34,9 @@ export async function generateMetadata() {
     description: client.description || '',
     icons: {
       icon: client.favicon || '',
+    },
+    alternates: {
+      canonical: client.url,
     },
   };
 }
