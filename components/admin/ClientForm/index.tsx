@@ -155,7 +155,7 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
           name="title"
           label="Title"
           isReadOnly={isReadOnly}
-          defaultValue={initialData?.title}
+          defaultValue={initialData?.title || ''}
         />
 
         <Input
@@ -163,7 +163,7 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
           label="Favicon"
           required
           isReadOnly={isReadOnly}
-          defaultValue={initialData?.favicon}
+          defaultValue={initialData?.favicon || ''}
         />
 
         <div className="flex w-full items-center gap-2">
@@ -230,7 +230,7 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
               name="mail_template_image"
               label="Email Template Image"
               isReadOnly={isReadOnly}
-              defaultValue={initialData?.mail_template_image}
+              defaultValue={initialData?.mail_template_image || ''}
             />
           </div>
         </div>
@@ -389,7 +389,7 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
           isReadOnly={isReadOnly}
           type="url"
           pattern="^(https?|ftp)://.+"
-          defaultValue={initialData?.tos_doc}
+          defaultValue={initialData?.tos_doc || ''}
         />
 
         <Input
@@ -398,7 +398,7 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
           isReadOnly={isReadOnly}
           type="url"
           pattern="^(https?|ftp)://.+"
-          defaultValue={initialData?.pp_doc}
+          defaultValue={initialData?.pp_doc || ''}
         />
 
         <div className="flex flex-col gap-2">
