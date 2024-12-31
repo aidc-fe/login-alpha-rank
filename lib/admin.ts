@@ -1,3 +1,5 @@
+import { Client } from "@prisma/client";
+
 export enum OPERATION_TYPE {
   CREATE = "add",
   EDIT = "update",
@@ -41,37 +43,14 @@ export const authMethodOptions = [
   },
 ]; //允许的登录方式
 
-export type ClientDataType = {
-  businessDomainId:string;
-  active?: boolean;
-  title?: string;
-  favicon?: string;
-  client_id?: string;
-  client_secret?: string;
-  created_at?: string;
-  description: string;
-  grant_types?: string;
-  name: string;
-  owner_email: string;
+export type ClientDataType = Omit<Client, "materials" | "redirect_uris" | "scope"> & {
   redirect_uris: string[];
-  scope: string[];
-  signout_uri: string;
-  updated_at?: string;
-  auth_domain: string;
-  brand_color?: string;
   materials?: {
     description: string;
     title: string;
     image: string;
   }[];
-  tos_doc?: string;
-  pp_doc?: string;
-  mail_server_host: string;
-  mail_server_port: string;
-  mail_server_user: string;
-  mail_server_password: string;
-  mail_template_image?: string;
-  login_methods: string[];
+  scope: string[];
 }
 
 export type BusinessDomainDataType = {
