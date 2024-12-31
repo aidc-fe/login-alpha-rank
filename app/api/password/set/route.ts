@@ -9,11 +9,10 @@ export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get("token");
 
   const newToken = await validateMagicLink(token || "");
-
   
   await updateUserByEmail(newToken.identifier, {
     password: newToken.password!,
-    businessDomainId: newToken.businessDomainId,
+    businessDomainId: newToken.businessDomainId || '',
   });
   return NextResponse.redirect(baseUrl, {
     status: 302,
