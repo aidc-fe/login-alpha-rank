@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "dotenv -e .env.development.local -- next dev",
+    "dev.prod": "dotenv -e .env.production.local -- next dev",
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",

@@ -4,6 +4,7 @@ import EmailProvider from "next-auth/providers/email";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import {
+  createOrUpdateAccount,
   getBusinessDomainIdByAuthDomain,
   getCurrentServerClient,
   getUserIdByEmail,
@@ -71,6 +72,48 @@ export const authOptions: NextAuthOptions = {
   },
 
   callbacks: {
+    async signIn({ user, account }) {
+      
+      if (account?.provider === 'google') {
+        // 首先确保用户存在
+        const businessDomainId = await getBusinessDomainIdByAuthDomain();
+
+        // 查找或创建用户
+        const dbUser = await prisma.user.upsert({
+          where: {
+            email_businessDomainId: {
+              email: user.email!,
+              businessDomainId: businessDomainId || '',
+            }
+          },
+          create: {
+            email: user.email!,
+            name: user.name!,
+            image: user.image,
+            businessDomainId: businessDomainId || '',
+          },
+          update: {
+            emailVerified: new Date(),
+          }
+        });
+
+        // 然后再处理账户关联
+        const existingAccount = await prisma.account.findFirst({
+          where: {
+            providerAccountId: account.providerAccountId,
+          },
+        });
+
+        if (!existingAccount) {
+          await createOrUpdateAccount({
+            userId: dbUser.id,  // 使用确认存在的用户ID
+            ...account
+          });
+        }
+      }
+
+      return true;
+    },
     async session({ session, token }) {
       return { ...session, jwtToken: token?.jwtToken, id: token?.sub };
     },
