@@ -14,10 +14,11 @@ export default function GetAuthPage() {
   const router = useRouter();
   const { businessDomainId, auth_domain } = useClient();
 
-  const websiteDomain =
+  const websiteDomain = `https://${
     process.env.NEXT_PUBLIC_ENV === "production"
       ? ""
-      : `https://${replaceDomain(auth_domain)}`;
+      : replaceDomain(auth_domain)
+  }`;
 
   // 如果不是在iframe中，禁止访问
   useEffect(() => {
