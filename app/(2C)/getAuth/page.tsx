@@ -20,10 +20,6 @@ export default function GetAuthPage() {
       : replaceDomain(auth_domain)
   }`;
 
-  const sendMessageToParent = async () => {
-    window.parent.postMessage({ status, userInfo: data?.user, session: data }, websiteDomain);
-  }
-
   // 如果不是在iframe中，禁止访问
   useEffect(() => {
     if (window.top === window.self) {
@@ -33,8 +29,8 @@ export default function GetAuthPage() {
 
   useEffect(() => {
     // 向父页面发送 status
-    sendMessageToParent();
-  }, [status, data, sendMessageToParent]);
+    window.parent.postMessage({ status, userInfo: data?.user, session: data }, websiteDomain);
+  }, [status, data]);
 
   useEffect(() => {
     if (window.top === window.self) {
