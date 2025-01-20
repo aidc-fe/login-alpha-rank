@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { useClient } from "@/providers/client-provider";
 
 function replaceDomain(authDomain: string) {
-  return authDomain.replace("pre-login", "pre-www");
+  return authDomain.replace("login", "www");
 }
 
 export default function GetAuthPage() {
@@ -14,11 +14,7 @@ export default function GetAuthPage() {
   const router = useRouter();
   const { businessDomainId, auth_domain } = useClient();
 
-  const websiteDomain = `https://${
-    process.env.NEXT_PUBLIC_ENV === "production"
-      ? ""
-      : replaceDomain(auth_domain)
-  }`;
+  const websiteDomain = `https://${replaceDomain(auth_domain)}`;
 
   // 如果不是在iframe中，禁止访问
   useEffect(() => {
