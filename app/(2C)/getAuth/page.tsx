@@ -3,14 +3,23 @@
 import { signIn, useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { WEBSITE_DOMAIN } from "@/lib/url";
 import { useClient } from "@/providers/client-provider";
+
+function replaceDomain(authDomain: string) {
+  return authDomain.replace("pre-login", "pre-www");
+}
 
 export default function GetAuthPage() {
   const { status, data } = useSession();
   const router = useRouter();
-  const { businessDomainId } = useClient();
-  
+  const { businessDomainId, auth_domain } = useClient();
+
+  const websiteDomain = `https://${
+    process.env.NEXT_PUBLIC_ENV === "production"
+      ? ""
+      : replaceDomain(auth_domain)
+  }`;
+
   // 如果不是在iframe中，禁止访问
   useEffect(() => {
     if (window.top === window.self) {
@@ -20,7 +29,7 @@ export default function GetAuthPage() {
 
   useEffect(() => {
     // 向父页面发送 status
-    window.parent.postMessage({ status, userInfo: data?.user }, WEBSITE_DOMAIN);
+    window.parent.postMessage({ status, userInfo: data?.user, session: data }, websiteDomain);
   }, [status, data]);
 
   useEffect(() => {
@@ -30,11 +39,11 @@ export default function GetAuthPage() {
 
     const handleMessage = (event: MessageEvent) => {
       // 检查来源，确保安全
-      if (!event.origin.includes(WEBSITE_DOMAIN)) {
+      if (!event.origin.includes(websiteDomain)) {
         return;
       }
       // 接收到信息，外面的button置为 loading
-      window.parent.postMessage({ status: "loading" }, WEBSITE_DOMAIN);
+      window.parent.postMessage({ status: "loading" }, websiteDomain);
 
       // 接收用户信息，并且进行登录
       signIn("thirdParty", {
