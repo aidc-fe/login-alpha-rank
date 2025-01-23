@@ -23,12 +23,14 @@ export default function Home() {
   const [email, setEmail] = useState(
     decodeURIComponent(searchParams.get("email") || "")
   );
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [jumpEmail, setJumpEmail] = useState("");
   const targetUrl = decodeURIComponent(searchParams.get("targetUrl") || "");
   const router = useRouter();
   const [callbackUrl, setCallbackUrl] = useState("");
   const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc, login_methods = [] } =
     useClient();
+
 
   // 根据是否是单点登录，判断登录后跳转的页面
   useEffect(() => {
@@ -40,7 +42,7 @@ export default function Home() {
       );
     } else {
       setCallbackUrl(
-        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}`
+        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}&callbackUrl=${window.opener && window.name === "loginWindow" ? `${window.location.origin}/popup-login` : ""}`
       );
     }
   }, [isSSO]);
@@ -125,7 +127,7 @@ export default function Home() {
                     <Link
                       underline="always"
                       href={`/signUp?email=${encodeURIComponent(email)}`}
-                      isDisabled={loading || emailLoading}
+                      isDisabled={loading || emailLoading || googleLoading}
                     >
                       Sign up
                     </Link>
@@ -138,7 +140,7 @@ export default function Home() {
                   size="lg"
                   spinner={<Spinner color="default" size="sm" />}
                   isLoading={loading}
-                  disabled={emailLoading}
+                  isDisabled={emailLoading || googleLoading}
                 >
                   Sign in
                 </Button>
@@ -159,7 +161,15 @@ export default function Home() {
               <Button
                 className="w-full"
                 size="lg"
-                onClick={() => signIn("google", { callbackUrl })}
+                onClick={() => {
+                  setGoogleLoading(true);
+                  signIn("google", { callbackUrl }).catch(() => {
+                    setGoogleLoading(false);
+                  });
+                }}
+                spinner={<Spinner color="primary" size="sm" />}
+                isDisabled={loading || emailLoading}
+                isLoading={googleLoading}
               >
                 <Image
                   height="24"
@@ -215,7 +225,7 @@ export default function Home() {
                   size="lg"
                   spinner={<Spinner color="default" size="sm" />}
                   isLoading={emailLoading}
-                  isDisabled={loading}
+                  isDisabled={loading || googleLoading}
                 >
                   Sign in
                 </Button>
