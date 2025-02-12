@@ -36,6 +36,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    if (!code) {
+      return NextResponse.json(
+        { message: "Authorization code missing" },
+        { status: 400 }
+      );
+    }
+
     // 查询 client 信息
     const client = await findClientByClientId(client_id);
     // 验证 client_secret 是否匹配

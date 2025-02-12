@@ -66,6 +66,8 @@ export function generateTokens(client_id: string) {
   const access_token = jwt.sign(
     {
       client_id,
+      jti: randomUUID(), // 添加一个唯一标识符
+      type: 'access_token'
     },
     process.env.NEXT_AUTH_SECRET!
   );
@@ -74,6 +76,8 @@ export function generateTokens(client_id: string) {
   const refresh_token = jwt.sign(
     {
       client_id,
+      jti: randomUUID(), // 添加一个唯一标识符
+      type: 'refresh_token'
     },
     process.env.NEXT_AUTH_SECRET!
   );
