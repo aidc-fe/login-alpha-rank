@@ -62,24 +62,33 @@ export function generateAuthorizationCode() {
 
 // 生成 accessToken 和 refreshToken
 export function generateTokens(client_id: string) {
-  // 生成 accessToken，通常包含用户信息和权限（scope）
+  // 生成短的随机字符串（8字节 = 16个字符）来确保唯一性
+  const uniqueId = randomBytes(8).toString('hex');
+
+  // 生成 accessToken
   const access_token = jwt.sign(
     {
       client_id,
-      jti: randomUUID(), // 添加一个唯一标识符
-      type: 'access_token'
+      type: 'access_token',
+      nonce: uniqueId // 添加短的随机值确保唯一性
     },
-    process.env.NEXT_AUTH_SECRET!
+    process.env.NEXT_AUTH_SECRET!,
+    {
+      noTimestamp: true // 移除时间戳以保持长度一致
+    }
   );
 
-  // 生成 refreshToken，通常是随机字符串或 JWT，也可以选择加密用户信息
+  // 生成 refreshToken
   const refresh_token = jwt.sign(
     {
       client_id,
-      jti: randomUUID(), // 添加一个唯一标识符
-      type: 'refresh_token'
+      type: 'refresh_token',
+      nonce: uniqueId // 使用相同机制确保唯一性
     },
-    process.env.NEXT_AUTH_SECRET!
+    process.env.NEXT_AUTH_SECRET!,
+    {
+      noTimestamp: true // 移除时间戳以保持长度一致
+    }
   );
 
   // 返回生成的 accessToken 和 refreshToken
