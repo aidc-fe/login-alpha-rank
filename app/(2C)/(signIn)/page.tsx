@@ -43,7 +43,7 @@ export default function Home() {
       );
     } else {
       setCallbackUrl(
-        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}&callbackUrl=${isLoginWindow || (window.opener && window.name === "loginWindow") ? `${window.location.origin}/popup-login` : ""}`
+        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}&callbackUrl=${isLoginWindow || (window.opener && window.name === "loginWindow") ? `${window.location.origin}/popup-login` : ""}${searchParams.get("utm_source") ? `&utm_source=${searchParams.get("utm_source")}&utm_type=sign_in` : ""}`
       );
     }
   }, [isSSO]);
