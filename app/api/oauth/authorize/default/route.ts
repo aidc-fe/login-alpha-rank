@@ -10,6 +10,8 @@ export async function GET(request: NextRequest) {
   const client_id = request.nextUrl.searchParams.get("client_id");
   const redirect_uri = request.nextUrl.searchParams.get("redirect_uri");
   const callbackUrl = request.nextUrl.searchParams.get("callbackUrl");
+  const utm_source = request.nextUrl.searchParams.get("utm_source");
+  const utm_type = request.nextUrl.searchParams.get("utm_type");
   //  const state = request.nextUrl.searchParams.get("state") || "";
   let userId = request.nextUrl.searchParams.get("userId") || "";
   
@@ -49,12 +51,19 @@ export async function GET(request: NextRequest) {
 
   // 构建重定向 URL
   const redirectUrl = new URL(redirect_uri);
+ 
   // redirectUrl.searchParams.set("hmac", hmac);
   redirectUrl.searchParams.set("code", authorizationCode.code);
   // redirectUrl.searchParams.set("state", state);
   redirectUrl.searchParams.set("userId", userId);
   if (callbackUrl) {
     redirectUrl.searchParams.set("callbackUrl", callbackUrl);
+  }
+  if (utm_source) {
+    redirectUrl.searchParams.set("utm_source", utm_source);
+  }
+  if (utm_type) {
+    redirectUrl.searchParams.set("utm_type", utm_type);
   }
   // 重定向到 redirect_uri
   return NextResponse.redirect(redirectUrl.toString(), 302);
