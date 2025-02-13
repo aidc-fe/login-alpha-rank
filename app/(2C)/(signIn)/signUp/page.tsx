@@ -27,7 +27,7 @@ export default function SignUpPage() {
       return;
     } else if (isSSO) {
       setCallbackUrl(
-        `/login-landing-page?${targetUrl ? "targetUrl=" + targetUrl : ""}`
+        `/login-landing-page?${targetUrl ? "targetUrl=" + targetUrl : ""}${searchParams.get("utm_source") ? `&utm_source=${searchParams.get("utm_source")}&utm_type=sign_up` : ""}`
       );
     } else {
       setCallbackUrl(
