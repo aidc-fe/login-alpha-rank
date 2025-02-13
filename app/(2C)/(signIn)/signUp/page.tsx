@@ -27,11 +27,11 @@ export default function SignUpPage() {
       return;
     } else if (isSSO) {
       setCallbackUrl(
-        `/login-landing-page?${targetUrl ? "targetUrl=" + targetUrl : ""}${searchParams.get("utm_source") ? `&utm_source=${searchParams.get("utm_source")}&utm_type=sign_up` : ""}`
+        `/login-landing-page?${targetUrl ? "targetUrl=" + targetUrl : ""}`
       );
     } else {
       setCallbackUrl(
-        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}`
+        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}${searchParams.get("utm_source") ? `&utm_source=${searchParams.get("utm_source")}&utm_type=sign_up` : ""}`
       );
     }
   }, [isSSO]);
