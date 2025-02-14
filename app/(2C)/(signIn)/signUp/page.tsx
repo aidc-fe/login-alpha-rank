@@ -31,7 +31,7 @@ export default function SignUpPage() {
       );
     } else {
       setCallbackUrl(
-        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}${searchParams.get("utm_source") ? `&utm_source=${searchParams.get("utm_source")}&utm_type=sign_up` : ""}`
+        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}${searchParams.get("utmSource") ? `&utmSource=${searchParams.get("utmSource")}&utmType=sign_up` : ""}`
       );
     }
   }, [isSSO]);
@@ -67,7 +67,7 @@ export default function SignUpPage() {
         password,
         targetUrl:isSSO
         ? `/login-landing-page?targetUrl=${searchParams.get("targetUrl")}`
-        : `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}${searchParams.get("utm_source") ? `&utm_source=${searchParams.get("utm_source")}&utm_type=sign_up` : ""}`,
+        : `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}${searchParams.get("utmSource") ? `&utmSource=${searchParams.get("utmSource")}&utmType=sign_up` : ""}`,
         businessDomainId,
         client_id,
       }),
