@@ -21,11 +21,6 @@ export default function SignUpPage() {
   const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc, url } =
     useClient();
 
-  const getCallbackSite = () => {
-    if (targetUrl) return `&callbackUrl=${targetUrl}`;
-    return "";
-  };
-
   const utmParams = searchParams.get("utmSource") 
     ? `&utmSource=${searchParams.get("utmSource")}&utmType=sign_up` 
     : "";
@@ -40,7 +35,7 @@ export default function SignUpPage() {
       );
     } else {
       setCallbackUrl(
-        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}${utmParams}${getCallbackSite()}`
+        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}${utmParams}${targetUrl ? `&callbackUrl=${targetUrl}` : ""}`
       );
     }
   }, [isSSO]);
@@ -76,7 +71,7 @@ export default function SignUpPage() {
         password,
         targetUrl:isSSO
         ? `/login-landing-page?targetUrl=${searchParams.get("targetUrl")}`
-        : `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}${utmParams}${getCallbackSite()}`,
+        : `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}${utmParams}${targetUrl ? `&callbackUrl=${targetUrl}` : ""}`,
         businessDomainId,
         client_id,
       }),
