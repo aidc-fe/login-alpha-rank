@@ -21,6 +21,10 @@ export default function SignUpPage() {
   const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc, url } =
     useClient();
 
+  const utmParams = searchParams.get("utmSource") 
+    ? `&utmSource=${searchParams.get("utmSource")}&utmType=sign_up` 
+    : "";
+
   // 根据是否是单点登录，判断登录后跳转的页面
   useEffect(() => {
     if (isSSO === undefined) {
@@ -31,7 +35,7 @@ export default function SignUpPage() {
       );
     } else {
       setCallbackUrl(
-        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}${searchParams.get("utmSource") ? `&utmSource=${searchParams.get("utmSource")}&utmType=sign_up` : ""}`
+        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}${utmParams}${targetUrl ? `&callbackUrl=${targetUrl}` : ""}`
       );
     }
   }, [isSSO]);
@@ -67,7 +71,7 @@ export default function SignUpPage() {
         password,
         targetUrl:isSSO
         ? `/login-landing-page?targetUrl=${searchParams.get("targetUrl")}`
-        : `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}${searchParams.get("utmSource") ? `&utmSource=${searchParams.get("utmSource")}&utmType=sign_up` : ""}`,
+        : `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}${utmParams}${targetUrl ? `&callbackUrl=${targetUrl}` : ""}`,
         businessDomainId,
         client_id,
       }),
@@ -154,7 +158,7 @@ export default function SignUpPage() {
             <span>Already have an account?</span>
             <Link
               underline="always"
-              href={`/?email=${encodeURIComponent(email)}`}
+              href={`/?email=${encodeURIComponent(email)}&targetUrl=${targetUrl}`}
             >
               sign in
             </Link>

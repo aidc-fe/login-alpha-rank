@@ -42,8 +42,14 @@ export default function Home() {
         `/login-landing-page?${targetUrl ? "targetUrl=" + targetUrl : ""}`
       );
     } else {
+      const callbackSite = window.opener && window.name === "loginWindow" ? `${window.location.origin}/popup-login` : (targetUrl || "")
+
+      const utmParams = searchParams.get("utmSource") 
+        ? `&utmSource=${searchParams.get("utmSource")}&utmType=sign_in` 
+        : "";
+
       setCallbackUrl(
-        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}&callbackUrl=${window.opener && window.name === "loginWindow" ? `${window.location.origin}/popup-login` : ""}${searchParams.get("utmSource") ? `&utmSource=${searchParams.get("utmSource")}&utmType=sign_in` : ""}`
+        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}${utmParams}&callbackUrl=${callbackSite}`
       );
     }
   }, [isSSO]);
@@ -127,7 +133,7 @@ export default function Home() {
                     Not a member?{" "}
                     <Link
                       underline="always"
-                      href={`/signUp?email=${encodeURIComponent(email)}`}
+                      href={`/signUp?email=${encodeURIComponent(email)}&targetUrl=${targetUrl}`}
                       isDisabled={loading || emailLoading || googleLoading}
                     >
                       Sign up
