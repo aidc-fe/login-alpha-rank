@@ -21,11 +21,8 @@ function PageContent() {
   useEffect(() => {
     switch (status) {
       case "authenticated":
-        if (window.opener && window.name === "loginWindow") {
           window.close();
-          return;
-        }
-        break;
+        return;
       case "unauthenticated":
         router.replace(`/${searchParams.toString()}`);
         break;
