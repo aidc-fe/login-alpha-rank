@@ -30,6 +30,7 @@ export default function Home() {
   const [callbackUrl, setCallbackUrl] = useState("");
   const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc, login_methods = [] } =
     useClient();
+  const isLoginWindow = searchParams.get('loginWindow');
 
 
   // 根据是否是单点登录，判断登录后跳转的页面
