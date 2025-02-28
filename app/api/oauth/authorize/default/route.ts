@@ -10,8 +10,7 @@ export async function GET(request: NextRequest) {
   const client_id = request.nextUrl.searchParams.get("client_id");
   const redirect_uri = request.nextUrl.searchParams.get("redirect_uri");
   const callbackUrl = request.nextUrl.searchParams.get("callbackUrl");
-  const utmSource = request.nextUrl.searchParams.get("utmSource");
-  const utmType = request.nextUrl.searchParams.get("utmType");
+  const auth_action = request.nextUrl.searchParams.get("auth_action");
   //  const state = request.nextUrl.searchParams.get("state") || "";
   let userId = request.nextUrl.searchParams.get("userId") || "";
   
@@ -59,11 +58,9 @@ export async function GET(request: NextRequest) {
   if (callbackUrl) {
     redirectUrl.searchParams.set("callbackUrl", callbackUrl);
   }
-  if (utmSource) {
-    redirectUrl.searchParams.set("utmSource", utmSource);
-  }
-  if (utmType) {
-    redirectUrl.searchParams.set("utmType", utmType);
+  // 添加auth_action
+  if (auth_action) {
+    redirectUrl.searchParams.set("authAction", auth_action);
   }
   // 重定向到 redirect_uri
   return NextResponse.redirect(redirectUrl.toString(), 302);

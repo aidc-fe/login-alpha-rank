@@ -21,9 +21,6 @@ export default function SignUpPage() {
   const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc, url } =
     useClient();
 
-  const utmParams = searchParams.get("utmSource") 
-    ? `&utmSource=${searchParams.get("utmSource")}&utmType=sign_up` 
-    : "";
 
   // 根据是否是单点登录，判断登录后跳转的页面
   useEffect(() => {
@@ -35,7 +32,7 @@ export default function SignUpPage() {
       );
     } else {
       setCallbackUrl(
-        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}${utmParams}${targetUrl ? `&callbackUrl=${targetUrl}` : ""}`
+        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}${targetUrl ? `&callbackUrl=${targetUrl}` : ""}&auth_action=sign_up`
       );
     }
   }, [isSSO]);
@@ -71,7 +68,7 @@ export default function SignUpPage() {
         password,
         targetUrl:isSSO
         ? `/login-landing-page?targetUrl=${searchParams.get("targetUrl")}`
-        : `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}${utmParams}${targetUrl ? `&callbackUrl=${targetUrl}` : ""}`,
+        : `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}${targetUrl ? `&callbackUrl=${targetUrl}` : ""}&auth_action=sign_up`,
         businessDomainId,
         client_id,
       }),

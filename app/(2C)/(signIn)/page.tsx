@@ -44,12 +44,10 @@ export default function Home() {
     } else {
       const callbackSite = window.opener && window.name === "loginWindow" ? `${window.location.origin}/popup-login` : (targetUrl || "")
 
-      const utmParams = searchParams.get("utmSource") 
-        ? `&utmSource=${searchParams.get("utmSource")}&utmType=sign_in` 
-        : "";
+      
 
       setCallbackUrl(
-        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}${utmParams}&callbackUrl=${callbackSite}`
+        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}&callbackUrl=${callbackSite}&auth_action=sign_in`
       );
     }
   }, [isSSO]);
