@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { hexToHSL } from "@/lib/utils";
 import { getClientByAuthDomain, getBusinessDomainById } from "@/lib/database";
 import { cache } from "react";
+import ClientSession from "@/components/ClientSession";
 
 const getClientWithCache = cache(async (authDomain: string) => {
   const client = await getClientByAuthDomain(authDomain);
@@ -62,6 +63,7 @@ export default async function RootLayout({
         } as React.CSSProperties
       }
     >
+      <ClientSession />
       <ClientProvider client={client}>{children}</ClientProvider>
     </div>
   );
