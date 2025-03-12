@@ -30,6 +30,7 @@ export default function Home() {
   const [callbackUrl, setCallbackUrl] = useState("");
   const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc, login_methods = [] } =
     useClient();
+  const isLoginWindow = searchParams.get('loginWindow');
 
 
   // 根据是否是单点登录，判断登录后跳转的页面
@@ -41,8 +42,12 @@ export default function Home() {
         `/login-landing-page?${targetUrl ? "targetUrl=" + targetUrl : ""}`
       );
     } else {
+      const callbackSite = window.opener && window.name === "loginWindow" ? `${window.location.origin}/popup-login` : (targetUrl || "")
+
+      
+
       setCallbackUrl(
-        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}&callbackUrl=${window.opener && window.name === "loginWindow" ? `${window.location.origin}/popup-login` : ""}&auth_action=sign_in`
+        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}&callbackUrl=${callbackSite}&auth_action=sign_in`
       );
     }
   }, [isSSO]);
@@ -126,7 +131,7 @@ export default function Home() {
                     Not a member?{" "}
                     <Link
                       underline="always"
-                      href={`/signUp?email=${encodeURIComponent(email)}`}
+                      href={`/signUp?email=${encodeURIComponent(email)}&targetUrl=${targetUrl}`}
                       isDisabled={loading || emailLoading || googleLoading}
                     >
                       Sign up

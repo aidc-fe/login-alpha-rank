@@ -22,6 +22,7 @@ export default function SignUpPage() {
   const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc, url } =
     useClient();
 
+
   // 根据是否是单点登录，判断登录后跳转的页面
   useEffect(() => {
     if (isSSO === undefined) {
@@ -32,7 +33,7 @@ export default function SignUpPage() {
       );
     } else {
       setCallbackUrl(
-        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}&auth_action=sign_up${invite ? `&invite=${invite}` : ""}`
+        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}${targetUrl ? `&callbackUrl=${targetUrl}` : ""}&auth_action=sign_up${invite ? `&invite=${invite}` : ""}`
       );
     }
   }, [isSSO]);
@@ -153,7 +154,7 @@ export default function SignUpPage() {
             <span>Already have an account?</span>
             <Link
               underline="always"
-              href={`/?email=${encodeURIComponent(email)}`}
+              href={`/?email=${encodeURIComponent(email)}&targetUrl=${targetUrl}`}
             >
               sign in
             </Link>
