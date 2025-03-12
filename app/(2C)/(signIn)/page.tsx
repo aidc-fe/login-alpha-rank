@@ -28,7 +28,7 @@ export default function Home() {
   const targetUrl = decodeURIComponent(searchParams.get("targetUrl") || "");
   const router = useRouter();
   const [callbackUrl, setCallbackUrl] = useState("");
-  const invite = sessionStorage.getItem("invite");
+  
   const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc, login_methods = [] } =
     useClient();
 
@@ -42,6 +42,8 @@ export default function Home() {
         `/login-landing-page?${targetUrl ? "targetUrl=" + targetUrl : ""}`
       );
     } else {
+      const invite = sessionStorage.getItem("invite");
+      
       setCallbackUrl(
         `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}&callbackUrl=${window.opener && window.name === "loginWindow" ? `${window.location.origin}/popup-login` : ""}&auth_action=sign_in${invite ? `&invite=${invite}` : ""}`
       );
