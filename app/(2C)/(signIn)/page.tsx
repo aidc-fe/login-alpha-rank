@@ -169,7 +169,7 @@ export default function Home() {
                 size="lg"
                 onClick={() => {
                   setGoogleLoading(true);
-                  signIn("google", { callbackUrl }).catch(() => {
+                  signIn("google", { callbackUrl: `${callbackUrl}&auth_type=google` }).catch(() => {
                     setGoogleLoading(false);
                   });
                 }}

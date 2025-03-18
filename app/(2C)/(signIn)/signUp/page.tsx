@@ -124,7 +124,7 @@ export default function SignUpPage() {
         <Button
           className="w-full"
           size="lg"
-          onClick={() => signIn("google", { callbackUrl })}
+          onClick={() => signIn("google", { callbackUrl: `${callbackUrl}&auth_type=google` })}
         >
           <Image
             height="24"
