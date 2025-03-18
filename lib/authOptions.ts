@@ -1,4 +1,4 @@
-import { NextAuthOptions } from "next-auth";
+import { NextAuthOptions, User } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import EmailProvider from "next-auth/providers/email";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -7,6 +7,7 @@ import {
   createOrUpdateAccount,
   getBusinessDomainIdByAuthDomain,
   getCurrentServerClient,
+  getUser,
   getUserIdByEmail,
   prisma,
 } from "@/lib/database";
@@ -115,7 +116,8 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
     async session({ session, token }) {
-      return { ...session, jwtToken: token?.jwtToken, id: token?.sub };
+      const user = (await getUser({ id: token.sub })) as User;
+      return { ...session, jwtToken: token?.jwtToken, id: token?.sub, user };
     },
   },
   secret: process.env.NEXT_AUTH_SECRET!,
