@@ -53,3 +53,19 @@ export function hexToHSL(hex: string) {
 
   return { h, s, l: lightness };
 }
+
+// 判断是否是3分钟内注册的
+export function is3Minutes(created_at: Date): "sign_up" | "sign_in" {
+  const verifiedTime = new Date(created_at).getTime();
+  const currentTime = Date.now();
+  const threeMinutes = 3 * 60 * 1000; // 3分钟转换为毫秒
+
+    if (
+      verifiedTime > currentTime - threeMinutes &&
+      verifiedTime <= currentTime
+    ) {
+      return "sign_up";
+    } else {
+      return "sign_in";
+    }
+}
