@@ -13,6 +13,7 @@ export async function GET(request: NextRequest) {
   const redirect_uri = request.nextUrl.searchParams.get("redirect_uri");
   const callbackUrl = request.nextUrl.searchParams.get("callbackUrl");
   const auth_action = request.nextUrl.searchParams.get("auth_action");
+  const invite = request.nextUrl.searchParams.get("invite");
   //  const state = request.nextUrl.searchParams.get("state") || "";
   const auth_type = request.nextUrl.searchParams.get("auth_type");
   let userId = request.nextUrl.searchParams.get("userId") || "";
@@ -60,6 +61,9 @@ export async function GET(request: NextRequest) {
   redirectUrl.searchParams.set("userId", userId);
   if (callbackUrl) {
     redirectUrl.searchParams.set("callbackUrl", callbackUrl);
+  }
+  if (invite) {
+    redirectUrl.searchParams.set("invite", invite);
   }
   // 添加auth_action
   if (auth_type !== "google" && auth_action) {

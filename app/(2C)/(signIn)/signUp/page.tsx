@@ -18,6 +18,7 @@ export default function SignUpPage() {
   );
   const targetUrl = decodeURIComponent(searchParams.get("targetUrl") || "");
   const [callbackUrl, setCallbackUrl] = useState("");
+  
   const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc, url } =
     useClient();
 
@@ -30,8 +31,9 @@ export default function SignUpPage() {
         `/login-landing-page?${targetUrl ? "targetUrl=" + targetUrl : ""}`
       );
     } else {
+      const invite = sessionStorage.getItem("invite");
       setCallbackUrl(
-        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}&auth_action=sign_up`
+        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}&auth_action=sign_up${invite ? `&invite=${invite}` : ""}`
       );
     }
   }, [isSSO]);
@@ -65,9 +67,7 @@ export default function SignUpPage() {
         name,
         email,
         password,
-        targetUrl:isSSO
-        ? `/login-landing-page?targetUrl=${searchParams.get("targetUrl")}`
-        : `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}&auth_action=sign_up`,
+        targetUrl: callbackUrl,
         businessDomainId,
         client_id,
       }),
