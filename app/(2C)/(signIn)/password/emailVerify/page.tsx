@@ -47,6 +47,7 @@ export default function Page() {
       })
       .catch(err => {
         console.log({ err });
+        window.location.reload();
       })
       .finally(() => {
         setLoading(false);
