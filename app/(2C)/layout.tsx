@@ -38,10 +38,10 @@ async function getClient() {
 export async function generateMetadata() {
   const client = await getClient();
   return {
-    title: client.title || '',
-    description: client.description || '',
+    title: client.title || "",
+    description: client.description || "",
     icons: {
-      icon: client.favicon || '',
+      icon: client.favicon || "",
     },
     alternates: {
       canonical: client.url,
@@ -55,7 +55,7 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const client = await getClient();
-  const hsl = hexToHSL(client.brand_color || '');
+  const hsl = hexToHSL(client.brand_color || "");
   return (
     <div
       style={

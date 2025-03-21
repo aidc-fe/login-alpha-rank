@@ -1,30 +1,15 @@
 import { ERROR_CONFIG } from "@/lib/errors";
-import {
-  createVerificationToken,
-  findClientByClientId,
-  getUser,
-} from "@/lib/database";
+import { createVerificationToken, findClientByClientId, getUser } from "@/lib/database";
 import { sendVerificationEmail } from "@/lib/email";
 import { formateError, formatSuccess } from "@/lib/request";
 import { NextRequest, NextResponse } from "next/server";
+import { verifyToken } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   const userInfo = await request.json();
 
-
-  // 验证人机验证
-  const secretKey = process.env.TURNSTILE_SECRET_KEY!;
-  const verifyUrl = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
-  const formData = new URLSearchParams();
-  formData.append("secret", secretKey);
-  formData.append("response", userInfo.token);
-
   try {
-    const response = await fetch(verifyUrl, {
-      method: "POST",
-      body: formData,
-    });
-    const result = await response.json();
+    const result = await verifyToken(userInfo.token);
 
     if (!result.success) {
       return NextResponse.json(formateError(ERROR_CONFIG.AUTH.TURNSTILE_VERIFY_FAIL));
@@ -32,7 +17,6 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     return NextResponse.json(formateError(ERROR_CONFIG.AUTH.TURNSTILE_VERIFY_FAIL));
   }
-
 
   // 获取当前请求的 host
   const host = request.headers.get("host") || request.headers.get(":authority");
@@ -69,8 +53,7 @@ export async function POST(request: NextRequest) {
         "Verify your email ",
         {
           title: "Verify your email address",
-          description:
-            "To continue setting up your account, please verify your email address.",
+          description: "To continue setting up your account, please verify your email address.",
           btnContent: "Verify Email Address",
         },
         {
@@ -89,9 +72,7 @@ export async function POST(request: NextRequest) {
       );
     } catch (error) {
       console.log("VERIFICATION_TOKEN.GENERATE_FAIL", error);
-      return NextResponse.json(
-        ERROR_CONFIG.DATABASE.VERIFICATION_TOKEN.GENERATE_FAIL
-      );
+      return NextResponse.json(ERROR_CONFIG.DATABASE.VERIFICATION_TOKEN.GENERATE_FAIL);
     }
   }
 }
