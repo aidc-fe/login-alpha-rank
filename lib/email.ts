@@ -46,7 +46,7 @@ export async function sendVerificationEmail(
           };  font-size: 20px; line-height: 56px; font-weight: 700; text-align: center;" target="_blank">${
             displayContent.btnContent
           }</a>
-        <a href=${verificationLink}>${verificationLink}</a>
+        <a style:"margin-bottom: 20px" href=${verificationLink}>${verificationLink}</a>
         </p>
       </div>
     `,
