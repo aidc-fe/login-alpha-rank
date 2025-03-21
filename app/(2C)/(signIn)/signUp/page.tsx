@@ -15,25 +15,19 @@ export default function SignUpPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState(
-    decodeURIComponent(searchParams.get("email") || "")
-  );
+  const [email, setEmail] = useState(decodeURIComponent(searchParams.get("email") || ""));
   const targetUrl = decodeURIComponent(searchParams.get("targetUrl") || "");
   const [callbackUrl, setCallbackUrl] = useState("");
   const [token, setToken] = useState("");
 
-  const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc, url } =
-    useClient();
-
+  const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc, url } = useClient();
 
   // 根据是否是单点登录，判断登录后跳转的页面
   useEffect(() => {
     if (isSSO === undefined) {
       return;
     } else if (isSSO) {
-      setCallbackUrl(
-        `/login-landing-page?${targetUrl ? "targetUrl=" + targetUrl : ""}`
-      );
+      setCallbackUrl(`/login-landing-page?${targetUrl ? "targetUrl=" + targetUrl : ""}`);
     } else {
       const invite = sessionStorage.getItem("invite");
       setCallbackUrl(
@@ -43,20 +37,19 @@ export default function SignUpPage() {
   }, [isSSO]);
 
   useEffect(() => {
-    
     // 查找或创建 canonical link 标签
     let link = document.querySelector("link[rel='canonical']");
     if (!link) {
-      link = document.createElement('link');
-      link.setAttribute('rel', 'canonical');
+      link = document.createElement("link");
+      link.setAttribute("rel", "canonical");
       document.head.appendChild(link);
     }
-    
+
     // 更新 canonical URL
-    link.setAttribute('href', `${url}/signUp`);
+    link.setAttribute("href", `${url}/signUp`);
   }, []); // 空数组表示只有在组件挂载时运行一次
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = e => {
     e.preventDefault();
     setLoading(true);
     const formData = new FormData(e.target as HTMLFormElement);
@@ -78,15 +71,13 @@ export default function SignUpPage() {
         targetUrl: callbackUrl,
         businessDomainId,
         client_id,
-        token
+        token,
       }),
     })
       .then(() => {
-        router.push(
-          `/email/sent?email=${encodeURIComponent(email || "")}&type=sign_up`
-        );
+        router.push(`/email/sent?email=${encodeURIComponent(email || "")}&type=sign_up`);
       })
-      .catch((err) => {
+      .catch(err => {
         console.log({ err });
       })
       .finally(() => {
@@ -106,7 +97,7 @@ export default function SignUpPage() {
           name="email"
           type="email"
           value={email}
-          onChange={(e) => {
+          onChange={e => {
             setEmail(e.target.value);
           }}
           label="E-mail"
@@ -115,9 +106,10 @@ export default function SignUpPage() {
         <PasswordInput name="password" label="Password" required />
         <Turnstile
           sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
-          onVerify={(token) => setToken(token)} // 验证成功后获取 token
+          onVerify={token => setToken(token)} // 验证成功后获取 token
+          refreshExpired="auto"
         />
-      
+
         <Button
           className="w-full"
           color="primary"

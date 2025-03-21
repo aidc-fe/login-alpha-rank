@@ -151,6 +151,7 @@ export default function Home() {
                   className="mx-auto"
                   sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
                   onVerify={token => setToken(token)} // 验证成功后获取 token
+                  refreshExpired="auto"
                 />
 
                 <Button

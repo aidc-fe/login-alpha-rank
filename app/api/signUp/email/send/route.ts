@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
   try {
     const result = await verifyToken(userInfo.token);
 
-    if (!result.success) {
+    if (!result) {
       return NextResponse.json(formateError(ERROR_CONFIG.AUTH.TURNSTILE_VERIFY_FAIL));
     }
   } catch (error) {
