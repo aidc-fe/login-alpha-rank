@@ -105,9 +105,13 @@ export default function Home() {
                         ...user,
                         callbackUrl: `${callbackUrl}&userId=${user.sub}`,
                         businessDomainId,
-                      }).finally(() => {
-                        setLoading(false);
-                      });
+                      })
+                        .catch(() => {
+                          window.location.reload();
+                        })
+                        .finally(() => {
+                          setLoading(false);
+                        });
                     })
                     .catch(() => {
                       setLoading(false);
