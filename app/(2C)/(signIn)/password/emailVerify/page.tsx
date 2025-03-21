@@ -8,18 +8,24 @@ import { Input, Button, Link, Spinner } from "@nextui-org/react";
 import { useClient } from "@/providers/client-provider";
 import PasswordInput from "@/components/PasswordInput";
 import { toast } from "react-toastify";
+import Turnstile from "react-turnstile";
 
 export default function Page() {
-  const { businessDomainId,client_id } = useClient();
+  const { businessDomainId, client_id } = useClient();
   const searchParams = useSearchParams();
-  const [email, setEmail] = useState<string>(
-    decodeURIComponent(searchParams.get("email") || "")
-  );
+  const [email, setEmail] = useState<string>(decodeURIComponent(searchParams.get("email") || ""));
   const [loading, setLoading] = useState(false);
+  const [token, setToken] = useState("");
   const router = useRouter();
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = e => {
     e.preventDefault();
+
+    if (!token) {
+      toast.error("Please verify the captcha");
+      return;
+    }
+
     const formData = new FormData(e.target as HTMLFormElement);
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
@@ -34,16 +40,12 @@ export default function Page() {
     setLoading(true);
     request("/api/password/emailVerify", {
       method: "POST",
-      body: JSON.stringify({ email, password, businessDomainId, client_id }),
+      body: JSON.stringify({ email, password, businessDomainId, client_id, token }),
     })
       .then(() => {
-        router.push(
-          `/email/sent?email=${encodeURIComponent(
-            email || ""
-          )}&type=set_password`
-        );
+        router.push(`/email/sent?email=${encodeURIComponent(email || "")}&type=set_password`);
       })
-      .catch((err) => {
+      .catch(err => {
         console.log({ err });
       })
       .finally(() => {
@@ -64,21 +66,17 @@ export default function Page() {
           label="E-mail"
           type="email"
           value={email}
-          onChange={(e) => {
+          onChange={e => {
             setEmail(e.target.value);
           }}
         />
 
-        <PasswordInput
-          name="password"
-          required
-          label="Password"
-        />
+        <PasswordInput name="password" required label="Password" />
 
-        <PasswordInput
-          name="check_password"
-          required
-          label="Re-enter password"
+        <PasswordInput name="check_password" required label="Re-enter password" />
+        <Turnstile
+          sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+          onVerify={token => setToken(token)} // 验证成功后获取 token
         />
         <Button
           className="group w-full"
@@ -96,10 +94,7 @@ export default function Page() {
         <div className="w-1/2 border-b mx-auto mt-4" />
         <div className="flex items-center text-muted gap-2">
           <span>Back to</span>
-          <Link
-            underline="always"
-            href={`/?email=${encodeURIComponent(email)}`}
-          >
+          <Link underline="always" href={`/?email=${encodeURIComponent(email)}`}>
             Sign in
           </Link>
         </div>

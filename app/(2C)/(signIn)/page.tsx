@@ -11,6 +11,8 @@ import { useClient } from "@/providers/client-provider";
 import { Session } from "next-auth";
 import PasswordInput from "@/components/PasswordInput";
 import { AUTH_METHOD } from "@/lib/admin";
+import Turnstile from "react-turnstile";
+import { toast } from "react-toastify";
 
 export default function Home() {
   const { status, data } = useSession() as {
@@ -20,33 +22,38 @@ export default function Home() {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [emailLoading, setEmailLoading] = useState(false);
-  const [email, setEmail] = useState(
-    decodeURIComponent(searchParams.get("email") || "")
-  );
+  const [email, setEmail] = useState(decodeURIComponent(searchParams.get("email") || ""));
   const [googleLoading, setGoogleLoading] = useState(false);
   const [jumpEmail, setJumpEmail] = useState("");
   const targetUrl = decodeURIComponent(searchParams.get("targetUrl") || "");
   const router = useRouter();
   const [callbackUrl, setCallbackUrl] = useState("");
-  
-  const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc, login_methods = [] } =
-    useClient();
-  const isLoginWindow = searchParams.get('loginWindow');
+  const [token, setToken] = useState("");
 
+  const {
+    businessDomainId,
+    isSSO,
+    redirect_uris,
+    client_id,
+    pp_doc,
+    tos_doc,
+    login_methods = [],
+  } = useClient();
 
   // 根据是否是单点登录，判断登录后跳转的页面
   useEffect(() => {
     if (isSSO === undefined) {
       return;
     } else if (isSSO) {
-      setCallbackUrl(
-        `/login-landing-page?${targetUrl ? "targetUrl=" + targetUrl : ""}`
-      );
+      setCallbackUrl(`/login-landing-page?${targetUrl ? "targetUrl=" + targetUrl : ""}`);
     } else {
-      const callbackSite = window.opener && window.name === "loginWindow" ? `${window.location.origin}/popup-login` : (targetUrl || "")
+      const callbackSite =
+        window.opener && window.name === "loginWindow"
+          ? `${window.location.origin}/popup-login`
+          : targetUrl || "";
 
       const invite = sessionStorage.getItem("invite");
-      
+
       setCallbackUrl(
         `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}&callbackUrl=${callbackSite}&auth_action=sign_in${invite ? `&invite=${invite}` : ""}`
       );
@@ -70,13 +77,19 @@ export default function Home() {
         <div className="flex items-center justify-center w-full h-full px-8 -mr-4 space-y-6">
           <div className="max-w-lg">
             <h1 className="font-bold text-3xl mb-12 text-center">Sign in</h1>
-            
+
             {/* 密码登录表单 */}
             {login_methods.includes(AUTH_METHOD.PASSWORD) && (
               <form
                 className="flex flex-col justify-between gap-4"
-                onSubmit={(e) => {
+                onSubmit={e => {
                   e.preventDefault();
+
+                  if (!token) {
+                    toast.error("Please verify the captcha");
+                    return;
+                  }
+
                   setLoading(true);
                   const formData = new FormData(e.target as HTMLFormElement);
                   const email = formData.get("email");
@@ -85,9 +98,9 @@ export default function Home() {
                   // 登录
                   request("/api/signIn", {
                     method: "POST",
-                    body: JSON.stringify({ email, password, businessDomainId }),
+                    body: JSON.stringify({ email, password, businessDomainId, token }),
                   })
-                    .then((user) => {
+                    .then(user => {
                       signIn("password", {
                         ...user,
                         callbackUrl: `${callbackUrl}&userId=${user.sub}`,
@@ -107,7 +120,7 @@ export default function Home() {
                   required
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={e => setEmail(e.target.value)}
                 />
                 <PasswordInput name="password" label="Password" required />
 
@@ -115,16 +128,11 @@ export default function Home() {
                   <Link
                     showAnchorIcon
                     anchorIcon={
-                      <ArrowUpRight
-                        className="group-hover:rotate-45 duration-150"
-                        size={20}
-                      />
+                      <ArrowUpRight className="group-hover:rotate-45 duration-150" size={20} />
                     }
                     underline="always"
                     className="group text-muted"
-                    href={`/password/emailVerify?email=${encodeURIComponent(
-                      email
-                    )}`}
+                    href={`/password/emailVerify?email=${encodeURIComponent(email)}`}
                   >
                     Forgot your password{" "}
                   </Link>
@@ -139,6 +147,11 @@ export default function Home() {
                     </Link>
                   </div>
                 </div>
+                <Turnstile
+                  className="mx-auto"
+                  sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+                  onVerify={token => setToken(token)} // 验证成功后获取 token
+                />
 
                 <Button
                   color="primary"
@@ -190,8 +203,10 @@ export default function Home() {
             {/* 邮箱登录表单 */}
             {login_methods.includes(AUTH_METHOD.EMAIL) && (
               <form
-                className={cn("flex py-4 gap-3 items-center", {"py-0": !login_methods.includes(AUTH_METHOD.GOOGLE)})}
-                onSubmit={(e) => {
+                className={cn("flex py-4 gap-3 items-center", {
+                  "py-0": !login_methods.includes(AUTH_METHOD.GOOGLE),
+                })}
+                onSubmit={e => {
                   e.preventDefault();
                   setEmailLoading(true);
                   const formData = new FormData(e.target as HTMLFormElement);
@@ -223,7 +238,7 @@ export default function Home() {
                   label="Enter email address for Magic Link Authentication"
                   type="email"
                   value={jumpEmail}
-                  onChange={(e) => setJumpEmail(e.target.value)}
+                  onChange={e => setJumpEmail(e.target.value)}
                 />
                 <Button
                   color="primary"
