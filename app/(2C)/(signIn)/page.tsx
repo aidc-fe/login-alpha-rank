@@ -105,15 +105,12 @@ export default function Home() {
                         ...user,
                         callbackUrl: `${callbackUrl}&userId=${user.sub}`,
                         businessDomainId,
-                      })
-                        .catch(() => {
-                          window.location.reload();
-                        })
-                        .finally(() => {
-                          setLoading(false);
-                        });
+                      });
                     })
                     .catch(() => {
+                      window.location.reload();
+                    })
+                    .finally(() => {
                       setLoading(false);
                     });
                 }}
