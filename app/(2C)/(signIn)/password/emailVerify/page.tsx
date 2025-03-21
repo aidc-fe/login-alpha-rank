@@ -77,6 +77,7 @@ export default function Page() {
         <Turnstile
           sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
           onVerify={token => setToken(token)} // 验证成功后获取 token
+          refreshExpired="auto"
         />
         <Button
           className="group w-full"

@@ -155,5 +155,6 @@ export async function verifyToken(token: string) {
     body: formData,
   });
   const result = await response.json();
+  console.log(process.env.TURNSTILE_SECRET_KEY, result);
   return result.success;
 }
