@@ -10,6 +10,30 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   const userInfo = await request.json();
+
+
+  // 验证人机验证
+  const secretKey = process.env.TURNSTILE_SECRET_KEY!;
+  const verifyUrl = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+  const formData = new URLSearchParams();
+  formData.append("secret", secretKey);
+  formData.append("response", userInfo.token);
+
+  try {
+    const response = await fetch(verifyUrl, {
+      method: "POST",
+      body: formData,
+    });
+    const result = await response.json();
+
+    if (!result.success) {
+      return NextResponse.json(formateError(ERROR_CONFIG.AUTH.TURNSTILE_VERIFY_FAIL));
+    }
+  } catch (error) {
+    return NextResponse.json(formateError(ERROR_CONFIG.AUTH.TURNSTILE_VERIFY_FAIL));
+  }
+
+
   // 获取当前请求的 host
   const host = request.headers.get("host") || request.headers.get(":authority");
   const baseUrl = `https://${host}`;

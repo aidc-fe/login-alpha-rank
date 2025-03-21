@@ -19,6 +19,7 @@ async function getClient() {
   const header = headers();
   // 在 HTTP/2 以及 HTTP/3 中，以一个伪头 :authority 代替 所以需要做一层兼容
   const hostname = header.get("host") || header.get(":authority");
+  // const hostname = "pre-login.text2go.ai";
 
   if (!hostname) {
     throw new Error("Hostname not found");

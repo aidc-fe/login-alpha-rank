@@ -5,9 +5,11 @@ import Image from "next/image";
 import request from "@/lib/request";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FormEventHandler, useEffect, useState } from "react";
+import { FormEventHandler, Suspense, useEffect, useState } from "react";
 import { useClient } from "@/providers/client-provider";
 import PasswordInput from "@/components/PasswordInput";
+import Turnstile from "react-turnstile";
+import { toast } from "react-toastify";
 
 export default function SignUpPage() {
   const searchParams = useSearchParams();
@@ -18,7 +20,8 @@ export default function SignUpPage() {
   );
   const targetUrl = decodeURIComponent(searchParams.get("targetUrl") || "");
   const [callbackUrl, setCallbackUrl] = useState("");
-  
+  const [token, setToken] = useState("");
+
   const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc, url } =
     useClient();
 
@@ -61,6 +64,10 @@ export default function SignUpPage() {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
+    if (!token) {
+      toast.error("Please verify the captcha");
+      return;
+    }
     // 发送验证邮件
     request("/api/signUp/email/send", {
       method: "POST",
@@ -71,6 +78,7 @@ export default function SignUpPage() {
         targetUrl: callbackUrl,
         businessDomainId,
         client_id,
+        token
       }),
     })
       .then(() => {
@@ -105,6 +113,11 @@ export default function SignUpPage() {
           required
         ></Input>
         <PasswordInput name="password" label="Password" required />
+        <Turnstile
+          sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+          onVerify={(token) => setToken(token)} // 验证成功后获取 token
+        />
+      
         <Button
           className="w-full"
           color="primary"
