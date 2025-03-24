@@ -51,7 +51,6 @@ export default function SignUpPage() {
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = e => {
     e.preventDefault();
-    setLoading(true);
     const formData = new FormData(e.target as HTMLFormElement);
     const name = formData.get("name");
     const email = formData.get("email") as string;
@@ -61,6 +60,8 @@ export default function SignUpPage() {
       toast.error("Please verify the captcha");
       return;
     }
+
+    setLoading(true);
     // 发送验证邮件
     request("/api/signUp/email/send", {
       method: "POST",
