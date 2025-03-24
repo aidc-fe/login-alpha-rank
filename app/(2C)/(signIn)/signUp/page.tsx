@@ -5,32 +5,29 @@ import Image from "next/image";
 import request from "@/lib/request";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FormEventHandler, useEffect, useState } from "react";
+import { FormEventHandler, Suspense, useEffect, useState } from "react";
 import { useClient } from "@/providers/client-provider";
 import PasswordInput from "@/components/PasswordInput";
+import Turnstile from "react-turnstile";
+import { toast } from "react-toastify";
 
 export default function SignUpPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState(
-    decodeURIComponent(searchParams.get("email") || "")
-  );
+  const [email, setEmail] = useState(decodeURIComponent(searchParams.get("email") || ""));
   const targetUrl = decodeURIComponent(searchParams.get("targetUrl") || "");
   const [callbackUrl, setCallbackUrl] = useState("");
-  
-  const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc, url } =
-    useClient();
+  const [token, setToken] = useState("");
 
+  const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc, url } = useClient();
 
   // 根据是否是单点登录，判断登录后跳转的页面
   useEffect(() => {
     if (isSSO === undefined) {
       return;
     } else if (isSSO) {
-      setCallbackUrl(
-        `/login-landing-page?${targetUrl ? "targetUrl=" + targetUrl : ""}`
-      );
+      setCallbackUrl(`/login-landing-page?${targetUrl ? "targetUrl=" + targetUrl : ""}`);
     } else {
       const invite = sessionStorage.getItem("invite");
       const loginReferral = sessionStorage.getItem("loginReferral");
@@ -41,20 +38,19 @@ export default function SignUpPage() {
   }, [isSSO]);
 
   useEffect(() => {
-    
     // 查找或创建 canonical link 标签
     let link = document.querySelector("link[rel='canonical']");
     if (!link) {
-      link = document.createElement('link');
-      link.setAttribute('rel', 'canonical');
+      link = document.createElement("link");
+      link.setAttribute("rel", "canonical");
       document.head.appendChild(link);
     }
-    
+
     // 更新 canonical URL
-    link.setAttribute('href', `${url}/signUp`);
+    link.setAttribute("href", `${url}/signUp`);
   }, []); // 空数组表示只有在组件挂载时运行一次
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = e => {
     e.preventDefault();
     setLoading(true);
     const formData = new FormData(e.target as HTMLFormElement);
@@ -62,6 +58,10 @@ export default function SignUpPage() {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
+    if (!token) {
+      toast.error("Please verify the captcha");
+      return;
+    }
     // 发送验证邮件
     request("/api/signUp/email/send", {
       method: "POST",
@@ -72,15 +72,15 @@ export default function SignUpPage() {
         targetUrl: callbackUrl,
         businessDomainId,
         client_id,
+        token,
       }),
     })
       .then(() => {
-        router.push(
-          `/email/sent?email=${encodeURIComponent(email || "")}&type=sign_up`
-        );
+        router.push(`/email/sent?email=${encodeURIComponent(email || "")}&type=sign_up`);
       })
-      .catch((err) => {
+      .catch(err => {
         console.log({ err });
+        window.location.reload();
       })
       .finally(() => {
         setLoading(false);
@@ -99,13 +99,19 @@ export default function SignUpPage() {
           name="email"
           type="email"
           value={email}
-          onChange={(e) => {
+          onChange={e => {
             setEmail(e.target.value);
           }}
           label="E-mail"
           required
         ></Input>
         <PasswordInput name="password" label="Password" required />
+        <Turnstile
+          sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+          onVerify={token => setToken(token)} // 验证成功后获取 token
+          refreshExpired="auto"
+        />
+
         <Button
           className="w-full"
           color="primary"
@@ -125,7 +131,7 @@ export default function SignUpPage() {
         <Button
           className="w-full"
           size="lg"
-          onClick={() => signIn("google", { callbackUrl })}
+          onClick={() => signIn("google", { callbackUrl: `${callbackUrl}&auth_type=google` })}
         >
           <Image
             height="24"

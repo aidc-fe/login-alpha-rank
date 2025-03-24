@@ -1,16 +1,19 @@
 import { ERROR_CONFIG } from "@/lib/errors";
-import {
-  createVerificationToken,
-  findClientByClientId,
-  getUser,
-} from "@/lib/database";
+import { createVerificationToken, findClientByClientId, getUser } from "@/lib/database";
 import { sendVerificationEmail } from "@/lib/email";
 import { formateError, formatSuccess } from "@/lib/request";
 import { NextRequest, NextResponse } from "next/server";
+import { verifyToken } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
-  const { email, password, businessDomainId, client_id } =
-    (await request.json()) || {};
+  const { email, password, businessDomainId, client_id, token } = (await request.json()) || {};
+
+  // 验证turnstile token
+  const result = await verifyToken(token);
+  if (!result) {
+    return NextResponse.json(formateError(ERROR_CONFIG.AUTH.TURNSTILE_VERIFY_FAIL));
+  }
+
   // 获取当前请求的 host
   const host = request.headers.get("host") || request.headers.get(":authority");
   const baseUrl = `https://${host}`;
@@ -24,7 +27,7 @@ export async function POST(request: NextRequest) {
       identifier: email, // 你需要的 identifier
       password,
       type: "passwordSet", // 可选
-      businessDomainId
+      businessDomainId,
     });
     const verificationLink = `${baseUrl}/api/password/set?token=${newToken.token}`;
     const client = await findClientByClientId(client_id);

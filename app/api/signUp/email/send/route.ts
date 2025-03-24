@@ -1,15 +1,23 @@
 import { ERROR_CONFIG } from "@/lib/errors";
-import {
-  createVerificationToken,
-  findClientByClientId,
-  getUser,
-} from "@/lib/database";
+import { createVerificationToken, findClientByClientId, getUser } from "@/lib/database";
 import { sendVerificationEmail } from "@/lib/email";
 import { formateError, formatSuccess } from "@/lib/request";
 import { NextRequest, NextResponse } from "next/server";
+import { verifyToken } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   const userInfo = await request.json();
+
+  try {
+    const result = await verifyToken(userInfo.token);
+
+    if (!result) {
+      return NextResponse.json(formateError(ERROR_CONFIG.AUTH.TURNSTILE_VERIFY_FAIL));
+    }
+  } catch (error) {
+    return NextResponse.json(formateError(ERROR_CONFIG.AUTH.TURNSTILE_VERIFY_FAIL));
+  }
+
   // 获取当前请求的 host
   const host = request.headers.get("host") || request.headers.get(":authority");
   const baseUrl = `https://${host}`;
@@ -45,8 +53,7 @@ export async function POST(request: NextRequest) {
         "Verify your email ",
         {
           title: "Verify your email address",
-          description:
-            "To continue setting up your account, please verify your email address.",
+          description: "To continue setting up your account, please verify your email address.",
           btnContent: "Verify Email Address",
         },
         {
@@ -65,9 +72,7 @@ export async function POST(request: NextRequest) {
       );
     } catch (error) {
       console.log("VERIFICATION_TOKEN.GENERATE_FAIL", error);
-      return NextResponse.json(
-        ERROR_CONFIG.DATABASE.VERIFICATION_TOKEN.GENERATE_FAIL
-      );
+      return NextResponse.json(ERROR_CONFIG.DATABASE.VERIFICATION_TOKEN.GENERATE_FAIL);
     }
   }
 }

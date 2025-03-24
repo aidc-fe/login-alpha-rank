@@ -63,6 +63,10 @@ export const ERROR_CONFIG = {
       code: "AUTH_USER_NOT_EXIST",
       message: "User does not exist, please sign up.",
     },
+    TURNSTILE_VERIFY_FAIL: {
+      code: "AUTH_TURNSTILE_VERIFY_FAIL",
+      message: "Captcha verification failed, please try again.",
+    },
   },
   SHOPLAZZA: {
     HMAC: {

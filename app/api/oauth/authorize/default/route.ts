@@ -1,6 +1,8 @@
 import { authOptions } from "@/lib/authOptions";
 import { createAuthorizationCode, findClientByClientId } from "@/lib/database";
 import { generateAuthorizationCode } from "@/lib/secret";
+import { is3Minutes } from "@/lib/utils";
+import { User } from "@prisma/client";
 import { Session } from "next-auth";
 import { getServerSession } from "next-auth/next";
 import { NextRequest, NextResponse } from "next/server";
@@ -14,10 +16,11 @@ export async function GET(request: NextRequest) {
   const invite = request.nextUrl.searchParams.get("invite");
   const loginReferral = request.nextUrl.searchParams.get("loginReferral");
   //  const state = request.nextUrl.searchParams.get("state") || "";
+  const auth_type = request.nextUrl.searchParams.get("auth_type");
   let userId = request.nextUrl.searchParams.get("userId") || "";
-  
+  const session = await getServerSession(authOptions) as Session & { id: string, jwtToken: string, user: User };
+
   if(!userId){
-    const session = await getServerSession(authOptions) as Session & { id: string, jwtToken: string };
     userId = session?.id;
   }
 
@@ -67,8 +70,12 @@ export async function GET(request: NextRequest) {
     redirectUrl.searchParams.set("loginReferral", loginReferral);
   }
   // 添加auth_action
-  if (auth_action) {
+  if (auth_type !== "google" && auth_action) {
     redirectUrl.searchParams.set("authAction", auth_action);
+  } else if (session.user?.created_at) {
+    // 验证时间戳是否在当前时间3分钟范围内,判断是注册还是登录
+    const authAction = is3Minutes(session.user.created_at);
+    redirectUrl.searchParams.set("authAction", authAction);
   }
   // 重定向到 redirect_uri
   return NextResponse.redirect(redirectUrl.toString(), 302);
