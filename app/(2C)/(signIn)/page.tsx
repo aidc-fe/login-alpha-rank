@@ -46,9 +46,10 @@ export default function Home() {
       const callbackSite = window.opener && window.name === "loginWindow" ? `${window.location.origin}/popup-login` : (targetUrl || "")
 
       const invite = sessionStorage.getItem("invite");
+      const loginReferral = sessionStorage.getItem("loginReferral");
       
       setCallbackUrl(
-        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}&callbackUrl=${callbackSite}&auth_action=sign_in${invite ? `&invite=${invite}` : ""}`
+        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}&callbackUrl=${callbackSite}&auth_action=sign_in${invite ? `&invite=${invite}` : ""}${loginReferral ? `&loginReferral=${loginReferral}` : ""}`
       );
     }
   }, [isSSO]);

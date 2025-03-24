@@ -33,8 +33,9 @@ export default function SignUpPage() {
       );
     } else {
       const invite = sessionStorage.getItem("invite");
+      const loginReferral = sessionStorage.getItem("loginReferral");
       setCallbackUrl(
-        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}${targetUrl ? `&callbackUrl=${targetUrl}` : ""}&auth_action=sign_up${invite ? `&invite=${invite}` : ""}`
+        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}${targetUrl ? `&callbackUrl=${targetUrl}` : ""}&auth_action=sign_up${invite ? `&invite=${invite}` : ""}${loginReferral ? `&loginReferral=${loginReferral}` : ""}`
       );
     }
   }, [isSSO]);
