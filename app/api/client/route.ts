@@ -40,6 +40,11 @@ export async function GET(req: NextRequest, res: NextResponse) {
       })
     );
   } catch (error) {
-    return NextResponse.json(formateError({ message: error as string }));
+    return NextResponse.json(
+      formateError({
+        code: "CLIENT_LIST_ERROR",
+        message: error as string,
+      })
+    );
   }
 }
