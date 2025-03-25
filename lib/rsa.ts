@@ -7,7 +7,8 @@ export const encryptWithRSA = (data: string, publicKey: string): string => {
     const encrypted = publicEncrypt(
       {
         key: publicKey,
-        padding: constants.RSA_PKCS1_PADDING,
+        padding: constants.RSA_PKCS1_OAEP_PADDING,
+        oaepHash: "sha256",
       },
       buffer
     );
@@ -31,7 +32,8 @@ export const decryptWithRSA = (encryptedData: string): string => {
     const decrypted = privateDecrypt(
       {
         key: privateKey,
-        padding: constants.RSA_PKCS1_PADDING,
+        padding: constants.RSA_PKCS1_OAEP_PADDING,
+        oaepHash: "sha256",
       },
       buffer
     );
