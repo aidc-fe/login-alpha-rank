@@ -79,7 +79,6 @@ export default function Home() {
 
     if (!token) {
       toast.error("Please verify the captcha");
-
       return;
     }
 
@@ -121,7 +120,6 @@ export default function Home() {
         });
     } catch (error) {
       setLoading(false);
-      toast.error("登录失败，请重试");
     }
   };
 
