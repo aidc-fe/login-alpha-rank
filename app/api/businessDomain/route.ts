@@ -18,6 +18,7 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     return NextResponse.json(
       formateError({
+        code: "BUSINESS_DOMAIN_CREATE_ERROR",
         message: error.message || "Failed to create business domain",
       })
     );
@@ -34,6 +35,11 @@ export async function GET() {
       })
     );
   } catch (error) {
-    return NextResponse.json(formateError({ message: error as string }));
+    return NextResponse.json(
+      formateError({
+        code: "BUSINESS_DOMAIN_GET_ERROR",
+        message: error as string,
+      })
+    );
   }
 }
