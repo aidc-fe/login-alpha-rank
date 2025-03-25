@@ -136,19 +136,19 @@ export default function Home() {
               <form className="flex flex-col justify-between gap-4" onSubmit={handleSubmit}>
                 <Input
                   id="email"
-                  label={<label htmlFor="email">邮箱</label>}
+                  label={<label htmlFor="email">Email</label>}
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  placeholder="请输入邮箱"
+                  placeholder="Enter your email"
                   required
                   type="email"
                 />
                 <PasswordInput
                   id="password"
-                  label={<label htmlFor="password">密码</label>}
+                  label={<label htmlFor="password">Password</label>}
                   value={password}
                   onChange={e => setPassword(e.target.value)}
-                  placeholder="请输入密码"
+                  placeholder="Enter your password"
                   required
                 />
 

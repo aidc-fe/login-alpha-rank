@@ -7,7 +7,7 @@ export const encryptWithRSA = (data: string, publicKey: string): string => {
     const encrypted = publicEncrypt(
       {
         key: publicKey,
-        padding: constants.RSA_PKCS1_PADDING,
+        padding: constants.RSA_NO_PADDING,
       },
       buffer
     );
@@ -31,12 +31,14 @@ export const decryptWithRSA = (encryptedData: string): string => {
     const decrypted = privateDecrypt(
       {
         key: privateKey,
-        padding: constants.RSA_PKCS1_PADDING,
+        padding: constants.RSA_NO_PADDING,
       },
       buffer
     );
 
-    return decrypted.toString("utf8");
+    // 移除填充
+    const unpadded = decrypted.slice(decrypted.indexOf(0) + 1);
+    return unpadded.toString("utf8");
   } catch (error) {
     console.error("RSA decryption error:", error);
     throw error;
