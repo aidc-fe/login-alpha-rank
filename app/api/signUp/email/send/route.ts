@@ -5,6 +5,7 @@ import { createVerificationToken, findClientByClientId, getUser } from "@/lib/da
 import { sendVerificationEmail } from "@/lib/email";
 import { formateError, formatSuccess } from "@/lib/request";
 import { verifyToken } from "@/lib/auth";
+import { decryptWithRSA } from "@/lib/rsa";
 
 export async function POST(request: NextRequest) {
   const userInfo = await request.json();
@@ -33,16 +34,17 @@ export async function POST(request: NextRequest) {
   ) {
     return NextResponse.json(formateError(ERROR_CONFIG.AUTH.USER_EXIST));
   } else {
-    // 生成验证链接（你需要实现生成实际的链接）
+    // 解密密码
+    const decryptedPassword = decryptWithRSA(userInfo.password);
 
     try {
       const newToken = await createVerificationToken({
-        identifier: userInfo?.email, // 你需要的 identifier
+        identifier: userInfo?.email,
         name: userInfo?.name,
-        password: userInfo?.password, // 可选
+        password: decryptedPassword,
         targetUrl: userInfo?.targetUrl,
         businessDomainId: userInfo?.businessDomainId,
-        type: "signUp", // 可选
+        type: "signUp",
       });
       const verificationLink = `${baseUrl}/api/signUp/email/verify?token=${newToken.token}`;
       const client = await findClientByClientId(userInfo?.client_id);

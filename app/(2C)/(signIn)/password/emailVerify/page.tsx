@@ -10,6 +10,7 @@ import Turnstile from "react-turnstile";
 import { useClient } from "@/providers/client-provider";
 import PasswordInput from "@/components/PasswordInput";
 import request from "@/lib/request";
+import { encryptWithRSA } from "@/lib/rsa";
 
 export default function Page() {
   const { businessDomainId, client_id } = useClient();
@@ -19,12 +20,11 @@ export default function Page() {
   const [token, setToken] = useState("");
   const router = useRouter();
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = e => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async e => {
     e.preventDefault();
 
     if (!token) {
       toast.error("Please verify the captcha");
-
       return;
     }
 
@@ -36,25 +36,43 @@ export default function Page() {
     // 校验新旧密码
     if (checkPassword !== password) {
       toast.error("Password does not match.");
-
       return;
     }
 
     setLoading(true);
-    request("/api/password/emailVerify", {
-      method: "POST",
-      body: JSON.stringify({ email, password, businessDomainId, client_id, token }),
-    })
-      .then(() => {
-        router.push(`/email/sent?email=${encodeURIComponent(email || "")}&type=set_password`);
+    try {
+      // 获取公钥
+      const response = await fetch("/api/rsa/public-key");
+      const { publicKey } = await response.json();
+
+      // 加密密码
+      const encryptedPassword = encryptWithRSA(password, publicKey);
+
+      // 发送验证邮件
+      request("/api/password/emailVerify", {
+        method: "POST",
+        body: JSON.stringify({
+          email,
+          password: encryptedPassword,
+          businessDomainId,
+          client_id,
+          token,
+        }),
       })
-      .catch(err => {
-        console.log({ err });
-        window.location.reload();
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+        .then(() => {
+          router.push(`/email/sent?email=${encodeURIComponent(email || "")}&type=set_password`);
+        })
+        .catch(err => {
+          console.log({ err });
+          window.location.reload();
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } catch (error) {
+      setLoading(false);
+      toast.error("设置密码失败，请重试");
+    }
   };
 
   return (

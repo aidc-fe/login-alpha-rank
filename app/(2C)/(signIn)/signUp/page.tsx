@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 import { useClient } from "@/providers/client-provider";
 import PasswordInput from "@/components/PasswordInput";
 import request from "@/lib/request";
+import { encryptWithRSA } from "@/lib/rsa";
 
 export default function SignUpPage() {
   const searchParams = useSearchParams();
@@ -52,7 +53,7 @@ export default function SignUpPage() {
     link.setAttribute("href", `${url}/signUp`);
   }, []); // 空数组表示只有在组件挂载时运行一次
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = e => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async e => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
     const name = formData.get("name");
@@ -61,18 +62,24 @@ export default function SignUpPage() {
 
     if (!token) {
       toast.error("Please verify the captcha");
-
       return;
     }
 
     setLoading(true);
+    // 获取公钥
+    const response = await fetch("/api/rsa/public-key");
+    const { publicKey } = await response.json();
+
+    // 加密密码
+    const encryptedPassword = encryptWithRSA(password, publicKey);
+
     // 发送验证邮件
     request("/api/signUp/email/send", {
       method: "POST",
       body: JSON.stringify({
         name,
         email,
-        password,
+        password: encryptedPassword,
         targetUrl: callbackUrl,
         businessDomainId,
         client_id,
