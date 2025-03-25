@@ -83,18 +83,19 @@ export default function Home() {
       return;
     }
 
-    setLoading(true);
-    const formData = new FormData(e.target as HTMLFormElement);
-    const email = formData.get("email");
-    const password = formData.get("password");
+    if (!email || !password) {
+      toast.error("Email and password are required");
+      return;
+    }
 
+    setLoading(true);
     try {
       // 获取公钥
       const response = await fetch("/api/rsa/public-key");
       const { publicKey } = await response.json();
 
       // 加密密码
-      const encryptedPassword = encryptWithRSA(password as string, publicKey);
+      const encryptedPassword = encryptWithRSA(password, publicKey);
 
       // 登录
       request("/api/signIn", {
