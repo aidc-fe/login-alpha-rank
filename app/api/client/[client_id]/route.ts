@@ -19,15 +19,27 @@ export async function GET(
 
     // 如果客户端不存在，返回错误
     if (!client) {
-      return NextResponse.json(formateError({ message: "Client not found" }), {
-        status: 404,
-      });
+      return NextResponse.json(
+        formateError({
+          code: "CLIENT_NOT_FOUND",
+          message: "Client not found",
+        }),
+        {
+          status: 404,
+        }
+      );
     }
 
     // 返回客户端详情
     return NextResponse.json(formatSuccess({ data: client }));
   } catch (error) {
-    return NextResponse.json(formateError({ message: "Internal Server Error" }), { status: 500 });
+    return NextResponse.json(
+      formateError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Internal Server Error",
+      }),
+      { status: 500 }
+    );
   }
 }
 
@@ -50,6 +62,11 @@ export async function POST(
 
     return NextResponse.json(formatSuccess({ data: updatedClient }));
   } catch (error) {
-    return NextResponse.json(formateError({ message: "Internal Server Error" }));
+    return NextResponse.json(
+      formateError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Internal Server Error",
+      })
+    );
   }
 }
