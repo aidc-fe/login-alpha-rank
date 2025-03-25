@@ -1,18 +1,19 @@
 "use client";
 
-import request from "@/lib/request";
 import { ArrowUpRight } from "lucide-react";
 import { signIn, useSession } from "next-auth/react";
 import { Button, cn, Input, Link, Spinner } from "@nextui-org/react";
 import Image from "next/image";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useClient } from "@/providers/client-provider";
 import { Session } from "next-auth";
-import PasswordInput from "@/components/PasswordInput";
-import { AUTH_METHOD } from "@/lib/admin";
 import Turnstile from "react-turnstile";
 import { toast } from "react-toastify";
+
+import { useClient } from "@/providers/client-provider";
+import PasswordInput from "@/components/PasswordInput";
+import { AUTH_METHOD } from "@/lib/admin";
+import request from "@/lib/request";
 import { encryptWithRSA } from "@/lib/rsa";
 
 export default function Home() {
@@ -78,6 +79,7 @@ export default function Home() {
 
     if (!token) {
       toast.error("Please verify the captcha");
+
       return;
     }
 
@@ -134,14 +136,14 @@ export default function Home() {
             {login_methods.includes(AUTH_METHOD.PASSWORD) && (
               <form className="flex flex-col justify-between gap-4" onSubmit={handleSubmit}>
                 <Input
-                  name="email"
-                  label="E-mail"
                   required
+                  label="E-mail"
+                  name="email"
                   type="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                 />
-                <PasswordInput name="password" label="Password" required />
+                <PasswordInput required label="Password" name="password" />
 
                 <div className="flex justify-between mb-3">
                   <Link
@@ -149,18 +151,18 @@ export default function Home() {
                     anchorIcon={
                       <ArrowUpRight className="group-hover:rotate-45 duration-150" size={20} />
                     }
-                    underline="always"
                     className="group text-muted"
                     href={`/password/emailVerify?email=${encodeURIComponent(email)}`}
+                    underline="always"
                   >
                     Forgot your password{" "}
                   </Link>
                   <div className="text-muted">
                     Not a member?{" "}
                     <Link
-                      underline="always"
                       href={`/signUp?email=${encodeURIComponent(email)}`}
                       isDisabled={loading || emailLoading || googleLoading}
+                      underline="always"
                     >
                       Sign up
                     </Link>
@@ -168,18 +170,18 @@ export default function Home() {
                 </div>
                 <Turnstile
                   className="mx-auto"
+                  refreshExpired="auto"
                   sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
                   onVerify={token => setToken(token)} // 验证成功后获取 token
-                  refreshExpired="auto"
                 />
 
                 <Button
                   color="primary"
-                  type="submit"
+                  isDisabled={emailLoading || googleLoading}
+                  isLoading={loading}
                   size="lg"
                   spinner={<Spinner color="default" size="sm" />}
-                  isLoading={loading}
-                  isDisabled={emailLoading || googleLoading}
+                  type="submit"
                 >
                   Sign in
                 </Button>
@@ -199,22 +201,22 @@ export default function Home() {
             {login_methods.includes(AUTH_METHOD.GOOGLE) && (
               <Button
                 className="w-full"
+                isDisabled={loading || emailLoading}
+                isLoading={googleLoading}
                 size="lg"
+                spinner={<Spinner color="primary" size="sm" />}
                 onClick={() => {
                   setGoogleLoading(true);
                   signIn("google", { callbackUrl: `${callbackUrl}&auth_type=google` }).catch(() => {
                     setGoogleLoading(false);
                   });
                 }}
-                spinner={<Spinner color="primary" size="sm" />}
-                isDisabled={loading || emailLoading}
-                isLoading={googleLoading}
               >
                 <Image
-                  height="24"
-                  width="24"
                   alt="provider-logo-dark"
+                  height="24"
                   src="https://authjs.dev/img/providers/google.svg"
+                  width="24"
                 />
                 Google
               </Button>
@@ -253,20 +255,20 @@ export default function Home() {
                 }}
               >
                 <Input
-                  name="email"
                   required
                   label="Enter email address for Magic Link Authentication"
+                  name="email"
                   type="email"
                   value={jumpEmail}
                   onChange={e => setJumpEmail(e.target.value)}
                 />
                 <Button
                   color="primary"
-                  type="submit"
+                  isDisabled={loading || googleLoading}
+                  isLoading={emailLoading}
                   size="lg"
                   spinner={<Spinner color="default" size="sm" />}
-                  isLoading={emailLoading}
-                  isDisabled={loading || googleLoading}
+                  type="submit"
                 >
                   Sign in
                 </Button>
@@ -278,13 +280,13 @@ export default function Home() {
             <div className="w-full text-foreground-500 font-normal text-center mt-4">
               By continuing with any of the options above, you agree to our{" "}
               {tos_doc && (
-                <Link href={tos_doc} isExternal underline="always">
+                <Link isExternal href={tos_doc} underline="always">
                   Terms of Service
                 </Link>
               )}{" "}
               and have read our{" "}
               {pp_doc && (
-                <Link href={pp_doc} isExternal underline="always">
+                <Link isExternal href={pp_doc} underline="always">
                   Privacy Policy
                 </Link>
               )}{" "}

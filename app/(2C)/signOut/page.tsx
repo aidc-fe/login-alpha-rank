@@ -4,6 +4,7 @@ import { signOut, useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Loader } from "lucide-react";
+
 import { thirdPartySignOut } from "@/lib/auth";
 import { useClient } from "@/providers/client-provider";
 
@@ -30,7 +31,7 @@ export default function SignOutPage() {
 
   return (
     <main className="h-svh flex justify-center items-center w-full">
-      <Loader size={60} className="text-primary animate-spin" />
+      <Loader className="text-primary animate-spin" size={60} />
     </main>
   );
 }

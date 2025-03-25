@@ -1,13 +1,14 @@
 "use client";
 
-import Header from "@/components/admin/Layouts/Header";
-import Sider from "@/components/admin/Layouts/Sider";
 import { Loader } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
-const whiteList = ['yuyuqueenlovemyself@gmail.com'];
+import Sider from "@/components/admin/Layouts/Sider";
+import Header from "@/components/admin/Layouts/Header";
+
+const whiteList = ["yuyuqueenlovemyself@gmail.com"];
 
 export default function RootLayout({
   children,
@@ -16,22 +17,22 @@ export default function RootLayout({
 }>) {
   const router = useRouter();
   const { data: session, status } = useSession();
-  
+
   useEffect(() => {
     // 检查是否在加载中
-    if (status === 'loading') return;
+    if (status === "loading") return;
 
-    if (status === 'unauthenticated' || !whiteList.includes(session?.user?.email || '')) {
-      router.replace('/');
+    if (status === "unauthenticated" || !whiteList.includes(session?.user?.email || "")) {
+      router.replace("/");
     }
   }, [status, session?.user?.email]);
 
-  if (status === 'loading') {
+  if (status === "loading") {
     return (
       <main className="h-full flex justify-center items-center w-full">
-        <Loader size={60} className="text-primary animate-spin" />
+        <Loader className="text-primary animate-spin" size={60} />
       </main>
-    )
+    );
   }
 
   // if (status === 'unauthenticated' || !whiteList.includes(session?.user?.email || '')) {
@@ -50,7 +51,7 @@ export default function RootLayout({
           {
             label: "Business Domain Manage",
             key: "/admin/businessDomain",
-          }
+          },
         ]}
       />
       <main className="pt-20 ml-64">

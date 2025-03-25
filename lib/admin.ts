@@ -30,15 +30,15 @@ export const scopeOptions = [
 
 export const authMethodOptions = [
   {
-    label: 'Magic Link',
+    label: "Magic Link",
     value: AUTH_METHOD.EMAIL,
   },
   {
-    label: 'Account Password',
+    label: "Account Password",
     value: AUTH_METHOD.PASSWORD,
   },
   {
-    label: 'Google OAuth',
+    label: "Google OAuth",
     value: AUTH_METHOD.GOOGLE,
   },
 ]; //允许的登录方式
@@ -51,7 +51,7 @@ export type ClientDataType = Omit<Client, "materials" | "redirect_uris" | "scope
     image: string;
   }[];
   scope: string[];
-}
+};
 
 export type BusinessDomainDataType = {
   id: string;
@@ -61,4 +61,4 @@ export type BusinessDomainDataType = {
   updated_at: Date;
   active: boolean;
   sso: boolean;
-}
+};

@@ -1,10 +1,11 @@
 "use client";
 
 import { toast } from "react-toastify";
-import request from "@/lib/request";
 import { Breadcrumbs, BreadcrumbItem } from "@nextui-org/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+
+import request from "@/lib/request";
 import ClientForm from "@/components/admin/ClientForm";
 
 export default function CreateClient() {
@@ -31,10 +32,7 @@ export default function CreateClient() {
       <div className="w-full font-semibold text-2xl mt-4 self-start h-10">
         <span>Create Client</span>
       </div>
-      <ClientForm
-        mode="create" 
-        onSubmit={handleSubmit}
-      />
+      <ClientForm mode="create" onSubmit={handleSubmit} />
     </>
   );
 }

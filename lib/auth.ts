@@ -1,5 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "crypto";
+
+import { NextRequest, NextResponse } from "next/server";
+
 import { encodeJwt } from "./secret";
 import { ERROR_CONFIG } from "./errors";
 
@@ -61,6 +63,7 @@ export function shoplazzaHmacValidator(request: NextRequest): boolean {
     const url = new URL(request.url);
     const hmac = url.searchParams.get("hmac");
     const queryParams = new URLSearchParams(url.searchParams);
+
     queryParams.delete("hmac");
 
     const sortedKeys = Array.from(queryParams.keys()).sort();
@@ -148,6 +151,7 @@ export async function verifyToken(token: string) {
   const secretKey = process.env.TURNSTILE_SECRET_KEY!;
   const verifyUrl = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
   const formData = new URLSearchParams();
+
   formData.append("secret", secretKey);
   formData.append("response", token);
   const response = await fetch(verifyUrl, {
@@ -155,6 +159,8 @@ export async function verifyToken(token: string) {
     body: formData,
   });
   const result = await response.json();
+
   console.log(process.env.TURNSTILE_SECRET_KEY, result);
+
   return result.success;
 }

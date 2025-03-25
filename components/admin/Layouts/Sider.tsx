@@ -1,8 +1,9 @@
-'use client'
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils";
-import Link from "next/link";
-import { usePathname } from 'next/navigation'
 
 export type SiderItem = {
   label: React.ReactNode;
@@ -17,7 +18,7 @@ export interface SiderProps {
 
 const Sider: React.FC<SiderProps> = ({ items }) => {
   const pathname = usePathname();
-  
+
   const activeClass = (key: string) => {
     if (key === "/" && pathname !== "/") {
       return "";
@@ -34,6 +35,7 @@ const Sider: React.FC<SiderProps> = ({ items }) => {
     if (pathname.includes(menuItem.key)) {
       return menuItem.activeIcon || menuItem.icon;
     }
+
     return menuItem.icon || <span />;
   };
 
@@ -46,7 +48,7 @@ const Sider: React.FC<SiderProps> = ({ items }) => {
       <div className="max-h-full h-full flex flex-col justify-between">
         <div className="w-[254px] flex-1 overflow-hidden hover:overflow-auto sider-bar">
           <div className="w-[248px] h-full pt-5 pl-4 pr-2.5">
-            {items?.map((route) => (
+            {items?.map(route => (
               <Link
                 key={route.key}
                 className={cn(

@@ -1,20 +1,23 @@
 "use client";
 
-import SuspenseWrapper from "@/components/suspend-wrapper";
-import { useClient } from "@/providers/client-provider";
 import { Loader } from "lucide-react";
 import { signIn } from "next-auth/react";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
+import { useClient } from "@/providers/client-provider";
+import SuspenseWrapper from "@/components/suspend-wrapper";
+
 function PageContent() {
   const searchParams = useSearchParams();
   const { businessDomainId } = useClient();
+
   // 从searchParams提取用户信息
   useEffect(() => {
     const userData = Array.from(searchParams.keys()).reduce(
       (acc: { [key: string]: string }, curr: string) => {
         acc[curr] = searchParams.get(curr) || "";
+
         return acc;
       },
       {}
@@ -24,24 +27,17 @@ function PageContent() {
     const shopName = searchParams.get("shopName");
     const displayDomain = searchParams.get("displayDomain");
 
-    const signedStoreList = JSON.parse(
-      localStorage.getItem("signedStoreList") || "[]"
-    );
+    const signedStoreList = JSON.parse(localStorage.getItem("signedStoreList") || "[]");
+
     if (
       !signedStoreList.some(
-        (item: {
-          shopDomain: string;
-          shopName: string;
-          displayDomain: string;
-        }) => item.shopDomain === shopDomain
+        (item: { shopDomain: string; shopName: string; displayDomain: string }) =>
+          item.shopDomain === shopDomain
       )
     ) {
       localStorage.setItem(
         "signedStoreList",
-        JSON.stringify([
-          ...signedStoreList,
-          { shopDomain, shopName, displayDomain },
-        ])
+        JSON.stringify([...signedStoreList, { shopDomain, shopName, displayDomain }])
       );
     }
 
@@ -49,15 +45,14 @@ function PageContent() {
       ...userData,
       businessDomainId,
       callbackUrl: `/login-landing-page?targetUrl=${
-        sessionStorage.getItem("shopifyTargetUrl") ||
-        searchParams.get("targetUrl")
+        sessionStorage.getItem("shopifyTargetUrl") || searchParams.get("targetUrl")
       }&shopDomain=${shopDomain}`,
     });
   }, [searchParams]);
 
   return (
     <main className="h-full flex justify-center items-center w-full">
-      <Loader size={60} className="text-primary animate-spin" />
+      <Loader className="text-primary animate-spin" size={60} />
     </main>
   );
 }

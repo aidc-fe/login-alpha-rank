@@ -1,3 +1,6 @@
+import { User } from "@prisma/client";
+import { NextRequest, NextResponse } from "next/server";
+
 import {
   findAccessToken,
   findClientByClientId,
@@ -5,8 +8,6 @@ import {
   getUser,
 } from "@/lib/database";
 import { encodeJwt } from "@/lib/secret";
-import { User } from "@prisma/client";
-import { NextRequest, NextResponse } from "next/server";
 
 type UserInfoType = {
   email?: { email: string };
@@ -29,20 +30,14 @@ type UserInfoType = {
   }>[];
 };
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     const { id } = params;
     const access_token = request.headers.get("access-token");
 
     // 参数校验
     if (!access_token) {
-      return NextResponse.json(
-        { message: "access_token missing" },
-        { status: 400 }
-      );
+      return NextResponse.json({ message: "access_token missing" }, { status: 400 });
     }
     if (!id) {
       return NextResponse.json({ message: "user id missing" }, { status: 400 });
@@ -50,6 +45,7 @@ export async function GET(
 
     // 获取用户信息
     const user = (await getUser({ id })) as User;
+
     if (!user) {
       return NextResponse.json({ message: "user not exist" }, { status: 404 });
     }
@@ -92,7 +88,8 @@ export async function GET(
 
     if (scope.includes("shoplazza")) {
       const accounts = await getAccountsByUserIdAndProviders(id, ["shoplazza"]);
-      userInfo.shoplazza = accounts.map((item) => ({
+
+      userInfo.shoplazza = accounts.map(item => ({
         access_token: item.access_token,
         refresh_token: item.refresh_token,
         expires_at: item.expires_at,
@@ -104,9 +101,6 @@ export async function GET(
 
     return NextResponse.json(userInfo);
   } catch (e: any) {
-    return NextResponse.json(
-      { message: e.message || "Error fetching user info" },
-      { status: 500 }
-    );
+    return NextResponse.json({ message: e.message || "Error fetching user info" }, { status: 500 });
   }
 }

@@ -1,17 +1,20 @@
-import ClientProvider from "@/providers/client-provider";
 import { headers } from "next/headers";
+import { cache } from "react";
+
+import ClientProvider from "@/providers/client-provider";
 import { hexToHSL } from "@/lib/utils";
 import { getClientByAuthDomain, getBusinessDomainById } from "@/lib/database";
-import { cache } from "react";
 import ClientSession from "@/components/ClientSession";
 
 const getClientWithCache = cache(async (authDomain: string) => {
   const client = await getClientByAuthDomain(authDomain);
+
   return client;
 });
 
 const getBusinessDomainWithCache = cache(async (id: string) => {
   const businessDomain = await getBusinessDomainById(id);
+
   return businessDomain;
 });
 
@@ -37,6 +40,7 @@ async function getClient() {
 
 export async function generateMetadata() {
   const client = await getClient();
+
   return {
     title: client.title || "",
     description: client.description || "",
@@ -56,6 +60,7 @@ export default async function RootLayout({
 }>) {
   const client = await getClient();
   const hsl = hexToHSL(client.brand_color || "");
+
   return (
     <div
       style={

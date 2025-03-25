@@ -2,9 +2,6 @@
 
 import { Plus, Trash2 } from "lucide-react";
 import { FormEventHandler, useEffect, useState } from "react";
-import { scopeOptions, BusinessDomainDataType, ClientDataType, authMethodOptions } from "@/lib/admin";
-import { cn } from "@/lib/utils";
-import request from "@/lib/request";
 import {
   Input,
   Button,
@@ -20,6 +17,15 @@ import {
   Select,
   SelectItem,
 } from "@nextui-org/react";
+
+import {
+  scopeOptions,
+  BusinessDomainDataType,
+  ClientDataType,
+  authMethodOptions,
+} from "@/lib/admin";
+import { cn } from "@/lib/utils";
+import request from "@/lib/request";
 import PasswordInput from "@/components/PasswordInput";
 
 export type FormMode = "create" | "edit" | "view";
@@ -33,7 +39,9 @@ interface ClientFormProps {
 
 export default function ClientForm({ mode, initialData, onSubmit, onCancel }: ClientFormProps) {
   const [loading, setLoading] = useState(false);
-  const [materials, setMaterials] = useState<Array<{ title: string; image: string; description: string }>>(initialData?.materials ?? []);
+  const [materials, setMaterials] = useState<
+    Array<{ title: string; image: string; description: string }>
+  >(initialData?.materials ?? []);
   const [redirectUris, setRedirectUris] = useState<string[]>(initialData?.redirect_uris ?? [""]);
   const [brandColor, setBrandColor] = useState(initialData?.brand_color ?? "#000000");
   const [businessDomains, setBusinessDomains] = useState<BusinessDomainDataType[]>([]);
@@ -50,12 +58,12 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
   }, [initialData]);
 
   const getBusinessDomains = () => {
-    request("/api/businessDomain").then((res) => {
+    request("/api/businessDomain").then(res => {
       setBusinessDomains(res);
     });
   };
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async e => {
     e.preventDefault();
     setLoading(true);
 
@@ -77,7 +85,7 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
     }
 
     const scope = formData.getAll("scope");
-    const redirect_uris = formData.getAll("redirect_uri").filter((uri) => uri);
+    const redirect_uris = formData.getAll("redirect_uri").filter(uri => uri);
 
     const params = {
       businessDomainId: formData.get("businessDomainId"),
@@ -116,121 +124,122 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
     >
       <div className="flex flex-col gap-4">
         <Select
-          label="Business Domain"
-          className="max-w-xs"
-          name="businessDomainId"
-          isDisabled={isReadOnly}
           required
+          className="max-w-xs"
           defaultSelectedKeys={initialData?.businessDomainId ? [initialData.businessDomainId] : []}
+          isDisabled={isReadOnly}
+          label="Business Domain"
+          name="businessDomainId"
         >
-          {businessDomains.map((item) => (
+          {businessDomains.map(item => (
             <SelectItem key={item.id}>{item.name}</SelectItem>
           ))}
         </Select>
 
+        <label
+          htmlFor="client_name"
+          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+        >
+          Client Name
+        </label>
         <Input
-          name="name"
-          label="Name"
-          isReadOnly={isReadOnly}
           required
           defaultValue={initialData?.name}
+          isReadOnly={isReadOnly}
+          label="Name"
+          name="name"
         />
 
         <Textarea
-          name="description"
-          label="Description"
-          rows={2}
-          isReadOnly={isReadOnly}
           defaultValue={initialData?.description}
+          isReadOnly={isReadOnly}
+          label="Description"
+          name="description"
+          rows={2}
         />
 
         <Input
-          name="auth_domain"
-          label="Auth Domain"
-          isReadOnly={isReadOnly}
           defaultValue={initialData?.auth_domain}
+          isReadOnly={isReadOnly}
+          label="Auth Domain"
+          name="auth_domain"
         />
 
         <Input
-          name="title"
+          defaultValue={initialData?.title || ""}
+          isReadOnly={isReadOnly}
           label="Title"
-          isReadOnly={isReadOnly}
-          defaultValue={initialData?.title || ''}
+          name="title"
         />
 
         <Input
-          name="favicon"
-          label="Favicon"
           required
+          defaultValue={initialData?.favicon || ""}
           isReadOnly={isReadOnly}
-          defaultValue={initialData?.favicon || ''}
+          label="Favicon"
+          name="favicon"
         />
 
         <div className="flex w-full items-center gap-2">
           <span className="capitalize text-sm">Brand Color:</span>
           <label
-            htmlFor="brand_color"
             className="h-10 w-10 p-2 rounded-xl border-1 cursor-pointer relative"
+            htmlFor="brand_color"
           >
             <Input
-              id="brand_color"
-              label="Brand Color"
-              type="color"
-              name="brand_color"
-              isDisabled={isReadOnly}
-              value={brandColor}
-              onChange={(e) => setBrandColor(e.target.value)}
               className="absolute inset-0 pointer-events-none opacity-0"
+              id="brand_color"
+              isDisabled={isReadOnly}
+              label="Brand Color"
+              name="brand_color"
+              type="color"
+              value={brandColor}
+              onChange={e => setBrandColor(e.target.value)}
             />
-            <div
-              className="rounded-md w-full h-full"
-              style={{ backgroundColor: brandColor }}
-            />
+            <div className="rounded-md w-full h-full" style={{ backgroundColor: brandColor }} />
           </label>
         </div>
 
         <div className="w-full flex flex-col gap-1">
           <span className="capitalize text-sm">Email Config:</span>
-          <div
-            className={cn("flex flex-col gap-4 border border-border rounded-xl px-4 py-6")}
-          >
+          <div className={cn("flex flex-col gap-4 border border-border rounded-xl px-4 py-6")}>
             <Input
-              name="mail_server_host"
-              label="Email Server Host"
-              isReadOnly={isReadOnly}
               required
               defaultValue={initialData?.mail_server_host}
-            />
-    
-            <Input
-              name="mail_server_port"
-              label="Email Server Port"
               isReadOnly={isReadOnly}
+              label="Email Server Host"
+              name="mail_server_host"
+            />
+
+            <Input
               required
               defaultValue={initialData?.mail_server_port}
-            />
-    
-            <Input
-              name="mail_server_user"
-              label="Email Server User"
               isReadOnly={isReadOnly}
+              label="Email Server Port"
+              name="mail_server_port"
+            />
+
+            <Input
               required
               defaultValue={initialData?.mail_server_user}
-            />
-    
-            <PasswordInput
-              name="mail_server_password"
-              label="Email Server Password"
               isReadOnly={isReadOnly}
+              label="Email Server User"
+              name="mail_server_user"
+            />
+
+            <PasswordInput
               required
               defaultValue={initialData?.mail_server_password}
-            />
-    
-            <Input
-              name="mail_template_image"
-              label="Email Template Image"
               isReadOnly={isReadOnly}
-              defaultValue={initialData?.mail_template_image || ''}
+              label="Email Server Password"
+              name="mail_server_password"
+            />
+
+            <Input
+              defaultValue={initialData?.mail_template_image || ""}
+              isReadOnly={isReadOnly}
+              label="Email Template Image"
+              name="mail_template_image"
             />
           </div>
         </div>
@@ -259,27 +268,27 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
                   <TableRow key={index}>
                     <TableCell>
                       <Input
-                        name="material_title"
-                        isReadOnly={isReadOnly}
                         defaultValue={item.title}
                         isClearable={!isReadOnly}
+                        isReadOnly={isReadOnly}
+                        name="material_title"
                       />
                     </TableCell>
                     <TableCell>
                       <Input
-                        name="material_description"
-                        isReadOnly={isReadOnly}
                         defaultValue={item.description}
                         isClearable={!isReadOnly}
+                        isReadOnly={isReadOnly}
+                        name="material_description"
                       />
                     </TableCell>
                     <TableCell>
                       <Input
-                        name="material_image"
-                        isReadOnly={isReadOnly}
-                        type="url"
                         defaultValue={item.image}
                         isClearable={!isReadOnly}
+                        isReadOnly={isReadOnly}
+                        name="material_image"
+                        type="url"
                       />
                     </TableCell>
                     <TableCell hidden={isReadOnly}>
@@ -289,6 +298,7 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
                         variant="light"
                         onClick={() => {
                           const newMaterials = [...materials];
+
                           newMaterials.splice(index, 1);
                           setMaterials(newMaterials);
                         }}
@@ -304,14 +314,11 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
             {!isReadOnly && (
               <div className="text-right">
                 <Button
-                  type="button"
-                  startContent={<Plus size={20} />}
                   isDisabled={loading}
+                  startContent={<Plus size={20} />}
+                  type="button"
                   onClick={() =>
-                    setMaterials([
-                      ...materials,
-                      { title: "", description: "", image: "" },
-                    ])
+                    setMaterials([...materials, { title: "", description: "", image: "" }])
                   }
                 >
                   Add Material
@@ -323,33 +330,29 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
 
         <div className="w-full flex flex-col gap-1">
           <span className="capitalize text-sm">Redirect URL:</span>
-          <div
-            className={cn("flex flex-col gap-4 border border-border rounded-xl px-4 py-6")}
-          >
+          <div className={cn("flex flex-col gap-4 border border-border rounded-xl px-4 py-6")}>
             {redirectUris.map((item, index) => (
               <div
                 key={`redirect_uri${index}`}
-                className={cn(
-                  "w-full grid grid-cols-[1fr_auto] gap-2 items-center",
-                  {
-                    "grid-cols-1": !index,
-                  }
-                )}
+                className={cn("w-full grid grid-cols-[1fr_auto] gap-2 items-center", {
+                  "grid-cols-1": !index,
+                })}
               >
                 <Input
-                  name="redirect_uri"
-                  isReadOnly={isReadOnly}
-                  defaultValue={item}
-                  type="url"
-                  pattern="^(https?|ftp)://.+"
                   required
+                  defaultValue={item}
+                  isReadOnly={isReadOnly}
+                  name="redirect_uri"
+                  pattern="^(https?|ftp)://.+"
+                  type="url"
                 />
                 <Button
                   isIconOnly
-                  color="danger"
                   className={cn({ hidden: !index || isReadOnly })}
+                  color="danger"
                   onClick={() => {
                     const newUris = [...redirectUris];
+
                     newUris.splice(index, 1);
                     setRedirectUris(newUris);
                   }}
@@ -361,9 +364,9 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
             {!isReadOnly && (
               <div className="text-right">
                 <Button
-                  type="button"
-                  startContent={<Plus size={20} />}
                   isDisabled={loading}
+                  startContent={<Plus size={20} />}
+                  type="button"
                   onClick={() => setRedirectUris([...redirectUris, ""])}
                 >
                   Add
@@ -374,43 +377,43 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
         </div>
 
         <Input
-          name="signout_uri"
-          label="Signout URL"
-          isReadOnly={isReadOnly}
           required
-          type="url"
-          pattern="^(https?|ftp)://.+"
           defaultValue={initialData?.signout_uri}
+          isReadOnly={isReadOnly}
+          label="Signout URL"
+          name="signout_uri"
+          pattern="^(https?|ftp)://.+"
+          type="url"
         />
 
         <Input
-          name="tos_doc"
+          defaultValue={initialData?.tos_doc || ""}
+          isReadOnly={isReadOnly}
           label="Terms of Service URL"
-          isReadOnly={isReadOnly}
-          type="url"
+          name="tos_doc"
           pattern="^(https?|ftp)://.+"
-          defaultValue={initialData?.tos_doc || ''}
+          type="url"
         />
 
         <Input
-          name="pp_doc"
-          label="Privacy Policy URL"
+          defaultValue={initialData?.pp_doc || ""}
           isReadOnly={isReadOnly}
-          type="url"
+          label="Privacy Policy URL"
+          name="pp_doc"
           pattern="^(https?|ftp)://.+"
-          defaultValue={initialData?.pp_doc || ''}
+          type="url"
         />
 
         <div className="flex flex-col gap-2">
           <label className="text-sm">Login Methods:</label>
           {!isReadOnly ? (
             <CheckboxGroup
+              defaultValue={initialData?.login_methods ?? []}
               name="login_methods"
               orientation="horizontal"
-              defaultValue={initialData?.login_methods ?? []}
             >
-              {authMethodOptions.map((item) => (
-                <div className="inline-flex items-center gap-2" key={item.value}>
+              {authMethodOptions.map(item => (
+                <div key={item.value} className="inline-flex items-center gap-2">
                   <Checkbox id={item.value} value={item.value}>
                     {item.label}
                   </Checkbox>
@@ -428,12 +431,12 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
           <label className="text-sm">Scope:</label>
           {!isReadOnly ? (
             <CheckboxGroup
+              defaultValue={initialData?.scope ?? []}
               name="scope"
               orientation="horizontal"
-              defaultValue={initialData?.scope ?? []}
             >
-              {scopeOptions.map((key) => (
-                <div className="inline-flex items-center gap-2" key={key}>
+              {scopeOptions.map(key => (
+                <div key={key} className="inline-flex items-center gap-2">
                   <Checkbox id={key} value={key}>
                     {key}
                   </Checkbox>
@@ -441,9 +444,7 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
               ))}
             </CheckboxGroup>
           ) : (
-            <div className="text-sm text-muted leading-10">
-              {initialData?.scope?.join(", ")}
-            </div>
+            <div className="text-sm text-muted leading-10">{initialData?.scope?.join(", ")}</div>
           )}
         </div>
       </div>
@@ -455,11 +456,11 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
               Cancel
             </Button>
           )}
-          <Button type="submit" isLoading={loading}>
+          <Button isLoading={loading} type="submit">
             {mode === "create" ? "Add" : "Update"}
           </Button>
         </div>
       )}
     </form>
   );
-} 
+}

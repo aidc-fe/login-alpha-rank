@@ -1,26 +1,28 @@
 import { PrismaClient } from "@prisma/client";
-import {
-  encodePassword,
-  generateClientId,
-  generateClientSecret,
-  hashToken,
-} from "./secret";
-import { ClientDataType } from "./admin";
-import { ERROR_CONFIG } from "@/lib/errors";
 import { headers } from "next/headers";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
+
+import { encodePassword, generateClientId, generateClientSecret, hashToken } from "./secret";
+import { ClientDataType } from "./admin";
+
+import { ERROR_CONFIG } from "@/lib/errors";
+import { logger } from "./logger";
 
 export const getHost = () => {
   const headersList = headers();
-  const host = headersList.get('host') || headersList.get(':authority');
+  const host = headersList.get("host") || headersList.get(":authority");
 
   return host;
-}
+};
 
 export const prisma = new PrismaClient();
 
 // 查询用户信息
-export const getUser = async (search: { email?: string; businessDomainId?: string; id?: string }) => {
+export const getUser = async (search: {
+  email?: string;
+  businessDomainId?: string;
+  id?: string;
+}) => {
   // Validate input: ensure either email and businessDomainId or id is provided
   if ((!search.email || !search.businessDomainId) && !search.id) {
     throw new Error(
@@ -33,11 +35,8 @@ export const getUser = async (search: { email?: string; businessDomainId?: strin
     const user = await prisma.user.findFirst({
       where: {
         OR: [
-          { 
-            AND: [
-              { email: search.email },
-              { businessDomainId: search.businessDomainId }
-            ]
+          {
+            AND: [{ email: search.email }, { businessDomainId: search.businessDomainId }],
           },
           { id: search.id },
         ],
@@ -47,7 +46,7 @@ export const getUser = async (search: { email?: string; businessDomainId?: strin
     // Return user if found, otherwise return null
     return user;
   } catch (error) {
-    console.error("Error fetching user:", error);
+    logger.error("Error fetching user:", error);
     throw new Error("Failed to fetch user. Please try again later.");
   }
 };
@@ -99,11 +98,10 @@ export const createOrUpdateUser = async (data: {
 
     return user;
   } catch (error) {
-    console.error("Error creating or updating user:", error);
+    logger.error("Error creating or updating user:", error);
     throw error;
   }
 };
-
 
 // 通过邮箱查找用户，更新用户信息
 export const updateUserByEmail = async (
@@ -123,7 +121,7 @@ export const updateUserByEmail = async (
 
     return updatedUser;
   } catch (error) {
-    console.error("Error updated user:", error);
+    logger.error("Error updated user:", error);
     throw error;
   }
 };
@@ -158,16 +156,13 @@ export const createOrUpdateAccount = async (data: {
 
     return account;
   } catch (error) {
-    console.error("Error creating or updating account:", error);
+    logger.error("Error creating or updating account:", error);
     throw error;
   }
 };
 
 //  查询指定用户的特定provide的account的数据
-export const getAccountsByUserIdAndProviders = async (
-  userId: string,
-  providers: string[]
-) => {
+export const getAccountsByUserIdAndProviders = async (userId: string, providers: string[]) => {
   const accounts = await prisma.account.findMany({
     where: {
       userId: userId,
@@ -199,6 +194,7 @@ export const createVerificationToken = async (info: {
         token: hashToken(),
       },
     });
+
     return newToken;
   } catch (error) {
     throw error;
@@ -270,9 +266,7 @@ export async function createClient(data: ClientDataType) {
     ...newClient,
     redirect_uris: newClient.redirect_uris?.split(",") ?? [],
     scope: newClient.scope?.split(",") ?? [],
-    materials: newClient.materials
-      ? JSON.parse(newClient.materials as string)
-      : [], // 解析 JSON 字符串
+    materials: newClient.materials ? JSON.parse(newClient.materials as string) : [], // 解析 JSON 字符串
   };
 }
 
@@ -301,18 +295,22 @@ export const updateClient = async ({
   ...data
 }: Partial<Omit<ClientDataType, "client_id">> & { client_id: string }) => {
   try {
-    const editData = Object.entries(data).reduce((acc, [key, value]) => {
-      if (value !== null && value !== undefined) {
-        if (key === "materials") {
-          acc[key] = JSON.stringify(value);
-        } else if (["redirect_uris", "scope"].includes(key)) {
-          acc[key] = (value as string[]).join(",");
-        } else {
-          acc[key] = value;
+    const editData = Object.entries(data).reduce(
+      (acc, [key, value]) => {
+        if (value !== null && value !== undefined) {
+          if (key === "materials") {
+            acc[key] = JSON.stringify(value);
+          } else if (["redirect_uris", "scope"].includes(key)) {
+            acc[key] = (value as string[]).join(",");
+          } else {
+            acc[key] = value;
+          }
         }
-      }
-      return acc;
-    }, {} as Record<string, any>);
+
+        return acc;
+      },
+      {} as Record<string, any>
+    );
 
     const updatedClient = await prisma.client.update({
       where: {
@@ -325,12 +323,10 @@ export const updateClient = async ({
       ...updatedClient,
       redirect_uris: updatedClient.redirect_uris?.split(",") ?? [],
       scope: updatedClient.scope?.split(",") ?? [],
-      materials: updatedClient.materials
-        ? JSON.parse(updatedClient.materials as string)
-        : [],
+      materials: updatedClient.materials ? JSON.parse(updatedClient.materials as string) : [],
     };
   } catch (error) {
-    console.error("Error updating client:", error);
+    logger.error("Error updating client:", error);
     throw error;
   }
 };
@@ -376,7 +372,7 @@ export async function getClientByAuthDomain(authDomain: string) {
       materials: client.materials ? JSON.parse(client.materials as string) : [],
     };
   } catch (error) {
-    console.error("Error fetching client by auth_domain:", error);
+    logger.error("Error fetching client by auth_domain:", error);
     throw error;
   } finally {
     await prisma.$disconnect();
@@ -393,9 +389,10 @@ export const getBusinessDomainIdByAuthDomain = async () => {
     }
 
     const client = await getClientByAuthDomain(host);
+
     return client.businessDomainId;
   } catch (error) {
-    console.error("Error fetching businessDomainId by auth_domain:", error);
+    logger.error("Error fetching businessDomainId by auth_domain:", error);
     throw error;
   }
 };
@@ -409,10 +406,11 @@ export const getUserIdByEmail = async (email: string) => {
       where: {
         email_businessDomainId: {
           email,
-          businessDomainId: businessDomainId || '',
+          businessDomainId: businessDomainId || "",
         },
       },
     });
+
     return user?.id;
   } catch (error) {
     throw error;
@@ -516,7 +514,7 @@ export const createAccessToken = async (data: {
 
     return accessToken;
   } catch (error) {
-    console.error("Error creating access token:", error);
+    logger.error("Error creating access token:", error);
     throw error;
   }
 };
@@ -542,10 +540,7 @@ export const findAccessToken = async (token: string) => {
 };
 
 // 插入RefreshToken
-export const createRefreshToken = async (data: {
-  token: string;
-  client_id: string;
-}) => {
+export const createRefreshToken = async (data: { token: string; client_id: string }) => {
   try {
     const now = new Date();
     const expiresAt = new Date(now.getTime() + 365 * 24 * 60 * 60 * 1000); // 一年后的时间
@@ -560,7 +555,7 @@ export const createRefreshToken = async (data: {
 
     return refreshToken;
   } catch (error) {
-    console.error("Error creating refresh token:", error);
+    logger.error("Error creating refresh token:", error);
     throw error;
   }
 };
@@ -586,7 +581,7 @@ export async function createBusinessDomain(
 
     return newBusinessDomain;
   } catch (error) {
-    console.error("Error creating BusinessDomain:", error);
+    logger.error("Error creating BusinessDomain:", error);
     throw error;
   } finally {
     await prisma.$disconnect();
@@ -597,14 +592,15 @@ export async function createBusinessDomain(
 export async function getAllBusinessDomains() {
   try {
     const allBusinessDomains = await prisma.businessDomain.findMany();
+
     return allBusinessDomains;
   } catch (error) {
-    console.error("Error fetching BusinessDomains:", error);
+    logger.error("Error fetching BusinessDomains:", error);
     throw error;
   } finally {
     await prisma.$disconnect();
   }
-};
+}
 
 // 通过id查询businessDomain详情
 export async function getBusinessDomainById(id: string) {
@@ -621,7 +617,7 @@ export async function getBusinessDomainById(id: string) {
 
     return businessDomain;
   } catch (error) {
-    console.error("Error fetching business domain:", error);
+    logger.error("Error fetching business domain:", error);
     throw error;
   }
 }
@@ -646,7 +642,9 @@ export async function updateBusinessDomain(
 
     return updatedBusinessDomain;
   } catch (error) {
-    console.error("Error updating business domain:", error);
+    logger.error("Error updating business domain:", error);
     throw error;
   }
 }
+
+logger.info("Database connected successfully");

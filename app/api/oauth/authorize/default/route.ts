@@ -1,11 +1,12 @@
-import { authOptions } from "@/lib/authOptions";
-import { createAuthorizationCode, findClientByClientId } from "@/lib/database";
-import { generateAuthorizationCode } from "@/lib/secret";
-import { is3Minutes } from "@/lib/utils";
 import { User } from "@prisma/client";
 import { Session } from "next-auth";
 import { getServerSession } from "next-auth/next";
 import { NextRequest, NextResponse } from "next/server";
+
+import { authOptions } from "@/lib/authOptions";
+import { createAuthorizationCode, findClientByClientId } from "@/lib/database";
+import { generateAuthorizationCode } from "@/lib/secret";
+import { is3Minutes } from "@/lib/utils";
 
 export async function GET(request: NextRequest) {
   // 解构查询参数
@@ -17,29 +18,27 @@ export async function GET(request: NextRequest) {
   //  const state = request.nextUrl.searchParams.get("state") || "";
   const auth_type = request.nextUrl.searchParams.get("auth_type");
   let userId = request.nextUrl.searchParams.get("userId") || "";
-  const session = await getServerSession(authOptions) as Session & { id: string, jwtToken: string, user: User };
+  const session = (await getServerSession(authOptions)) as Session & {
+    id: string;
+    jwtToken: string;
+    user: User;
+  };
 
-  if(!userId){
+  if (!userId) {
     userId = session?.id;
   }
 
-   // 参数校验
-   if (!client_id) {
-    return NextResponse.json(
-      { message: "Client id missing" },
-      { status: 400 }
-    );
+  // 参数校验
+  if (!client_id) {
+    return NextResponse.json({ message: "Client id missing" }, { status: 400 });
   }
 
   // 查询 client_id 对应的 client 信息
   const client = await findClientByClientId(client_id);
 
-   // 验证 redirect_uri 是否有效
-   if (!redirect_uri || !client?.redirect_uris?.includes(redirect_uri)) {
-    return NextResponse.json(
-      { message: "Invalid redirect_uri" },
-      { status: 400 }
-    );
+  // 验证 redirect_uri 是否有效
+  if (!redirect_uri || !client?.redirect_uris?.includes(redirect_uri)) {
+    return NextResponse.json({ message: "Invalid redirect_uri" }, { status: 400 });
   }
 
   // 生成授权码
@@ -54,7 +53,7 @@ export async function GET(request: NextRequest) {
 
   // 构建重定向 URL
   const redirectUrl = new URL(redirect_uri);
- 
+
   // redirectUrl.searchParams.set("hmac", hmac);
   redirectUrl.searchParams.set("code", authorizationCode.code);
   // redirectUrl.searchParams.set("state", state);
@@ -71,8 +70,10 @@ export async function GET(request: NextRequest) {
   } else if (session.user?.created_at) {
     // 验证时间戳是否在当前时间3分钟范围内,判断是注册还是登录
     const authAction = is3Minutes(session.user.created_at);
+
     redirectUrl.searchParams.set("authAction", authAction);
   }
+
   // 重定向到 redirect_uri
   return NextResponse.redirect(redirectUrl.toString(), 302);
 }

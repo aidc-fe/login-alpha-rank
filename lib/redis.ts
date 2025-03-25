@@ -4,7 +4,7 @@ const redis = createClient({
   url: process.env.REDIS_URL,
 });
 
-redis.on("error", (err) => console.error("Redis Client Error", err));
+redis.on("error", err => console.error("Redis Client Error", err));
 
 // 确保 Redis 客户端在连接时已准备好
 async function connectRedis() {
@@ -21,16 +21,13 @@ export async function emailRateLimiter(email: string) {
   const dailyEmailKey = `${process.env.ENV}:daily:email:${email}`;
   // 每日邮箱限制
   const dailyEmailCount = await redis.get(dailyEmailKey);
+
   if (dailyEmailCount && parseInt(dailyEmailCount, 10) >= DAILY_EMAIL_LIMIT) {
     return false;
   }
 
   // 增加计数
-  await redis
-    .multi()
-    .incr(dailyEmailKey)
-    .expire(dailyEmailKey, DAILY_WINDOW_IN_SECONDS)
-    .exec();
+  await redis.multi().incr(dailyEmailKey).expire(dailyEmailKey, DAILY_WINDOW_IN_SECONDS).exec();
 
   return true; // 表示限流检查通过
 }

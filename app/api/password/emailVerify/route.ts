@@ -1,8 +1,9 @@
+import { NextRequest, NextResponse } from "next/server";
+
 import { ERROR_CONFIG } from "@/lib/errors";
 import { createVerificationToken, findClientByClientId, getUser } from "@/lib/database";
 import { sendVerificationEmail } from "@/lib/email";
 import { formateError, formatSuccess } from "@/lib/request";
-import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth";
 import { decryptWithRSA } from "@/lib/rsa";
 
@@ -11,6 +12,7 @@ export async function POST(request: NextRequest) {
 
   // 验证turnstile token
   const result = await verifyToken(token);
+
   if (!result) {
     return NextResponse.json(formateError(ERROR_CONFIG.AUTH.TURNSTILE_VERIFY_FAIL));
   }
@@ -56,6 +58,7 @@ export async function POST(request: NextRequest) {
       },
       client.brand_color
     );
+
     return NextResponse.json(
       formatSuccess({
         message: "Please check your email to verify your account.",

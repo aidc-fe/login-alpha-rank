@@ -1,5 +1,5 @@
 import React from "react";
-import {Input, InputProps} from "@nextui-org/react";
+import { Input, InputProps } from "@nextui-org/react";
 
 export const EyeSlashFilledIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -65,7 +65,12 @@ export default function PasswordInput(props: Omit<InputProps, "type" | "endConte
   return (
     <Input
       endContent={
-        <button className="focus:outline-none" type="button" onClick={toggleVisibility} aria-label="toggle password visibility">
+        <button
+          aria-label="toggle password visibility"
+          className="focus:outline-none"
+          type="button"
+          onClick={toggleVisibility}
+        >
           {isVisible ? (
             <EyeSlashFilledIcon className="text-xl text-default-400 pointer-events-none" />
           ) : (

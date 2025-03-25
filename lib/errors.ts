@@ -51,7 +51,7 @@ export const ERROR_CONFIG = {
       code: "AUTH_NEED_EMAIL",
       message: "please enter email address.",
     },
-    NEED_BUSINESS_DOMAIN_ID:{
+    NEED_BUSINESS_DOMAIN_ID: {
       code: "AUTH_NEED_BUSINESS_DOMAIN_ID",
       message: "businessDomainId is required.",
     },

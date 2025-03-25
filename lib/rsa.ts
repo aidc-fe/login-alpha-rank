@@ -17,6 +17,7 @@ export const getRSAKeyPair = () => {
       },
     });
   }
+
   return keyPair;
 };
 
@@ -30,6 +31,7 @@ export const encryptWithRSA = (data: string, publicKey: string): string => {
     },
     buffer
   );
+
   return encrypted.toString("base64");
 };
 
@@ -44,5 +46,6 @@ export const decryptWithRSA = (encryptedData: string): string => {
     },
     buffer
   );
+
   return decrypted.toString("utf8");
 };

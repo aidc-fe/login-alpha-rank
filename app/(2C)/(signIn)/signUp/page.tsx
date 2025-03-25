@@ -2,14 +2,15 @@
 
 import { Input, Button, Link, Spinner } from "@nextui-org/react";
 import Image from "next/image";
-import request from "@/lib/request";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FormEventHandler, Suspense, useEffect, useState } from "react";
-import { useClient } from "@/providers/client-provider";
-import PasswordInput from "@/components/PasswordInput";
+import { FormEventHandler, useEffect, useState } from "react";
 import Turnstile from "react-turnstile";
 import { toast } from "react-toastify";
+
+import { useClient } from "@/providers/client-provider";
+import PasswordInput from "@/components/PasswordInput";
+import request from "@/lib/request";
 
 export default function SignUpPage() {
   const searchParams = useSearchParams();
@@ -30,6 +31,7 @@ export default function SignUpPage() {
       setCallbackUrl(`/login-landing-page?${targetUrl ? "targetUrl=" + targetUrl : ""}`);
     } else {
       const invite = sessionStorage.getItem("invite");
+
       setCallbackUrl(
         `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}&auth_action=sign_up${invite ? `&invite=${invite}` : ""}`
       );
@@ -39,6 +41,7 @@ export default function SignUpPage() {
   useEffect(() => {
     // 查找或创建 canonical link 标签
     let link = document.querySelector("link[rel='canonical']");
+
     if (!link) {
       link = document.createElement("link");
       link.setAttribute("rel", "canonical");
@@ -58,6 +61,7 @@ export default function SignUpPage() {
 
     if (!token) {
       toast.error("Please verify the captcha");
+
       return;
     }
 
@@ -86,6 +90,7 @@ export default function SignUpPage() {
         setLoading(false);
       });
   };
+
   return (
     <div className="flex items-center justify-center h-full w-full">
       <form
@@ -94,32 +99,32 @@ export default function SignUpPage() {
       >
         <h1 className="font-bold text-3xl mb-12">Sign up</h1>
 
-        <Input name="name" label="Username" required></Input>
+        <Input required label="Username" name="name" />
         <Input
+          required
+          label="E-mail"
           name="email"
           type="email"
           value={email}
           onChange={e => {
             setEmail(e.target.value);
           }}
-          label="E-mail"
-          required
-        ></Input>
-        <PasswordInput name="password" label="Password" required />
+        />
+        <PasswordInput required label="Password" name="password" />
         <Turnstile
+          refreshExpired="auto"
           sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
           onVerify={token => setToken(token)} // 验证成功后获取 token
-          refreshExpired="auto"
         />
 
         <Button
           className="w-full"
           color="primary"
-          type="submit"
-          spinner={<Spinner color="default" size="sm" />}
-          size="lg"
           disabled={loading}
           isLoading={loading}
+          size="lg"
+          spinner={<Spinner color="default" size="sm" />}
+          type="submit"
         >
           Sign up
         </Button>
@@ -134,11 +139,11 @@ export default function SignUpPage() {
           onClick={() => signIn("google", { callbackUrl: `${callbackUrl}&auth_type=google` })}
         >
           <Image
-            height="24"
-            width="24"
             alt="provider-logo-dark"
+            height="24"
             src="https://authjs.dev/img/providers/google.svg"
-          ></Image>
+            width="24"
+          />
           Google
         </Button>
         <div className="w-1/2 border-b mx-auto mt-4" />
@@ -146,13 +151,13 @@ export default function SignUpPage() {
           <div className="text-center">
             By continuing with any of the options above, you agree to our{" "}
             {tos_doc && (
-              <Link underline="always" isExternal href={tos_doc}>
+              <Link isExternal href={tos_doc} underline="always">
                 Terms of Service
               </Link>
             )}{" "}
             and have read our{" "}
             {pp_doc && (
-              <Link underline="always" isExternal href={pp_doc}>
+              <Link isExternal href={pp_doc} underline="always">
                 Privacy Policy
               </Link>
             )}
@@ -160,7 +165,7 @@ export default function SignUpPage() {
           </div>
           <div className="flex gap-1 items-center">
             <span>Already have an account?</span>
-            <Link underline="always" href={`/?email=${encodeURIComponent(email)}`}>
+            <Link href={`/?email=${encodeURIComponent(email)}`} underline="always">
               sign in
             </Link>
           </div>

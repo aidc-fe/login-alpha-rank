@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { formateError, formatSuccess } from "@/lib/request";
 import { createClient, getClients } from "@/lib/database";
 
@@ -8,13 +9,14 @@ export async function POST(request: NextRequest) {
   const req = await createClient({
     ...data,
   });
+
   return NextResponse.json(formatSuccess({ data: req }));
 }
 
 // 查询所有client列表
 export async function GET(req: NextRequest, res: NextResponse) {
-  const current = req.nextUrl.searchParams.get('current');
-  const pageSize = req.nextUrl.searchParams.get('pageSize');
+  const current = req.nextUrl.searchParams.get("current");
+  const pageSize = req.nextUrl.searchParams.get("pageSize");
 
   const pageNumber = parseInt(current as string, 10);
   const itemsPerPage = parseInt(pageSize as string, 10);

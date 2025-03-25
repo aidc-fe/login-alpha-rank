@@ -1,6 +1,5 @@
 "use client";
-import { Copy, Plus } from "lucide-react";
-
+import { Plus } from "lucide-react";
 import {
   Modal,
   ModalContent,
@@ -19,11 +18,12 @@ import {
 } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useRequest, useUpdateEffect } from "ahooks";
+import { useRequest } from "ahooks";
+import Link from "next/link";
+
 import request from "@/lib/request";
 import Loader from "@/components/ui/loader";
 import { ClientDataType } from "@/lib/admin";
-import Link from "next/link";
 import CopyButton from "@/components/CopyButton";
 
 function getList(
@@ -47,7 +47,7 @@ export default function List() {
   const [switchLoading, setLoading] = useState(false);
   const { data, loading, run, refresh, mutate } = useRequest(
     (current: number = 1, pageSize: number = 100) =>
-      getList(current, pageSize).then((res) => {
+      getList(current, pageSize).then(res => {
         return res.list;
       }),
     {}
@@ -69,20 +69,21 @@ export default function List() {
         active,
       }),
     })
-      .then((res) => {
+      .then(res => {
         onClose();
         setCurrentData({
           client_id: "",
           active: true,
         });
-        mutate((old) =>
-          old?.map((i) => {
+        mutate(old =>
+          old?.map(i => {
             if (i.client_id === client_id) {
               return {
                 ...i,
                 active,
               };
             }
+
             return i;
           })
         );
@@ -97,9 +98,9 @@ export default function List() {
       <div className="flex items-center justify-between">
         <span className="text-2xl font-semibold">My Clients</span>
         <Button
+          className="inline-flex items-center gap-1"
           startContent={<Plus size={16} />}
           type="button"
-          className="inline-flex items-center gap-1"
           onClick={() => {
             router.push("/admin/client/add");
           }}
@@ -119,7 +120,7 @@ export default function List() {
             </TableHeader>
             <TableBody>
               {(data || []).map((item, index) => (
-                <TableRow className="h-14" key={item.client_id}>
+                <TableRow key={item.client_id} className="h-14">
                   <TableCell>
                     <Link
                       className="hover:underline hover:text-primary"
@@ -139,7 +140,7 @@ export default function List() {
                       isSelected={item.active}
                       // Nextui不存在loading态
                       // loading={item.client_id === currentData.client_id}
-                      onValueChange={(checked) => {
+                      onValueChange={checked => {
                         setCurrentData({
                           client_id: item.client_id!,
                           active: checked,
@@ -171,26 +172,20 @@ export default function List() {
       </div>
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
         <ModalContent>
-          {(onClose) => (
+          {onClose => (
             <>
-              <ModalHeader className="flex flex-col gap-1">
-                Deactivate Client
-              </ModalHeader>
+              <ModalHeader className="flex flex-col gap-1">Deactivate Client</ModalHeader>
               <ModalBody>
                 <p>
-                  This client will be deactivate immediately. Once deactivate,
-                  it can no longer be used to make oAuth Login.
+                  This client will be deactivate immediately. Once deactivate, it can no longer be
+                  used to make oAuth Login.
                 </p>
               </ModalBody>
               <ModalFooter>
                 <Button variant="faded" onPress={onClose}>
                   Cancel
                 </Button>
-                <Button
-                  isLoading={switchLoading}
-                  color="primary"
-                  onClick={() => handleConfirm()}
-                >
+                <Button color="primary" isLoading={switchLoading} onClick={() => handleConfirm()}>
                   Continue
                 </Button>
               </ModalFooter>

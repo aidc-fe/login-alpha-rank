@@ -1,5 +1,3 @@
-import { User } from "@prisma/client";
-import bcrypt from "bcryptjs";
 import {
   createHash,
   randomUUID,
@@ -8,20 +6,21 @@ import {
   createCipheriv,
   createDecipheriv,
 } from "crypto";
+
+import { User } from "@prisma/client";
+import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { JWTDecodeParams, JWTEncodeParams } from "next-auth/jwt";
 
 // 生成密码哈希
 export const encodePassword = (password: string) => {
   const salt = bcrypt.genSaltSync(10); // 10 是加密轮数，越高越安全
+
   return bcrypt.hashSync(password, salt); // 使用传入的密码
 };
 
 // 验证密码是否一致
-export const isPasswordMatch = (
-  newPassword: string,
-  hashedPassword: string
-) => {
+export const isPasswordMatch = (newPassword: string, hashedPassword: string) => {
   return bcrypt.compareSync(newPassword, hashedPassword); // 比较新密码和存储的哈希密码
 };
 
@@ -35,20 +34,17 @@ export async function encodeJwt({ token = {}, secret }: JWTEncodeParams) {
   delete token?.exp;
   delete token?.jwtToken;
   delete token?.password;
-  return jwt.sign(
-    { ...token, id: token.sub } as string | object | Buffer,
-    secret,
-    {
-      expiresIn: "30d",
-    }
-  );
+
+  return jwt.sign({ ...token, id: token.sub } as string | object | Buffer, secret, {
+    expiresIn: "30d",
+  });
 }
 
 // 解析JWT
 export async function decodeJwt({ token = "", secret }: JWTDecodeParams) {
   try {
-    const info =
-      (jwt.verify(token, secret) as jwt.JwtPayload & Partial<User>) || {};
+    const info = (jwt.verify(token, secret) as jwt.JwtPayload & Partial<User>) || {};
+
     return { ...info, jwtToken: token };
   } catch (error) {
     return null;
@@ -63,18 +59,18 @@ export function generateAuthorizationCode() {
 // 生成 accessToken 和 refreshToken
 export function generateTokens(client_id: string) {
   // 生成短的随机字符串（8字节 = 16个字符）来确保唯一性
-  const uniqueId = randomBytes(8).toString('hex');
+  const uniqueId = randomBytes(8).toString("hex");
 
   // 生成 accessToken
   const access_token = jwt.sign(
     {
       client_id,
-      type: 'access_token',
-      nonce: uniqueId // 添加短的随机值确保唯一性
+      type: "access_token",
+      nonce: uniqueId, // 添加短的随机值确保唯一性
     },
     process.env.NEXT_AUTH_SECRET!,
     {
-      noTimestamp: true // 移除时间戳以保持长度一致
+      noTimestamp: true, // 移除时间戳以保持长度一致
     }
   );
 
@@ -82,12 +78,12 @@ export function generateTokens(client_id: string) {
   const refresh_token = jwt.sign(
     {
       client_id,
-      type: 'refresh_token',
-      nonce: uniqueId // 使用相同机制确保唯一性
+      type: "refresh_token",
+      nonce: uniqueId, // 使用相同机制确保唯一性
     },
     process.env.NEXT_AUTH_SECRET!,
     {
-      noTimestamp: true // 移除时间戳以保持长度一致
+      noTimestamp: true, // 移除时间戳以保持长度一致
     }
   );
 
@@ -96,20 +92,15 @@ export function generateTokens(client_id: string) {
 }
 
 // 生成 HMAC 的函数
-export function generateHmac(
-  parameters: { [key: string]: string },
-  clientSecret: string
-) {
+export function generateHmac(parameters: { [key: string]: string }, clientSecret: string) {
   // 1. 根据字典顺序对参数进行排序
   const sortedParams = Object.keys(parameters)
     .sort()
-    .map((key) => `${key}=${parameters[key]}`)
+    .map(key => `${key}=${parameters[key]}`)
     .join("&");
 
   // 2. 使用 HMAC-SHA256 哈希函数生成哈希值
-  const hmac = createHmac("sha256", clientSecret)
-    .update(sortedParams)
-    .digest("base64"); // 转换为 Base64 编码
+  const hmac = createHmac("sha256", clientSecret).update(sortedParams).digest("base64"); // 转换为 Base64 编码
 
   return hmac;
 }
@@ -125,9 +116,7 @@ export function generateClientSecret() {
 }
 
 // 生成对称加密的密码
-export function generateEncryptedState(data: {
-  [key: string]: string | number;
-}) {
+export function generateEncryptedState(data: { [key: string]: string | number }) {
   // 定义加密算法和密钥
   const algorithm = "aes-256-cbc";
   const iv = randomBytes(16); // 生成随机的初始化向量 (IV)
@@ -136,14 +125,11 @@ export function generateEncryptedState(data: {
   const jsonData = JSON.stringify(data);
 
   // 创建加密器
-  const cipher = createCipheriv(
-    algorithm,
-    Buffer.from(process.env.NEXT_AUTH_SECRET!, "hex"),
-    iv
-  );
+  const cipher = createCipheriv(algorithm, Buffer.from(process.env.NEXT_AUTH_SECRET!, "hex"), iv);
 
   // 加密数据
   let encrypted = cipher.update(jsonData, "utf8", "hex");
+
   encrypted += cipher.final("hex");
 
   // 返回加密后的 state，包括 IV 和密文，以便解密
@@ -164,6 +150,7 @@ export function decryptState(encryptedState: string) {
 
   // 解密数据
   let decrypted = decipher.update(encryptedText, "hex", "utf8");
+
   decrypted += decipher.final("utf8");
 
   // 解析 JSON 字符串为原始对象

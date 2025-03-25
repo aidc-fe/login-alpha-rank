@@ -2,9 +2,7 @@ import { HttpsProxyAgent } from "https-proxy-agent";
 import { NextRequest, NextResponse } from "next/server";
 import fetch from "node-fetch";
 
-const proxyAgent = process.env.PROXY_URL
-  ? new HttpsProxyAgent(process.env.PROXY_URL)
-  : undefined;
+const proxyAgent = process.env.PROXY_URL ? new HttpsProxyAgent(process.env.PROXY_URL) : undefined;
 
 export async function GET(request: NextRequest) {
   const url = new URL(request.url);
@@ -30,16 +28,13 @@ export async function GET(request: NextRequest) {
 
   const token = (await tokenResponse.json()) as { access_token: string };
 
-  const shop = await fetch(
-    `https://${url.searchParams.get("shop")}/admin/api/2023-07/shop.json`,
-    {
-      method: "GET",
-      headers: {
-        "X-Shopify-Access-Token": token?.access_token,
-      },
-      agent: proxyAgent,
-    }
-  );
+  const shop = await fetch(`https://${url.searchParams.get("shop")}/admin/api/2023-07/shop.json`, {
+    method: "GET",
+    headers: {
+      "X-Shopify-Access-Token": token?.access_token,
+    },
+    agent: proxyAgent,
+  });
 
   const shopData = (await shop.json()) as { shop: any };
 
@@ -59,9 +54,7 @@ export async function GET(request: NextRequest) {
   });
 
   return NextResponse.redirect(
-    `${
-      process.env.NEXT_PUBLIC_NEXT_AUTH_URL
-    }/shopify/login?${searchParams.toString()}`,
+    `${process.env.NEXT_PUBLIC_NEXT_AUTH_URL}/shopify/login?${searchParams.toString()}`,
     302
   );
 }

@@ -1,14 +1,15 @@
 "use client";
 
-import request from "@/lib/request";
 import { Send } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEventHandler, useState } from "react";
 import { Input, Button, Link, Spinner } from "@nextui-org/react";
-import { useClient } from "@/providers/client-provider";
-import PasswordInput from "@/components/PasswordInput";
 import { toast } from "react-toastify";
 import Turnstile from "react-turnstile";
+
+import { useClient } from "@/providers/client-provider";
+import PasswordInput from "@/components/PasswordInput";
+import request from "@/lib/request";
 
 export default function Page() {
   const { businessDomainId, client_id } = useClient();
@@ -23,6 +24,7 @@ export default function Page() {
 
     if (!token) {
       toast.error("Please verify the captcha");
+
       return;
     }
 
@@ -34,6 +36,7 @@ export default function Page() {
     // 校验新旧密码
     if (checkPassword !== password) {
       toast.error("Password does not match.");
+
       return;
     }
 
@@ -62,9 +65,9 @@ export default function Page() {
       >
         <h1 className="font-bold text-3xl mb-12">Set Password</h1>
         <Input
-          name="email"
           required
           label="E-mail"
+          name="email"
           type="email"
           value={email}
           onChange={e => {
@@ -72,31 +75,31 @@ export default function Page() {
           }}
         />
 
-        <PasswordInput name="password" required label="Password" />
+        <PasswordInput required label="Password" name="password" />
 
-        <PasswordInput name="check_password" required label="Re-enter password" />
+        <PasswordInput required label="Re-enter password" name="check_password" />
         <Turnstile
+          refreshExpired="auto"
           sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
           onVerify={token => setToken(token)} // 验证成功后获取 token
-          refreshExpired="auto"
         />
         <Button
           className="group w-full"
           color="primary"
-          type="submit"
+          isLoading={loading}
           size="lg"
           spinner={<Spinner color="default" size="sm" />}
           startContent={
-            !loading && <Send size={20} className="group-hover:rotate-45 duration-150" />
+            !loading && <Send className="group-hover:rotate-45 duration-150" size={20} />
           }
-          isLoading={loading}
+          type="submit"
         >
           Send set instructions
         </Button>
         <div className="w-1/2 border-b mx-auto mt-4" />
         <div className="flex items-center text-muted gap-2">
           <span>Back to</span>
-          <Link underline="always" href={`/?email=${encodeURIComponent(email)}`}>
+          <Link href={`/?email=${encodeURIComponent(email)}`} underline="always">
             Sign in
           </Link>
         </div>
