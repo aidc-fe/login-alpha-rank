@@ -59,6 +59,7 @@ export const EyeFilledIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 export default function PasswordInput(props: Omit<InputProps, "type" | "endContent">) {
   const [isVisible, setIsVisible] = React.useState(false);
+  const id = props.id || props.name || "password-input";
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
@@ -78,6 +79,8 @@ export default function PasswordInput(props: Omit<InputProps, "type" | "endConte
           )}
         </button>
       }
+      id={id}
+      label={<label htmlFor={id}>{props.label}</label>}
       type={isVisible ? "text" : "password"}
       {...props}
     />

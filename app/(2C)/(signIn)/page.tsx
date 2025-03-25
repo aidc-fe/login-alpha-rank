@@ -25,6 +25,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [emailLoading, setEmailLoading] = useState(false);
   const [email, setEmail] = useState(decodeURIComponent(searchParams.get("email") || ""));
+  const [password, setPassword] = useState("");
   const [googleLoading, setGoogleLoading] = useState(false);
   const [jumpEmail, setJumpEmail] = useState("");
   const targetUrl = decodeURIComponent(searchParams.get("targetUrl") || "");
@@ -134,14 +135,22 @@ export default function Home() {
             {login_methods.includes(AUTH_METHOD.PASSWORD) && (
               <form className="flex flex-col justify-between gap-4" onSubmit={handleSubmit}>
                 <Input
-                  required
-                  label="E-mail"
-                  name="email"
-                  type="email"
+                  id="email"
+                  label={<label htmlFor="email">邮箱</label>}
                   value={email}
                   onChange={e => setEmail(e.target.value)}
+                  placeholder="请输入邮箱"
+                  required
+                  type="email"
                 />
-                <PasswordInput required label="Password" name="password" />
+                <PasswordInput
+                  id="password"
+                  label={<label htmlFor="password">密码</label>}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="请输入密码"
+                  required
+                />
 
                 <div className="flex justify-between mb-3">
                   <Link
