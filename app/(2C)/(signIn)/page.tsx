@@ -13,6 +13,7 @@ import PasswordInput from "@/components/PasswordInput";
 import { AUTH_METHOD } from "@/lib/admin";
 import Turnstile from "react-turnstile";
 import { toast } from "react-toastify";
+import { encryptWithRSA } from "@/lib/rsa";
 
 export default function Home() {
   const { status, data } = useSession() as {
@@ -72,6 +73,56 @@ export default function Home() {
     }
   }, [router, status, data, isSSO, callbackUrl]);
 
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!token) {
+      toast.error("Please verify the captcha");
+      return;
+    }
+
+    setLoading(true);
+    const formData = new FormData(e.target as HTMLFormElement);
+    const email = formData.get("email");
+    const password = formData.get("password");
+
+    try {
+      // 获取公钥
+      const response = await fetch("/api/rsa/public-key");
+      const { publicKey } = await response.json();
+
+      // 加密密码
+      const encryptedPassword = encryptWithRSA(password as string, publicKey);
+
+      // 登录
+      request("/api/signIn", {
+        method: "POST",
+        body: JSON.stringify({
+          email,
+          password: encryptedPassword,
+          businessDomainId,
+          token,
+        }),
+      })
+        .then(user => {
+          signIn("password", {
+            ...user,
+            callbackUrl: `${callbackUrl}&userId=${user.sub}`,
+            businessDomainId,
+          });
+        })
+        .catch(() => {
+          window.location.reload();
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } catch (error) {
+      setLoading(false);
+      toast.error("登录失败，请重试");
+    }
+  };
+
   switch (status) {
     case "unauthenticated":
       return (
@@ -81,41 +132,7 @@ export default function Home() {
 
             {/* 密码登录表单 */}
             {login_methods.includes(AUTH_METHOD.PASSWORD) && (
-              <form
-                className="flex flex-col justify-between gap-4"
-                onSubmit={e => {
-                  e.preventDefault();
-
-                  if (!token) {
-                    toast.error("Please verify the captcha");
-                    return;
-                  }
-
-                  setLoading(true);
-                  const formData = new FormData(e.target as HTMLFormElement);
-                  const email = formData.get("email");
-                  const password = formData.get("password");
-
-                  // 登录
-                  request("/api/signIn", {
-                    method: "POST",
-                    body: JSON.stringify({ email, password, businessDomainId, token }),
-                  })
-                    .then(user => {
-                      signIn("password", {
-                        ...user,
-                        callbackUrl: `${callbackUrl}&userId=${user.sub}`,
-                        businessDomainId,
-                      });
-                    })
-                    .catch(() => {
-                      window.location.reload();
-                    })
-                    .finally(() => {
-                      setLoading(false);
-                    });
-                }}
-              >
+              <form className="flex flex-col justify-between gap-4" onSubmit={handleSubmit}>
                 <Input
                   name="email"
                   label="E-mail"

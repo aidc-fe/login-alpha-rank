@@ -4,6 +4,7 @@ import { sendVerificationEmail } from "@/lib/email";
 import { formateError, formatSuccess } from "@/lib/request";
 import { NextRequest, NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth";
+import { decryptWithRSA } from "@/lib/rsa";
 
 export async function POST(request: NextRequest) {
   const { email, password, businessDomainId, client_id, token } = (await request.json()) || {};
@@ -23,10 +24,13 @@ export async function POST(request: NextRequest) {
   } else if (!(await getUser({ email, businessDomainId }))) {
     return NextResponse.json(formateError(ERROR_CONFIG.AUTH.USER_NOT_EXIST));
   } else {
+    // 解密密码
+    const decryptedPassword = decryptWithRSA(password);
+
     const newToken = await createVerificationToken({
-      identifier: email, // 你需要的 identifier
-      password,
-      type: "passwordSet", // 可选
+      identifier: email,
+      password: decryptedPassword,
+      type: "passwordSet",
       businessDomainId,
     });
     const verificationLink = `${baseUrl}/api/password/set?token=${newToken.token}`;
