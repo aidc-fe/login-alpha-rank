@@ -51,7 +51,7 @@ export const ERROR_CONFIG = {
       code: "AUTH_NEED_EMAIL",
       message: "please enter email address.",
     },
-    NEED_BUSINESS_DOMAIN_ID:{
+    NEED_BUSINESS_DOMAIN_ID: {
       code: "AUTH_NEED_BUSINESS_DOMAIN_ID",
       message: "businessDomainId is required.",
     },
@@ -62,6 +62,10 @@ export const ERROR_CONFIG = {
     USER_NOT_EXIST: {
       code: "AUTH_USER_NOT_EXIST",
       message: "User does not exist, please sign up.",
+    },
+    TURNSTILE_VERIFY_FAIL: {
+      code: "AUTH_TURNSTILE_VERIFY_FAIL",
+      message: "Captcha verification failed, please try again.",
     },
   },
   SHOPLAZZA: {

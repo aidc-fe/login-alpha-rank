@@ -3,6 +3,7 @@
 import { signIn, useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+
 import { useClient } from "@/providers/client-provider";
 
 function replaceDomain(authDomain: string) {
@@ -48,6 +49,7 @@ export default function GetAuthPage() {
         callbackUrl: `/getAuth`,
       });
     };
+
     window.addEventListener("message", handleMessage);
 
     return () => {
@@ -55,5 +57,5 @@ export default function GetAuthPage() {
     };
   }, []);
 
-  return <div className="flex items-center flex-col gap-2"></div>;
+  return <div className="flex items-center flex-col gap-2" />;
 }

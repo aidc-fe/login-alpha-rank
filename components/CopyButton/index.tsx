@@ -4,8 +4,9 @@
 import React, { useState } from "react";
 import { Copy, CopyCheck } from "lucide-react";
 import { Button } from "@nextui-org/react";
-import { cn } from "@/lib/utils";
 import { toast } from "react-toastify";
+
+import { cn } from "@/lib/utils";
 
 export interface CopyButtonProps {
   textToCopy?: string;
@@ -22,7 +23,7 @@ const CopyButton: React.FC<CopyButtonProps> = ({ textToCopy = "" }) => {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000); // 2秒后恢复初始状态
       })
-      .catch((err) => {
+      .catch(err => {
         console.error("Could not copy text: ", err);
         toast.error("Failed to copy to clipboard");
       });
@@ -32,10 +33,10 @@ const CopyButton: React.FC<CopyButtonProps> = ({ textToCopy = "" }) => {
 
   return (
     <Button
-      onClick={handleCopy}
+      isIconOnly
       className={cn("p-0 w-auto min-w-0 h-5 ml-1", { "pointer-events-none": copied })}
       variant="light"
-      isIconOnly
+      onClick={handleCopy}
     >
       <Icon className="text-muted" size={16} />
     </Button>

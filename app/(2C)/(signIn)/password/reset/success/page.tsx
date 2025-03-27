@@ -1,9 +1,10 @@
 "use client";
 
-import { Alert, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@nextui-org/react";
 import { RocketIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
+
+import { Alert, AlertTitle } from "@/components/ui/alert";
 
 export default function PasswordSetSuccess() {
   const router = useRouter();
@@ -14,12 +15,12 @@ export default function PasswordSetSuccess() {
       <AlertTitle className="font-semibold text-2xl ml-2 flex flex-col gap-2 lg:flex-row items-center justify-between">
         Succeed set your Password !{" "}
         <Button
+          className="w-fit"
+          size={"lg"}
+          type="submit"
           onClick={() => {
             router.push("/");
           }}
-          size={"lg"}
-          type="submit"
-          className="w-fit"
         >
           Sign in
         </Button>

@@ -2,8 +2,9 @@
 import Image from "next/image";
 import { Button } from "@nextui-org/react";
 import { useEffect, useState } from "react";
-import { isGmail } from "@/lib/utils";
 import { useSearchParams } from "next/navigation";
+
+import { isGmail } from "@/lib/utils";
 import { useClient } from "@/providers/client-provider";
 
 export default function EmailSent() {
@@ -13,9 +14,7 @@ export default function EmailSent() {
   const { support_email } = useClient();
 
   useEffect(() => {
-    setEmail(
-      searchParams.get("email") || sessionStorage.getItem("verifyEmail") || ""
-    );
+    setEmail(searchParams.get("email") || sessionStorage.getItem("verifyEmail") || "");
   }, [searchParams]);
 
   return (
@@ -26,14 +25,12 @@ export default function EmailSent() {
             Check your email for the {type.replace("_", " ")} link.
           </h1>
           <Image
-            className="row-span-2 ml-auto"
-            src={
-              "https://img.icons8.com/?size=100&id=114252&format=png&color=000000"
-            }
-            width={80}
-            height={80}
             alt="email logo"
-          ></Image>
+            className="row-span-2 ml-auto"
+            height={80}
+            src={"https://img.icons8.com/?size=100&id=114252&format=png&color=000000"}
+            width={80}
+          />
           <div className="mt-auto text-sm">{`We've sent a ${type.replace(
             "_",
             " "
@@ -43,15 +40,17 @@ export default function EmailSent() {
           {email}
           {isGmail(email) && (
             <Button
+              startContent={
+                <Image
+                  alt="google"
+                  height="16"
+                  src="https://authjs.dev/img/providers/google.svg"
+                  width="16"
+                />
+              }
               onClick={() => {
                 window.open("https://mail.google.com/mail/u/0/#inbox");
               }}
-              startContent={<Image
-                height="16"
-                width="16"
-                alt="google"
-                src="https://authjs.dev/img/providers/google.svg"
-              />}
             >
               Open Gmail
             </Button>
@@ -63,20 +62,18 @@ export default function EmailSent() {
           Please open this email to complete your {type.replace("_", " ")}.
         </p>
         <p className="text-muted text-xs">
-          If you don’t see the email in your inbox within 10 minutes, please
-          check your spam folder. If you find it there, mark it as “Not Spam.”
-          If you continue to experience login issues, contact us at support
+          If you don’t see the email in your inbox within 10 minutes, please check your spam folder.
+          If you find it there, mark it as “Not Spam.” If you continue to experience login issues,
+          contact us at support
           <Button
-            onClick={() => {
-              window.open(
-                `https://mail.google.com/mail/u/0/?fs=1&to=${support_email}&tf=cm`
-              );
-            }}
             className="p-0 ml-2 h-auto !bg-transparent w-auto min-w-0"
             color="primary"
             variant="light"
+            onClick={() => {
+              window.open(`https://mail.google.com/mail/u/0/?fs=1&to=${support_email}&tf=cm`);
+            }}
           >
-           {support_email}
+            {support_email}
           </Button>
           .
         </p>

@@ -1,24 +1,18 @@
 "use client";
 
 import { toast } from "react-toastify";
-import request from "@/lib/request";
 import { FormEventHandler, useState } from "react";
-import {
-  Input,
-  Button,
-  Textarea,
-  Breadcrumbs,
-  BreadcrumbItem,
-  Switch,
-} from "@nextui-org/react";
+import { Input, Button, Textarea, Breadcrumbs, BreadcrumbItem, Switch } from "@nextui-org/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+
+import request from "@/lib/request";
 
 export default function EditClient() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit: FormEventHandler = async (e) => {
+  const handleSubmit: FormEventHandler = async e => {
     e.preventDefault();
     setLoading(true);
 
@@ -50,37 +44,32 @@ export default function EditClient() {
         <BreadcrumbItem>
           <Link href="/admin/businessDomain">Business Domain</Link>
         </BreadcrumbItem>
-        <BreadcrumbItem className="capitalize">
-          Add Business Domain
-        </BreadcrumbItem>
+        <BreadcrumbItem className="capitalize">Add Business Domain</BreadcrumbItem>
       </Breadcrumbs>
       <div className="font-semibold text-2xl mt-4 mb-2 self-start h-10">
         <span>Add Business Domain</span>
       </div>
-      <form
-        onSubmit={handleSubmit}
-        className="flex flex-col mt-6 w-full min-h-full flex-auto"
-      >
+      <form className="flex flex-col mt-6 w-full min-h-full flex-auto" onSubmit={handleSubmit}>
         <div className="flex flex-col gap-4">
-          <Input label="Name" name="name" required />
+          <Input required label="Name" name="name" />
 
           <Textarea label="Description" name="description" />
 
           <div className="flex gap-8">
             <div className="flex items-center gap-2">
-              <Switch value="on" name="active" defaultSelected />
+              <Switch defaultSelected name="active" value="on" />
               <span>Active</span>
             </div>
 
             <div className="flex items-center gap-2">
-              <Switch value="on" name="sso" />
+              <Switch name="sso" value="on" />
               <span>Enable SSO</span>
             </div>
           </div>
         </div>
 
         <div className="flex justify-end gap-4">
-          <Button color="primary" type="submit" isLoading={loading}>
+          <Button color="primary" isLoading={loading} type="submit">
             Add
           </Button>
         </div>

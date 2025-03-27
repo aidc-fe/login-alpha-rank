@@ -2,9 +2,6 @@
 
 import { Plus, Trash2 } from "lucide-react";
 import { FormEventHandler, useEffect, useState } from "react";
-import { scopeOptions, BusinessDomainDataType, ClientDataType, authMethodOptions } from "@/lib/admin";
-import { cn } from "@/lib/utils";
-import request from "@/lib/request";
 import {
   Input,
   Button,
@@ -20,6 +17,15 @@ import {
   Select,
   SelectItem,
 } from "@nextui-org/react";
+
+import {
+  scopeOptions,
+  BusinessDomainDataType,
+  ClientDataType,
+  authMethodOptions,
+} from "@/lib/admin";
+import { cn } from "@/lib/utils";
+import request from "@/lib/request";
 import PasswordInput from "@/components/PasswordInput";
 
 export type FormMode = "create" | "edit" | "view";
@@ -33,7 +39,9 @@ interface ClientFormProps {
 
 export default function ClientForm({ mode, initialData, onSubmit, onCancel }: ClientFormProps) {
   const [loading, setLoading] = useState(false);
-  const [materials, setMaterials] = useState<Array<{ title: string; image: string; description: string }>>(initialData?.materials ?? []);
+  const [materials, setMaterials] = useState<
+    Array<{ title: string; image: string; description: string }>
+  >(initialData?.materials ?? []);
   const [redirectUris, setRedirectUris] = useState<string[]>(initialData?.redirect_uris ?? [""]);
   const [brandColor, setBrandColor] = useState(initialData?.brand_color ?? "#000000");
   const [businessDomains, setBusinessDomains] = useState<BusinessDomainDataType[]>([]);
@@ -50,12 +58,12 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
   }, [initialData]);
 
   const getBusinessDomains = () => {
-    request("/api/businessDomain").then((res) => {
+    request("/api/businessDomain").then(res => {
       setBusinessDomains(res);
     });
   };
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async e => {
     e.preventDefault();
     setLoading(true);
 
@@ -77,7 +85,7 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
     }
 
     const scope = formData.getAll("scope");
-    const redirect_uris = formData.getAll("redirect_uri").filter((uri) => uri);
+    const redirect_uris = formData.getAll("redirect_uri").filter(uri => uri);
 
     const params = {
       businessDomainId: formData.get("businessDomainId"),
@@ -102,7 +110,6 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
     };
 
     try {
-      // console.log(params);
       await onSubmit(params);
     } finally {
       setLoading(false);
@@ -116,350 +123,315 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
     >
       <div className="flex flex-col gap-4">
         <Select
-          label="Business Domain"
-          className="max-w-xs"
-          name="businessDomainId"
-          isDisabled={isReadOnly}
+          id="business-domain"
+          label={<label htmlFor="business-domain">业务域名</label>}
           required
+          className="max-w-xs"
           defaultSelectedKeys={initialData?.businessDomainId ? [initialData.businessDomainId] : []}
+          isDisabled={isReadOnly}
+          name="businessDomainId"
         >
-          {businessDomains.map((item) => (
+          {businessDomains.map(item => (
             <SelectItem key={item.id}>{item.name}</SelectItem>
           ))}
         </Select>
 
         <Input
-          name="name"
-          label="Name"
+          id="client-name"
+          label={<label htmlFor="client-name">客户端名称</label>}
+          value={initialData?.name}
           isReadOnly={isReadOnly}
-          required
-          defaultValue={initialData?.name}
+          name="name"
+          onChange={e => {
+            // handleInputChange("name", e.target.value);
+          }}
         />
 
         <Textarea
+          id="client-description"
+          label={<label htmlFor="client-description">描述</label>}
+          value={initialData?.description}
+          isReadOnly={isReadOnly}
           name="description"
-          label="Description"
           rows={2}
-          isReadOnly={isReadOnly}
-          defaultValue={initialData?.description}
+          onChange={e => {
+            // handleInputChange("description", e.target.value);
+          }}
         />
 
         <Input
+          id="client-domain"
+          label={<label htmlFor="client-domain">授权域名</label>}
+          value={initialData?.auth_domain}
+          isReadOnly={isReadOnly}
           name="auth_domain"
-          label="Auth Domain"
-          isReadOnly={isReadOnly}
-          defaultValue={initialData?.auth_domain}
+          onChange={e => {
+            // handleInputChange("auth_domain", e.target.value);
+          }}
         />
 
         <Input
+          id="client-title"
+          label={<label htmlFor="client-title">标题</label>}
+          defaultValue={initialData?.title || ""}
+          isReadOnly={isReadOnly}
           name="title"
-          label="Title"
-          isReadOnly={isReadOnly}
-          defaultValue={initialData?.title || ''}
         />
 
         <Input
-          name="favicon"
-          label="Favicon"
+          id="client-favicon"
+          label={<label htmlFor="client-favicon">网站图标</label>}
           required
+          defaultValue={initialData?.favicon || ""}
           isReadOnly={isReadOnly}
-          defaultValue={initialData?.favicon || ''}
+          name="favicon"
         />
 
         <div className="flex w-full items-center gap-2">
-          <span className="capitalize text-sm">Brand Color:</span>
+          <span className="capitalize text-sm">品牌颜色:</span>
           <label
-            htmlFor="brand_color"
             className="h-10 w-10 p-2 rounded-xl border-1 cursor-pointer relative"
+            htmlFor="brand-color"
           >
             <Input
-              id="brand_color"
-              label="Brand Color"
+              id="brand-color"
               type="color"
+              defaultValue={brandColor}
+              isReadOnly={isReadOnly}
               name="brand_color"
-              isDisabled={isReadOnly}
-              value={brandColor}
-              onChange={(e) => setBrandColor(e.target.value)}
-              className="absolute inset-0 pointer-events-none opacity-0"
+              className="opacity-0 absolute inset-0 cursor-pointer"
             />
-            <div
-              className="rounded-md w-full h-full"
-              style={{ backgroundColor: brandColor }}
-            />
+            <div className="w-full h-full rounded-lg" style={{ backgroundColor: brandColor }} />
           </label>
         </div>
 
-        <div className="w-full flex flex-col gap-1">
-          <span className="capitalize text-sm">Email Config:</span>
-          <div
-            className={cn("flex flex-col gap-4 border border-border rounded-xl px-4 py-6")}
-          >
-            <Input
-              name="mail_server_host"
-              label="Email Server Host"
-              isReadOnly={isReadOnly}
-              required
-              defaultValue={initialData?.mail_server_host}
-            />
-    
-            <Input
-              name="mail_server_port"
-              label="Email Server Port"
-              isReadOnly={isReadOnly}
-              required
-              defaultValue={initialData?.mail_server_port}
-            />
-    
-            <Input
-              name="mail_server_user"
-              label="Email Server User"
-              isReadOnly={isReadOnly}
-              required
-              defaultValue={initialData?.mail_server_user}
-            />
-    
-            <PasswordInput
-              name="mail_server_password"
-              label="Email Server Password"
-              isReadOnly={isReadOnly}
-              required
-              defaultValue={initialData?.mail_server_password}
-            />
-    
-            <Input
-              name="mail_template_image"
-              label="Email Template Image"
-              isReadOnly={isReadOnly}
-              defaultValue={initialData?.mail_template_image || ''}
-            />
-          </div>
-        </div>
+        <Input
+          id="client-signout-uri"
+          label={<label htmlFor="client-signout-uri">登出URI</label>}
+          defaultValue={initialData?.signout_uri || ""}
+          isReadOnly={isReadOnly}
+          name="signout_uri"
+        />
 
-        <div className="flex flex-col gap-1">
-          <div className="capitalize text-sm">Materials:</div>
-          <div className="flex flex-col gap-4">
-            <Table
-              aria-label="Materials table"
-              classNames={{
-                wrapper: cn("border rounded-xl", {
-                  "bg-content1": !isReadOnly,
-                }),
-              }}
-            >
-              <TableHeader>
-                <TableColumn>Title</TableColumn>
-                <TableColumn>Description</TableColumn>
-                <TableColumn>Image Url</TableColumn>
-                <TableColumn hidden={isReadOnly} width={65}>
-                  Operation
-                </TableColumn>
-              </TableHeader>
-              <TableBody>
-                {materials.map((item, index) => (
-                  <TableRow key={index}>
-                    <TableCell>
-                      <Input
-                        name="material_title"
-                        isReadOnly={isReadOnly}
-                        defaultValue={item.title}
-                        isClearable={!isReadOnly}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Input
-                        name="material_description"
-                        isReadOnly={isReadOnly}
-                        defaultValue={item.description}
-                        isClearable={!isReadOnly}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Input
-                        name="material_image"
-                        isReadOnly={isReadOnly}
-                        type="url"
-                        defaultValue={item.image}
-                        isClearable={!isReadOnly}
-                      />
-                    </TableCell>
-                    <TableCell hidden={isReadOnly}>
-                      <Button
-                        isIconOnly
-                        color="danger"
-                        variant="light"
-                        onClick={() => {
-                          const newMaterials = [...materials];
-                          newMaterials.splice(index, 1);
-                          setMaterials(newMaterials);
-                        }}
-                      >
-                        <Trash2 size={20} />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+        <Input
+          id="client-mail-server-host"
+          label={<label htmlFor="client-mail-server-host">邮件服务器主机</label>}
+          defaultValue={initialData?.mail_server_host || ""}
+          isReadOnly={isReadOnly}
+          name="mail_server_host"
+        />
 
-            {!isReadOnly && (
-              <div className="text-right">
+        <Input
+          id="client-mail-server-port"
+          label={<label htmlFor="client-mail-server-port">邮件服务器端口</label>}
+          defaultValue={initialData?.mail_server_port || ""}
+          isReadOnly={isReadOnly}
+          name="mail_server_port"
+        />
+
+        <Input
+          id="client-mail-server-user"
+          label={<label htmlFor="client-mail-server-user">邮件服务器用户名</label>}
+          defaultValue={initialData?.mail_server_user || ""}
+          isReadOnly={isReadOnly}
+          name="mail_server_user"
+        />
+
+        <PasswordInput
+          id="client-mail-server-password"
+          label={<label htmlFor="client-mail-server-password">邮件服务器密码</label>}
+          defaultValue={initialData?.mail_server_password || ""}
+          isReadOnly={isReadOnly}
+          name="mail_server_password"
+        />
+
+        <Input
+          id="client-mail-template-image"
+          label={<label htmlFor="client-mail-template-image">邮件模板图片</label>}
+          defaultValue={initialData?.mail_template_image || ""}
+          isReadOnly={isReadOnly}
+          name="mail_template_image"
+        />
+
+        <CheckboxGroup
+          id="client-login-methods"
+          label={<label htmlFor="client-login-methods">登录方式</label>}
+          defaultValue={initialData?.login_methods || []}
+          isReadOnly={isReadOnly}
+          name="login_methods"
+        >
+          {authMethodOptions.map((option: { value: string; label: string }) => (
+            <Checkbox key={option.value} value={option.value}>
+              {option.label}
+            </Checkbox>
+          ))}
+        </CheckboxGroup>
+
+        <CheckboxGroup
+          id="client-scope"
+          label={<label htmlFor="client-scope">权限范围</label>}
+          defaultValue={initialData?.scope || []}
+          isReadOnly={isReadOnly}
+          name="scope"
+        >
+          {scopeOptions.map(scope => (
+            <Checkbox key={scope} value={scope}>
+              {scope}
+            </Checkbox>
+          ))}
+        </CheckboxGroup>
+
+        <div className="flex flex-col gap-2">
+          <label htmlFor="client-redirect-uri">重定向URI</label>
+          {redirectUris.map((uri, index) => (
+            <div key={index} className="flex gap-2">
+              <Input
+                id={`client-redirect-uri-${index}`}
+                value={uri}
+                isReadOnly={isReadOnly}
+                name="redirect_uri"
+                onChange={e => {
+                  const newUris = [...redirectUris];
+                  newUris[index] = e.target.value;
+                  setRedirectUris(newUris);
+                }}
+              />
+              {!isReadOnly && (
                 <Button
-                  type="button"
-                  startContent={<Plus size={20} />}
-                  isDisabled={loading}
-                  onClick={() =>
-                    setMaterials([
-                      ...materials,
-                      { title: "", description: "", image: "" },
-                    ])
-                  }
-                >
-                  Add Material
-                </Button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="w-full flex flex-col gap-1">
-          <span className="capitalize text-sm">Redirect URL:</span>
-          <div
-            className={cn("flex flex-col gap-4 border border-border rounded-xl px-4 py-6")}
-          >
-            {redirectUris.map((item, index) => (
-              <div
-                key={`redirect_uri${index}`}
-                className={cn(
-                  "w-full grid grid-cols-[1fr_auto] gap-2 items-center",
-                  {
-                    "grid-cols-1": !index,
-                  }
-                )}
-              >
-                <Input
-                  name="redirect_uri"
-                  isReadOnly={isReadOnly}
-                  defaultValue={item}
-                  type="url"
-                  pattern="^(https?|ftp)://.+"
-                  required
-                />
-                <Button
-                  isIconOnly
                   color="danger"
-                  className={cn({ hidden: !index || isReadOnly })}
+                  isDisabled={redirectUris.length === 1}
                   onClick={() => {
-                    const newUris = [...redirectUris];
-                    newUris.splice(index, 1);
+                    const newUris = redirectUris.filter((_, i) => i !== index);
                     setRedirectUris(newUris);
                   }}
                 >
-                  <Trash2 size={20} />
+                  <Trash2 className="h-4 w-4" />
                 </Button>
-              </div>
-            ))}
-            {!isReadOnly && (
-              <div className="text-right">
-                <Button
-                  type="button"
-                  startContent={<Plus size={20} />}
-                  isDisabled={loading}
-                  onClick={() => setRedirectUris([...redirectUris, ""])}
-                >
-                  Add
-                </Button>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <Input
-          name="signout_uri"
-          label="Signout URL"
-          isReadOnly={isReadOnly}
-          required
-          type="url"
-          pattern="^(https?|ftp)://.+"
-          defaultValue={initialData?.signout_uri}
-        />
-
-        <Input
-          name="tos_doc"
-          label="Terms of Service URL"
-          isReadOnly={isReadOnly}
-          type="url"
-          pattern="^(https?|ftp)://.+"
-          defaultValue={initialData?.tos_doc || ''}
-        />
-
-        <Input
-          name="pp_doc"
-          label="Privacy Policy URL"
-          isReadOnly={isReadOnly}
-          type="url"
-          pattern="^(https?|ftp)://.+"
-          defaultValue={initialData?.pp_doc || ''}
-        />
-
-        <div className="flex flex-col gap-2">
-          <label className="text-sm">Login Methods:</label>
-          {!isReadOnly ? (
-            <CheckboxGroup
-              name="login_methods"
-              orientation="horizontal"
-              defaultValue={initialData?.login_methods ?? []}
-            >
-              {authMethodOptions.map((item) => (
-                <div className="inline-flex items-center gap-2" key={item.value}>
-                  <Checkbox id={item.value} value={item.value}>
-                    {item.label}
-                  </Checkbox>
-                </div>
-              ))}
-            </CheckboxGroup>
-          ) : (
-            <div className="text-sm text-muted leading-10">
-              {initialData?.login_methods?.join(", ")}
+              )}
             </div>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <label className="text-sm">Scope:</label>
-          {!isReadOnly ? (
-            <CheckboxGroup
-              name="scope"
-              orientation="horizontal"
-              defaultValue={initialData?.scope ?? []}
-            >
-              {scopeOptions.map((key) => (
-                <div className="inline-flex items-center gap-2" key={key}>
-                  <Checkbox id={key} value={key}>
-                    {key}
-                  </Checkbox>
-                </div>
-              ))}
-            </CheckboxGroup>
-          ) : (
-            <div className="text-sm text-muted leading-10">
-              {initialData?.scope?.join(", ")}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {!isReadOnly && (
-        <div className="flex mt-8 w-full justify-center xl:justify-end gap-3">
-          {mode === "edit" && onCancel && (
-            <Button type="button" onClick={onCancel}>
-              Cancel
+          ))}
+          {!isReadOnly && (
+            <Button color="primary" onClick={() => setRedirectUris([...redirectUris, ""])}>
+              <Plus className="h-4 w-4" />
             </Button>
           )}
-          <Button type="submit" isLoading={loading}>
-            {mode === "create" ? "Add" : "Update"}
+        </div>
+
+        <div className="flex flex-col gap-2">
+          <label htmlFor="client-materials">素材</label>
+          <Table aria-label="Materials table">
+            <TableHeader>
+              {(() => {
+                const columns = [
+                  <TableColumn key="title">标题</TableColumn>,
+                  <TableColumn key="image">图片</TableColumn>,
+                  <TableColumn key="description">描述</TableColumn>,
+                ];
+                if (!isReadOnly) {
+                  columns.push(<TableColumn key="operation">操作</TableColumn>);
+                }
+                return columns;
+              })()}
+            </TableHeader>
+            <TableBody>
+              {materials.map((material, index) => {
+                const row = (
+                  <TableRow key={index}>
+                    <TableCell>
+                      <Input
+                        id={`client-material-title-${index}`}
+                        value={material.title}
+                        isReadOnly={isReadOnly}
+                        name="material_title"
+                        onChange={e => {
+                          const newMaterials = [...materials];
+                          newMaterials[index] = {
+                            ...newMaterials[index],
+                            title: e.target.value,
+                          };
+                          setMaterials(newMaterials);
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        id={`client-material-image-${index}`}
+                        value={material.image}
+                        isReadOnly={isReadOnly}
+                        name="material_image"
+                        onChange={e => {
+                          const newMaterials = [...materials];
+                          newMaterials[index] = {
+                            ...newMaterials[index],
+                            image: e.target.value,
+                          };
+                          setMaterials(newMaterials);
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        id={`client-material-description-${index}`}
+                        value={material.description}
+                        isReadOnly={isReadOnly}
+                        name="material_description"
+                        onChange={e => {
+                          const newMaterials = [...materials];
+                          newMaterials[index] = {
+                            ...newMaterials[index],
+                            description: e.target.value,
+                          };
+                          setMaterials(newMaterials);
+                        }}
+                      />
+                    </TableCell>
+                  </TableRow>
+                );
+
+                if (!isReadOnly) {
+                  row.props.children.push(
+                    <TableCell key="operation">
+                      <Button
+                        color="danger"
+                        isDisabled={materials.length === 1}
+                        onClick={() => {
+                          const newMaterials = materials.filter((_, i) => i !== index);
+                          setMaterials(newMaterials);
+                        }}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  );
+                }
+
+                return row;
+              })}
+            </TableBody>
+          </Table>
+          {!isReadOnly && (
+            <Button
+              color="primary"
+              onClick={() =>
+                setMaterials([...materials, { title: "", image: "", description: "" }])
+              }
+            >
+              <Plus className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+
+        <div className="flex justify-end gap-2">
+          {onCancel && (
+            <Button color="danger" variant="light" onClick={onCancel}>
+              取消
+            </Button>
+          )}
+          <Button color="primary" isLoading={loading} type="submit">
+            {mode === "create" ? "创建" : mode === "edit" ? "更新" : "确定"}
           </Button>
         </div>
-      )}
+      </div>
     </form>
   );
-} 
+}

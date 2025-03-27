@@ -6,7 +6,7 @@ const SuspenseWrapper = ({ children }: { children: React.ReactNode }) => {
     <Suspense
       fallback={
         <main className="h-full flex justify-center items-center w-full">
-          <Loader size={60} className="text-primary animate-spin" />
+          <Loader className="text-primary animate-spin" size={60} />
         </main>
       }
     >

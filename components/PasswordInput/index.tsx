@@ -1,5 +1,5 @@
 import React from "react";
-import {Input, InputProps} from "@nextui-org/react";
+import { Input, InputProps } from "@nextui-org/react";
 
 export const EyeSlashFilledIcon = (props: React.SVGProps<SVGSVGElement>) => (
   <svg
@@ -59,13 +59,19 @@ export const EyeFilledIcon = (props: React.SVGProps<SVGSVGElement>) => (
 
 export default function PasswordInput(props: Omit<InputProps, "type" | "endContent">) {
   const [isVisible, setIsVisible] = React.useState(false);
+  const id = props.id || props.name || "password-input";
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
   return (
     <Input
       endContent={
-        <button className="focus:outline-none" type="button" onClick={toggleVisibility} aria-label="toggle password visibility">
+        <button
+          aria-label="toggle password visibility"
+          className="focus:outline-none"
+          type="button"
+          onClick={toggleVisibility}
+        >
           {isVisible ? (
             <EyeSlashFilledIcon className="text-xl text-default-400 pointer-events-none" />
           ) : (
@@ -73,6 +79,8 @@ export default function PasswordInput(props: Omit<InputProps, "type" | "endConte
           )}
         </button>
       }
+      id={id}
+      label={<label htmlFor={id}>{props.label}</label>}
       type={isVisible ? "text" : "password"}
       {...props}
     />

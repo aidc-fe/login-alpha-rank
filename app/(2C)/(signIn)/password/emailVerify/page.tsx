@@ -1,25 +1,33 @@
 "use client";
 
-import request from "@/lib/request";
 import { Send } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEventHandler, useState } from "react";
 import { Input, Button, Link, Spinner } from "@nextui-org/react";
+import { toast } from "react-toastify";
+import Turnstile from "react-turnstile";
+
 import { useClient } from "@/providers/client-provider";
 import PasswordInput from "@/components/PasswordInput";
-import { toast } from "react-toastify";
+import request from "@/lib/request";
+import { encryptWithRSA } from "@/lib/rsa";
 
 export default function Page() {
-  const { businessDomainId,client_id } = useClient();
+  const { businessDomainId, client_id } = useClient();
   const searchParams = useSearchParams();
-  const [email, setEmail] = useState<string>(
-    decodeURIComponent(searchParams.get("email") || "")
-  );
+  const [email, setEmail] = useState<string>(decodeURIComponent(searchParams.get("email") || ""));
   const [loading, setLoading] = useState(false);
+  const [token, setToken] = useState("");
   const router = useRouter();
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async e => {
     e.preventDefault();
+
+    if (!token) {
+      toast.error("Please verify the captcha");
+      return;
+    }
+
     const formData = new FormData(e.target as HTMLFormElement);
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
@@ -32,23 +40,39 @@ export default function Page() {
     }
 
     setLoading(true);
-    request("/api/password/emailVerify", {
-      method: "POST",
-      body: JSON.stringify({ email, password, businessDomainId, client_id }),
-    })
-      .then(() => {
-        router.push(
-          `/email/sent?email=${encodeURIComponent(
-            email || ""
-          )}&type=set_password`
-        );
+    try {
+      // 获取公钥
+      const response = await fetch("/api/rsa/public-key");
+      const { publicKey } = await response.json();
+
+      // 加密密码
+      const encryptedPassword = encryptWithRSA(password, publicKey);
+
+      // 发送验证邮件
+      request("/api/password/emailVerify", {
+        method: "POST",
+        body: JSON.stringify({
+          email,
+          password: encryptedPassword,
+          businessDomainId,
+          client_id,
+          token,
+        }),
       })
-      .catch((err) => {
-        console.log({ err });
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+        .then(() => {
+          router.push(`/email/sent?email=${encodeURIComponent(email || "")}&type=set_password`);
+        })
+        .catch(err => {
+          console.log({ err });
+          window.location.reload();
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } catch (error) {
+      setLoading(false);
+      toast.error("设置密码失败，请重试");
+    }
   };
 
   return (
@@ -59,47 +83,41 @@ export default function Page() {
       >
         <h1 className="font-bold text-3xl mb-12">Set Password</h1>
         <Input
-          name="email"
           required
           label="E-mail"
+          name="email"
           type="email"
           value={email}
-          onChange={(e) => {
+          onChange={e => {
             setEmail(e.target.value);
           }}
         />
 
-        <PasswordInput
-          name="password"
-          required
-          label="Password"
-        />
+        <PasswordInput required label="Password" name="password" />
 
-        <PasswordInput
-          name="check_password"
-          required
-          label="Re-enter password"
+        <PasswordInput required label="Re-enter password" name="check_password" />
+        <Turnstile
+          refreshExpired="auto"
+          sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+          onVerify={token => setToken(token)} // 验证成功后获取 token
         />
         <Button
           className="group w-full"
           color="primary"
-          type="submit"
+          isLoading={loading}
           size="lg"
           spinner={<Spinner color="default" size="sm" />}
           startContent={
-            !loading && <Send size={20} className="group-hover:rotate-45 duration-150" />
+            !loading && <Send className="group-hover:rotate-45 duration-150" size={20} />
           }
-          isLoading={loading}
+          type="submit"
         >
           Send set instructions
         </Button>
         <div className="w-1/2 border-b mx-auto mt-4" />
         <div className="flex items-center text-muted gap-2">
           <span>Back to</span>
-          <Link
-            underline="always"
-            href={`/?email=${encodeURIComponent(email)}`}
-          >
+          <Link href={`/?email=${encodeURIComponent(email)}`} underline="always">
             Sign in
           </Link>
         </div>

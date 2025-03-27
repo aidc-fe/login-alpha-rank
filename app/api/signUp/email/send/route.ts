@@ -1,15 +1,25 @@
+import { NextRequest, NextResponse } from "next/server";
+
 import { ERROR_CONFIG } from "@/lib/errors";
-import {
-  createVerificationToken,
-  findClientByClientId,
-  getUser,
-} from "@/lib/database";
+import { createVerificationToken, findClientByClientId, getUser } from "@/lib/database";
 import { sendVerificationEmail } from "@/lib/email";
 import { formateError, formatSuccess } from "@/lib/request";
-import { NextRequest, NextResponse } from "next/server";
+import { verifyToken } from "@/lib/auth";
+import { decryptWithRSA } from "@/lib/rsa";
 
 export async function POST(request: NextRequest) {
   const userInfo = await request.json();
+
+  try {
+    const result = await verifyToken(userInfo.token);
+
+    if (!result) {
+      return NextResponse.json(formateError(ERROR_CONFIG.AUTH.TURNSTILE_VERIFY_FAIL));
+    }
+  } catch (error) {
+    return NextResponse.json(formateError(ERROR_CONFIG.AUTH.TURNSTILE_VERIFY_FAIL));
+  }
+
   // 获取当前请求的 host
   const host = request.headers.get("host") || request.headers.get(":authority");
   const baseUrl = `https://${host}`;
@@ -24,16 +34,17 @@ export async function POST(request: NextRequest) {
   ) {
     return NextResponse.json(formateError(ERROR_CONFIG.AUTH.USER_EXIST));
   } else {
-    // 生成验证链接（你需要实现生成实际的链接）
+    // 解密密码
+    const decryptedPassword = decryptWithRSA(userInfo.password);
 
     try {
       const newToken = await createVerificationToken({
-        identifier: userInfo?.email, // 你需要的 identifier
+        identifier: userInfo?.email,
         name: userInfo?.name,
-        password: userInfo?.password, // 可选
+        password: decryptedPassword,
         targetUrl: userInfo?.targetUrl,
         businessDomainId: userInfo?.businessDomainId,
-        type: "signUp", // 可选
+        type: "signUp",
       });
       const verificationLink = `${baseUrl}/api/signUp/email/verify?token=${newToken.token}`;
       const client = await findClientByClientId(userInfo?.client_id);
@@ -45,8 +56,7 @@ export async function POST(request: NextRequest) {
         "Verify your email ",
         {
           title: "Verify your email address",
-          description:
-            "To continue setting up your account, please verify your email address.",
+          description: "To continue setting up your account, please verify your email address.",
           btnContent: "Verify Email Address",
         },
         {
@@ -58,6 +68,7 @@ export async function POST(request: NextRequest) {
         },
         client.brand_color
       );
+
       return NextResponse.json(
         formatSuccess({
           message: "Please check your email to verify your account.",
@@ -65,9 +76,8 @@ export async function POST(request: NextRequest) {
       );
     } catch (error) {
       console.log("VERIFICATION_TOKEN.GENERATE_FAIL", error);
-      return NextResponse.json(
-        ERROR_CONFIG.DATABASE.VERIFICATION_TOKEN.GENERATE_FAIL
-      );
+
+      return NextResponse.json(ERROR_CONFIG.DATABASE.VERIFICATION_TOKEN.GENERATE_FAIL);
     }
   }
 }

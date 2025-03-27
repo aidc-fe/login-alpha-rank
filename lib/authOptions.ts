@@ -1,12 +1,14 @@
-import { NextAuthOptions } from "next-auth";
+import { NextAuthOptions, User } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import EmailProvider from "next-auth/providers/email";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
+
 import {
   createOrUpdateAccount,
   getBusinessDomainIdByAuthDomain,
   getCurrentServerClient,
+  getUser,
   getUserIdByEmail,
   prisma,
 } from "@/lib/database";
@@ -27,7 +29,7 @@ export const authOptions: NextAuthOptions = {
         where: {
           email_businessDomainId: {
             email,
-            businessDomainId: businessDomainId || '',
+            businessDomainId: businessDomainId || "",
           },
         },
       });
@@ -38,11 +40,11 @@ export const authOptions: NextAuthOptions = {
       // 从请求中获取 businessDomainId
       // 注意：这里需要访问请求上下文来获取 businessDomainId
       const businessDomainId = await getBusinessDomainIdByAuthDomain();
-     
+
       const user = await prisma.user.create({
         data: {
           ...data,
-          businessDomainId: businessDomainId || '',
+          businessDomainId: businessDomainId || "",
         },
       });
 
@@ -73,8 +75,7 @@ export const authOptions: NextAuthOptions = {
 
   callbacks: {
     async signIn({ user, account }) {
-      
-      if (account?.provider === 'google') {
+      if (account?.provider === "google") {
         // 首先确保用户存在
         const businessDomainId = await getBusinessDomainIdByAuthDomain();
 
@@ -83,18 +84,18 @@ export const authOptions: NextAuthOptions = {
           where: {
             email_businessDomainId: {
               email: user.email!,
-              businessDomainId: businessDomainId || '',
-            }
+              businessDomainId: businessDomainId || "",
+            },
           },
           create: {
             email: user.email!,
             name: user.name!,
             image: user.image,
-            businessDomainId: businessDomainId || '',
+            businessDomainId: businessDomainId || "",
           },
           update: {
             emailVerified: new Date(),
-          }
+          },
         });
 
         // 然后再处理账户关联
@@ -106,8 +107,8 @@ export const authOptions: NextAuthOptions = {
 
         if (!existingAccount) {
           await createOrUpdateAccount({
-            userId: dbUser.id,  // 使用确认存在的用户ID
-            ...account
+            userId: dbUser.id, // 使用确认存在的用户ID
+            ...account,
           });
         }
       }
@@ -115,7 +116,9 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
     async session({ session, token }) {
-      return { ...session, jwtToken: token?.jwtToken, id: token?.sub };
+      const user = (await getUser({ id: token.sub })) as User;
+
+      return { ...session, jwtToken: token?.jwtToken, id: token?.sub, user };
     },
   },
   secret: process.env.NEXT_AUTH_SECRET!,
@@ -218,6 +221,7 @@ export const authOptions: NextAuthOptions = {
         const client = await getCurrentServerClient();
         const urlObj = new URL(url);
         let callbackUrl = urlObj.searchParams.get("callbackUrl");
+
         if (callbackUrl && userId) {
           // 解码 callbackUrl
           callbackUrl = decodeURIComponent(callbackUrl);
@@ -240,17 +244,13 @@ export const authOptions: NextAuthOptions = {
           `${client.name} - Login`,
           {
             title: `Login to ${client.name}`,
-            description: `<p>You can login to ${
-              client.name
-            } by clicking the button below.</p> 
+            description: `<p>You can login to ${client.name} by clicking the button below.</p> 
             <p>
             Good news!  You and your team can use username/password to login your ${
               client.name
             } account now. Just set your password with the following link: <a style='color:${
               client.brand_color
-            }' href='https://${
-              host
-            }/password/emailVerify?email=${encodeURIComponent(
+            }' href='https://${host}/password/emailVerify?email=${encodeURIComponent(
               email
             )}'>setting your password.</a>.
             </p>

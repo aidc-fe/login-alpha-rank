@@ -1,20 +1,14 @@
 "use client";
 
 import { toast } from "react-toastify";
-import request from "@/lib/request";
 import { FormEventHandler, useEffect, useState } from "react";
-import {
-  Input,
-  Button,
-  Textarea,
-  Breadcrumbs,
-  BreadcrumbItem,
-  Switch,
-} from "@nextui-org/react";
+import { Input, Button, Textarea, Breadcrumbs, BreadcrumbItem, Switch } from "@nextui-org/react";
 import Link from "next/link";
-import CopyButton from "@/components/CopyButton";
 import dayjs from "dayjs";
 import { FilePenLine } from "lucide-react";
+
+import CopyButton from "@/components/CopyButton";
+import request from "@/lib/request";
 import Loader from "@/components/ui/loader";
 
 interface BusinessDomain {
@@ -27,11 +21,7 @@ interface BusinessDomain {
   updated_at: string;
 }
 
-export default function BusinessDomainDetail({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default function BusinessDomainDetail({ params }: { params: { id: string } }) {
   const [loading, setLoading] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [data, setData] = useState<BusinessDomain | null>(null);
@@ -44,6 +34,7 @@ export default function BusinessDomainDetail({
   const fetchData = async () => {
     try {
       const response = await request(`/api/businessDomain/${params.id}`);
+
       setData(response);
     } catch (error: any) {
       toast.error(error.message || "Failed to fetch data");
@@ -52,7 +43,7 @@ export default function BusinessDomainDetail({
     }
   };
 
-  const handleSubmit: FormEventHandler = async (e) => {
+  const handleSubmit: FormEventHandler = async e => {
     e.preventDefault();
     setLoading(true);
 
@@ -69,10 +60,10 @@ export default function BusinessDomainDetail({
         method: "PUT",
         body: JSON.stringify(updateData),
       });
+
       setData(response);
       setIsEdit(false);
       toast.success("Update success");
-
     } catch (error: any) {
       toast.error(error.message || "Update failed");
     } finally {
@@ -95,14 +86,14 @@ export default function BusinessDomainDetail({
         <div className="flex gap-4 mt-4 flex-col xl:gap-8 xl:flex-row">
           {!pageLoading ? (
             <>
-              <form onSubmit={handleSubmit} className="w-full">
+              <form className="w-full" onSubmit={handleSubmit}>
                 <div className="w-full flex items-center justify-between font-semibold text-2xl mb-2 self-start h-10">
                   <span>{isEdit ? "Update" : "Detail"} Business Domain</span>
                   {!isEdit ? (
                     <Button
-                      type="button"
                       startContent={<FilePenLine size={16} />}
-                      onClick={(e) => {
+                      type="button"
+                      onClick={e => {
                         e.stopPropagation();
                         e.preventDefault();
                         setIsEdit(true);
@@ -114,37 +105,37 @@ export default function BusinessDomainDetail({
                 </div>
                 <div className="space-y-4 mt-6">
                   <Input
-                    label="Name"
-                    name="name"
+                    required
                     defaultValue={data?.name}
                     isReadOnly={!isEdit}
-                    required
+                    label="Name"
+                    name="name"
                   />
 
                   <Textarea
-                    label="Description"
-                    name="description"
                     defaultValue={data?.description || ""}
                     isReadOnly={!isEdit}
+                    label="Description"
+                    name="description"
                   />
 
                   <div className="flex gap-8">
                     <div className="flex items-center gap-2">
                       <Switch
+                        defaultSelected={data?.active}
+                        isDisabled={!isEdit}
                         name="active"
                         value="on"
-                        isDisabled={!isEdit}
-                        defaultSelected={data?.active}
                       />
                       <span>Active</span>
                     </div>
 
                     <div className="flex items-center gap-2">
                       <Switch
+                        defaultSelected={data?.sso}
+                        isDisabled={!isEdit}
                         name="sso"
                         value="on"
-                        isDisabled={!isEdit}
-                        defaultSelected={data?.sso}
                       />
                       <span>Enable SSO</span>
                     </div>
@@ -156,7 +147,7 @@ export default function BusinessDomainDetail({
                         <Button type="button" onClick={() => setIsEdit(false)}>
                           Cancel
                         </Button>
-                        <Button color="primary" type="submit" isLoading={loading}>
+                        <Button color="primary" isLoading={loading} type="submit">
                           Update
                         </Button>
                       </div>
@@ -176,24 +167,20 @@ export default function BusinessDomainDetail({
                   </div>
                 </div>
                 <div className="flex flex-col gap-2 pl-3">
-                  <div className="text-base text-foreground flex items-center">
-                    Create Time
-                  </div>
+                  <div className="text-base text-foreground flex items-center">Create Time</div>
                   <div className="text-sm text-muted break-all">
                     {dayjs(data?.created_at).format("YYYY-MM-DD HH:mm:ss")}
                   </div>
                 </div>
                 <div className="flex flex-col gap-2 pl-3">
-                  <div className="text-base text-foreground flex items-center">
-                    Update Time
-                  </div>
+                  <div className="text-base text-foreground flex items-center">Update Time</div>
                   <div className="text-sm text-muted break-all">
                     {dayjs(data?.updated_at).format("YYYY-MM-DD HH:mm:ss")}
                   </div>
                 </div>
               </div>
             </>
-          ): null}
+          ) : null}
         </div>
       </Loader>
     </div>

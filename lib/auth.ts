@@ -1,5 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
 import { createHmac, timingSafeEqual } from "crypto";
+
+import { NextRequest, NextResponse } from "next/server";
+
 import { encodeJwt } from "./secret";
 import { ERROR_CONFIG } from "./errors";
 
@@ -15,7 +17,7 @@ export const CookieOpt = {
 export function thirdPartySignIn(jwt: string, shopDomain?: string | null) {
   const urls = process.env.NEXT_PUBLIC_THIRD_PARTY_SIGNIN_API?.split(",") || [];
 
-  const fetchPromises = urls.map((url) => {
+  const fetchPromises = urls.map(url => {
     return fetch(url, {
       method: "POST",
       credentials: "include", // 确保 cookie 被发送
@@ -35,10 +37,9 @@ export function thirdPartySignIn(jwt: string, shopDomain?: string | null) {
 
 // 往所有端种登录态cookie
 export function thirdPartySignOut() {
-  const urls =
-    process.env.NEXT_PUBLIC_THIRD_PARTY_SIGNOUT_API?.split(",") || [];
+  const urls = process.env.NEXT_PUBLIC_THIRD_PARTY_SIGNOUT_API?.split(",") || [];
 
-  const fetchPromises = urls.map((url) => {
+  const fetchPromises = urls.map(url => {
     return fetch(`${url}`, {
       method: "POST",
       credentials: "include", // 确保 cookie 被发送
@@ -62,24 +63,17 @@ export function shoplazzaHmacValidator(request: NextRequest): boolean {
     const url = new URL(request.url);
     const hmac = url.searchParams.get("hmac");
     const queryParams = new URLSearchParams(url.searchParams);
+
     queryParams.delete("hmac");
 
     const sortedKeys = Array.from(queryParams.keys()).sort();
-    const message = sortedKeys
-      .map((key) => `${key}=${queryParams.get(key)}`)
-      .join("&");
+    const message = sortedKeys.map(key => `${key}=${queryParams.get(key)}`).join("&");
 
-    const generatedHash = createHmac(
-      "sha256",
-      process.env.SHOPLAZZA_CLIENT_SECRET!
-    )
+    const generatedHash = createHmac("sha256", process.env.SHOPLAZZA_CLIENT_SECRET!)
       .update(message)
       .digest("hex");
 
-    const validate = timingSafeEqual(
-      Buffer.from(generatedHash),
-      Buffer.from(hmac!)
-    );
+    const validate = timingSafeEqual(Buffer.from(generatedHash), Buffer.from(hmac!));
 
     if (validate) {
       return true;
@@ -151,3 +145,22 @@ export const SHOPLAZZA_SCOPES = [
   "unauthenticated_read_product_tags",
   "unauthenticated_read_selling_plans",
 ];
+
+// 验证turnstile token
+export async function verifyToken(token: string) {
+  const secretKey = process.env.TURNSTILE_SECRET_KEY!;
+  const verifyUrl = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+  const formData = new URLSearchParams();
+
+  formData.append("secret", secretKey);
+  formData.append("response", token);
+  const response = await fetch(verifyUrl, {
+    method: "POST",
+    body: formData,
+  });
+  const result = await response.json();
+
+  console.log(process.env.TURNSTILE_SECRET_KEY, result);
+
+  return result.success;
+}

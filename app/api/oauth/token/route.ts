@@ -1,3 +1,5 @@
+import { NextRequest, NextResponse } from "next/server";
+
 import {
   createAccessToken,
   createRefreshToken,
@@ -5,7 +7,6 @@ import {
   findClientByClientId,
 } from "@/lib/database";
 import { generateTokens } from "@/lib/secret";
-import { NextRequest, NextResponse } from "next/server";
 
 // 定义请求体的类型
 interface OAuthRequestBody {
@@ -18,8 +19,7 @@ interface OAuthRequestBody {
 export async function POST(request: NextRequest) {
   try {
     // 尝试解析请求体，避免 undefined 默认值
-    const { client_id, client_secret, code }: OAuthRequestBody =
-      await request.json();
+    const { client_id, client_secret, code }: OAuthRequestBody = await request.json();
 
     // 如果没有提供 client_id 或 client_secret，则立即返回错误
     if (!client_id) {
@@ -45,6 +45,7 @@ export async function POST(request: NextRequest) {
 
     // 查询 client 信息
     const client = await findClientByClientId(client_id);
+
     // 验证 client_secret 是否匹配
     if (client.client_secret !== client_secret) {
       return NextResponse.json(
@@ -56,6 +57,7 @@ export async function POST(request: NextRequest) {
     // 查找并校验 code 的准确性
     try {
       const authorizationCode = await findAndUseAuthorizationCode(code);
+
       if (authorizationCode.client_id !== client_id) {
         return NextResponse.json(
           { error: "invalid_grant", error_description: "Invalid authorization code" },
@@ -101,6 +103,7 @@ export async function POST(request: NextRequest) {
     }
   } catch (e: any) {
     console.error("Error creating tokens:", e);
+
     return NextResponse.json(
       { error: "server_error", error_description: e.message || "Failed to create tokens" },
       { status: 500 }

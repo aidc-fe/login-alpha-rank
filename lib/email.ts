@@ -35,18 +35,18 @@ export async function sendVerificationEmail(
     subject,
     html: `
       <div style="width: 500px; margin: 0 auto;">
-        <img src="${mail_template_image}" alt="logo" style="width: 100%; object-fit: contain;" />
         <h1 style="color: #000; font-size: 20px; line-height: 24px; margin: 0px 0px 22px;"> ${
           displayContent.title
         }</h1>
         <div style="margin: 0; font-size: 16px; line-height: 24px; color: #2c2c2c">${displayContent.description}</div>
         <p style="margin: 16px 0px 0px; text-align: center;"> 
         <a href=${verificationLink}
-          style="width: 100%; height: 56px; display: inline-block; text-decoration: none; background: ${color}; border-radius: 20px; color: ${
-          color ? "white" : ""
-        };  font-size: 20px; line-height: 56px; font-weight: 700; text-align: center;" target="_blank">${
-          displayContent.btnContent
-        }</a>
+          style="width: 100%;margin-bottom:10px; height: 56px; display: inline-block; text-decoration: none; background: ${color}; border-radius: 20px; color: ${
+            color ? "white" : ""
+          };  font-size: 20px; line-height: 56px; font-weight: 700; text-align: center;" target="_blank">${
+            displayContent.btnContent
+          }</a>
+        <a href=${verificationLink}>${verificationLink}</a>
         </p>
       </div>
     `,

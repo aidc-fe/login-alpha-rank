@@ -12,12 +12,12 @@ class EventBus {
 
   off(event: string, callback: EventCallback) {
     if (!this.listeners[event]) return;
-    this.listeners[event] = this.listeners[event].filter((cb) => cb !== callback);
+    this.listeners[event] = this.listeners[event].filter(cb => cb !== callback);
   }
 
   emit(event: string, ...args: any[]) {
     if (!this.listeners[event]) return;
-    this.listeners[event].forEach((callback) => callback(...args));
+    this.listeners[event].forEach(callback => callback(...args));
   }
 }
 

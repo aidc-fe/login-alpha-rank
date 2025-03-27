@@ -21,10 +21,11 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useRequest } from "ahooks";
+import Link from "next/link";
+
 import request from "@/lib/request";
 import Loader from "@/components/ui/loader";
 import { BusinessDomainDataType } from "@/lib/admin";
-import Link from "next/link";
 import CopyButton from "@/components/CopyButton";
 
 // 类型定义
@@ -32,7 +33,7 @@ interface SwitchState {
   id: string;
   active: boolean;
   sso: boolean;
-  type: 'active' | 'sso';
+  type: "active" | "sso";
 }
 
 // 独立的 API 调用函数
@@ -55,11 +56,11 @@ const columns = [
 ];
 
 // 开关组件
-const LoadingSwitch = ({ 
-  isSelected, 
-  isLoading, 
+const LoadingSwitch = ({
+  isSelected,
+  isLoading,
   onValueChange,
-  disabled 
+  disabled,
 }: {
   isSelected: boolean;
   isLoading: boolean;
@@ -67,16 +68,18 @@ const LoadingSwitch = ({
   disabled?: boolean;
 }) => (
   <Switch
-    isSelected={isSelected}
     disabled={disabled || isLoading}
-    thumbIcon={isLoading ? (
-      <Spinner
-        size="sm"
-        classNames={{
-          wrapper: "scale-75",
-        }}
-      />
-    ) : null}
+    isSelected={isSelected}
+    thumbIcon={
+      isLoading ? (
+        <Spinner
+          classNames={{
+            wrapper: "scale-75",
+          }}
+          size="sm"
+        />
+      ) : null
+    }
     onValueChange={onValueChange}
   />
 );
@@ -86,7 +89,7 @@ const DeactivateModal = ({
   isOpen,
   onClose,
   onConfirm,
-  isLoading
+  isLoading,
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -95,24 +98,20 @@ const DeactivateModal = ({
 }) => (
   <Modal isOpen={isOpen} onOpenChange={onClose}>
     <ModalContent>
-      {(onClose) => (
+      {onClose => (
         <>
           <ModalHeader>Deactivate Client</ModalHeader>
           <ModalBody>
             <p>
-              This client will be deactivate immediately. Once deactivate,
-              it can no longer be used to make oAuth Login.
+              This client will be deactivate immediately. Once deactivate, it can no longer be used
+              to make oAuth Login.
             </p>
           </ModalBody>
           <ModalFooter>
             <Button variant="faded" onPress={onClose}>
               Cancel
             </Button>
-            <Button
-              isLoading={isLoading}
-              color="primary"
-              onClick={onConfirm}
-            >
+            <Button color="primary" isLoading={isLoading} onClick={onConfirm}>
               Continue
             </Button>
           </ModalFooter>
@@ -134,57 +133,58 @@ export default function List() {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
 
   const { data, loading, mutate } = useRequest(getList, {
-    onError: (err) => {
-      console.error('Failed to fetch business domains:', err);
-    }
+    onError: err => {
+      console.error("Failed to fetch business domains:", err);
+    },
   });
 
   const handleSwitchChange = async (
     id: string,
-    type: 'active' | 'sso',
+    type: "active" | "sso",
     checked: boolean,
     item: BusinessDomainDataType
   ) => {
     setCurrentData({
       id,
-      active: type === 'active' ? checked : item.active,
-      sso: type === 'sso' ? checked : item.sso,
+      active: type === "active" ? checked : item.active,
+      sso: type === "sso" ? checked : item.sso,
       type,
     });
 
-    if (type === 'active' && !checked) {
+    if (type === "active" && !checked) {
       onOpen();
+
       return;
     }
 
     await handleConfirm({
       id,
-      active: type === 'active' ? checked : item.active,
-      sso: type === 'sso' ? checked : item.sso
+      active: type === "active" ? checked : item.active,
+      sso: type === "sso" ? checked : item.sso,
     });
   };
 
-  const handleConfirm = async ({ id, active, sso }: { id: string, active: boolean, sso: boolean } = currentData) => {
+  const handleConfirm = async ({
+    id,
+    active,
+    sso,
+  }: { id: string; active: boolean; sso: boolean } = currentData) => {
     setLoading(true);
     try {
       await updateBusinessDomain(id, { active, sso });
-      
-      mutate((old) =>
-        old?.map((item) =>
-          item.id === id ? { ...item, active, sso } : item
-        )
-      );
-      
+
+      mutate(old => old?.map(item => (item.id === id ? { ...item, active, sso } : item)));
+
       onClose();
     } catch (error) {
-      console.error('Failed to update business domain:', error);
+      console.error("Failed to update business domain:", error);
     } finally {
       setLoading(false);
       setCurrentData({ id: "", active: true, sso: false, type: "active" });
     }
   };
 
-  const isLoading = (id: string, type: "active" | "sso") => 
+  const isLoading = (id: string, type: "active" | "sso") =>
     currentData.id === id && currentData.type === type && switchLoading;
 
   return (
@@ -203,14 +203,14 @@ export default function List() {
         <Loader className="top-12" loading={loading}>
           <Table removeWrapper>
             <TableHeader>
-              {columns.map((column) => (
+              {columns.map(column => (
                 <TableColumn key={column.key} className={column.width}>
                   {column.label}
                 </TableColumn>
               ))}
             </TableHeader>
             <TableBody>
-              {(data || []).map((item) => (
+              {(data || []).map(item => (
                 <TableRow key={item.id} className="h-14">
                   <TableCell>
                     <Link
@@ -228,20 +228,18 @@ export default function List() {
                   </TableCell>
                   <TableCell>
                     <LoadingSwitch
-                      isSelected={item.active}
                       isLoading={isLoading(item.id, "active")}
-                      onValueChange={(checked) => 
+                      isSelected={item.active}
+                      onValueChange={checked =>
                         handleSwitchChange(item.id!, "active", checked, item)
                       }
                     />
                   </TableCell>
                   <TableCell>
                     <LoadingSwitch
-                      isSelected={item.sso}
                       isLoading={isLoading(item.id, "sso")}
-                      onValueChange={(checked) => 
-                        handleSwitchChange(item.id!, "sso", checked, item)
-                      }
+                      isSelected={item.sso}
+                      onValueChange={checked => handleSwitchChange(item.id!, "sso", checked, item)}
                     />
                   </TableCell>
                   <TableCell>
@@ -260,10 +258,10 @@ export default function List() {
       </div>
 
       <DeactivateModal
+        isLoading={switchLoading}
         isOpen={isOpen}
         onClose={onClose}
         onConfirm={() => handleConfirm()}
-        isLoading={switchLoading}
       />
     </div>
   );

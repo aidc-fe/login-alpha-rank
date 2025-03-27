@@ -3,9 +3,10 @@
 import { useSearchParams, useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
-import SuspenseWrapper from "@/components/suspend-wrapper";
 import { Loader } from "lucide-react";
 import React from "react";
+
+import SuspenseWrapper from "@/components/suspend-wrapper";
 
 declare module "next-auth" {
   interface Session {
@@ -23,6 +24,7 @@ function PageContent() {
       case "authenticated":
         if (window.opener && window.name === "loginWindow") {
           window.close();
+
           return;
         }
         break;
@@ -36,7 +38,7 @@ function PageContent() {
 
   return (
     <main className="min-h-svh flex justify-center items-center w-full">
-      <Loader size={60} className="text-primary animate-spin" />
+      <Loader className="text-primary animate-spin" size={60} />
     </main>
   );
 }
