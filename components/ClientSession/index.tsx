@@ -9,11 +9,15 @@ export default function ClientSession() {
   useEffect(() => {
     const invite = searchParams.get("invite") as string;
     const loginReferral = searchParams.get("loginReferral") as string;
+    const utmSource = searchParams.get("utm_source") as string;
     if (invite) {
       sessionStorage.setItem("invite", invite);
     }
     if (loginReferral) {
       sessionStorage.setItem("loginReferral", loginReferral);
+    }
+    if (utmSource) {
+      sessionStorage.setItem("utmSource", utmSource);
     }
   }, []);
 

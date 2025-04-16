@@ -16,6 +16,7 @@ export async function GET(request: NextRequest) {
   const auth_action = request.nextUrl.searchParams.get("auth_action");
   const invite = request.nextUrl.searchParams.get("invite");
   const loginReferral = request.nextUrl.searchParams.get("loginReferral");
+  const utmSource = request.nextUrl.searchParams.get("utm_source");
   //  const state = request.nextUrl.searchParams.get("state") || "";
   const auth_type = request.nextUrl.searchParams.get("auth_type");
   let userId = request.nextUrl.searchParams.get("userId") || "";
@@ -67,6 +68,9 @@ export async function GET(request: NextRequest) {
   }
   if (loginReferral) {
     redirectUrl.searchParams.set("loginReferral", loginReferral);
+  }
+  if (utmSource) {
+    redirectUrl.searchParams.set("utm_source", utmSource);
   }
   // 添加auth_action
   if (auth_type !== "google" && auth_action) {

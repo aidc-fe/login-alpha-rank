@@ -52,6 +52,7 @@ export default function Home() {
     } else {
       const invite = sessionStorage.getItem("invite");
       const loginReferral = sessionStorage.getItem("loginReferral");
+      const utmSource = sessionStorage.getItem("utmSource");
 
       setCallbackUrl(
         `/api/oauth/authorize/default?redirect_uri=${
@@ -60,7 +61,7 @@ export default function Home() {
           window.opener && window.name === "loginWindow"
             ? `${window.location.origin}/popup-login`
             : ""
-        }&auth_action=sign_in${invite ? `&invite=${invite}` : ""}${loginReferral ? `&loginReferral=${loginReferral}` : ""}`
+        }&auth_action=sign_in${invite ? `&invite=${invite}` : ""}${loginReferral ? `&loginReferral=${loginReferral}` : ""}${utmSource ? `&utm_source=${utmSource}` : ""}`
       );
     }
   }, [isSSO]);
