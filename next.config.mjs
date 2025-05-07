@@ -1,5 +1,6 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+
+export default {
   images: {
     remotePatterns: [
       {
@@ -23,5 +24,3 @@ const nextConfig = {
     NEXT_PUBLIC_TURNSTILE_SITE_KEY: process.env.TURNSTILE_SITE_KEY,
   },
 };
-
-export default nextConfig;
