@@ -7,7 +7,6 @@ import { ToastContainer } from "react-toastify";
 import SessionProvider from "@/providers/session-provider";
 import "@/styles/globals.css";
 import SuspenseWrapper from "@/components/suspend-wrapper";
-
 import { NextUIProviderWrapper } from "@/providers/nextui-provider";
 
 import "react-toastify/dist/ReactToastify.css";
@@ -25,7 +24,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {process.env.ENV === "production" && <GoogleTagManager gtmId="GTM-M5XV9Z8Z" />}
+        {process.env.ENV === "production" && (
+          <>
+            <GoogleTagManager gtmId="GTM-M5XV9Z8Z" />
+            <GoogleTagManager gtmId="GTM-MHKZ2LZH" />
+          </>
+        )}
         <script
           dangerouslySetInnerHTML={{
             __html:
