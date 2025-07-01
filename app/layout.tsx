@@ -7,7 +7,6 @@ import { ToastContainer } from "react-toastify";
 import SessionProvider from "@/providers/session-provider";
 import "@/styles/globals.css";
 import SuspenseWrapper from "@/components/suspend-wrapper";
-
 import { NextUIProviderWrapper } from "@/providers/nextui-provider";
 
 import "react-toastify/dist/ReactToastify.css";
