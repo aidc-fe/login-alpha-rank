@@ -25,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {process.env.ENV === "production" && <GoogleTagManager gtmId="GTM-M5XV9Z8Z" />}
+        <GoogleTagManager gtmId="GTM-N898LL9V" />
         <script
           dangerouslySetInnerHTML={{
             __html:
