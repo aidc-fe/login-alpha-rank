@@ -10,6 +10,11 @@ import Header from "@/components/admin/Layouts/Header";
 
 const whiteList = ["yuyuqueenlovemyself@gmail.com"];
 
+// 检查邮箱是否为 alibaba-inc.com 域名
+const isAlibabaEmail = (email: string) => {
+  return email.endsWith("@alibaba-inc.com");
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -22,7 +27,11 @@ export default function RootLayout({
     // 检查是否在加载中
     if (status === "loading") return;
 
-    if (status === "unauthenticated" || !whiteList.includes(session?.user?.email || "")) {
+    const userEmail = session?.user?.email || "";
+    if (
+      status === "unauthenticated" ||
+      (!whiteList.includes(userEmail) && !isAlibabaEmail(userEmail))
+    ) {
       router.replace("/");
     }
   }, [status, session?.user?.email]);
