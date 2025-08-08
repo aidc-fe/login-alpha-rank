@@ -47,6 +47,7 @@ export async function POST(request: NextRequest) {
         type: "signUp",
       });
       const verificationLink = `${baseUrl}/api/signUp/email/verify?token=${newToken.token}`;
+      console.log(verificationLink);
       const client = await findClientByClientId(userInfo?.client_id);
 
       // 发送验证邮件

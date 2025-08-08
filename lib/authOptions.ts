@@ -237,7 +237,7 @@ export const authOptions: NextAuthOptions = {
         const host = getHost();
 
         const finalUrl = urlObj.toString();
-
+        console.log(finalUrl);
         await sendVerificationEmail(
           email,
           finalUrl,
