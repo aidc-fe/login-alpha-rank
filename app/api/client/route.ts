@@ -3,6 +3,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { formateError, formatSuccess } from "@/lib/request";
 import { createClient, getClients } from "@/lib/database";
 
+function sanitizeClient<T extends Record<string, any>>(client: T) {
+  const {
+    support_email,
+    mail_server_host,
+    mail_server_port,
+    mail_server_user,
+    mail_server_password,
+    ...safeClient
+  } = client;
+  return safeClient;
+}
+
 // 新建client
 export async function POST(request: NextRequest) {
   const data = await request.json();
@@ -10,7 +22,7 @@ export async function POST(request: NextRequest) {
     ...data,
   });
 
-  return NextResponse.json(formatSuccess({ data: req }));
+  return NextResponse.json(formatSuccess({ data: sanitizeClient(req as any) }));
 }
 
 // 查询所有client列表
@@ -31,7 +43,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
     return NextResponse.json(
       formatSuccess({
         data: {
-          list: clients,
+          list: clients.map(c => sanitizeClient(c as any)),
           current: pageNumber,
           pageSize: itemsPerPage,
           totals: totalClients,

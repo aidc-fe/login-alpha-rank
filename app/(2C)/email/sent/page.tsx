@@ -5,13 +5,11 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
 import { isGmail } from "@/lib/utils";
-import { useClient } from "@/providers/client-provider";
 
 export default function EmailSent() {
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const type = searchParams.get("type") || "login";
-  const { support_email } = useClient();
 
   useEffect(() => {
     setEmail(searchParams.get("email") || sessionStorage.getItem("verifyEmail") || "");
@@ -64,18 +62,7 @@ export default function EmailSent() {
         <p className="text-muted text-xs">
           If you don’t see the email in your inbox within 10 minutes, please check your spam folder.
           If you find it there, mark it as “Not Spam.” If you continue to experience login issues,
-          contact us at support
-          <Button
-            className="p-0 ml-2 h-auto !bg-transparent w-auto min-w-0"
-            color="primary"
-            variant="light"
-            onClick={() => {
-              window.open(`https://mail.google.com/mail/u/0/?fs=1&to=${support_email}&tf=cm`);
-            }}
-          >
-            {support_email}
-          </Button>
-          .
+          please contact support.
         </p>
       </div>
     </div>

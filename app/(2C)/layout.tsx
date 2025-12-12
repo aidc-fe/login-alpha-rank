@@ -35,7 +35,17 @@ async function getClient() {
 
   const businessDomain = await getBusinessDomainWithCache(client.businessDomainId);
 
-  return { ...client, isSSO: businessDomain.sso, url: `https://${hostname}` };
+  // 不把敏感/内部配置字段序列化到浏览器端
+  const {
+    support_email,
+    mail_server_host,
+    mail_server_port,
+    mail_server_user,
+    mail_server_password,
+    ...safeClient
+  } = client as any;
+
+  return { ...safeClient, isSSO: businessDomain.sso, url: `https://${hostname}` };
 }
 
 export async function generateMetadata() {

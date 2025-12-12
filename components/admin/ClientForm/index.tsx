@@ -24,9 +24,7 @@ import {
   ClientDataType,
   authMethodOptions,
 } from "@/lib/admin";
-import { cn } from "@/lib/utils";
 import request from "@/lib/request";
-import PasswordInput from "@/components/PasswordInput";
 
 export type FormMode = "create" | "edit" | "view";
 
@@ -98,10 +96,6 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
       signout_uri: formData.get("signout_uri"),
       title: formData.get("title"),
       favicon: formData.get("favicon"),
-      mail_server_host: formData.get("mail_server_host"),
-      mail_server_port: formData.get("mail_server_port"),
-      mail_server_user: formData.get("mail_server_user"),
-      mail_server_password: formData.get("mail_server_password"),
       mail_template_image: formData.get("mail_template_image"),
       login_methods: formData.getAll("login_methods"),
       materials,
@@ -211,38 +205,6 @@ export default function ClientForm({ mode, initialData, onSubmit, onCancel }: Cl
           defaultValue={initialData?.signout_uri || ""}
           isReadOnly={isReadOnly}
           name="signout_uri"
-        />
-
-        <Input
-          id="client-mail-server-host"
-          label={<label htmlFor="client-mail-server-host">邮件服务器主机</label>}
-          defaultValue={initialData?.mail_server_host || ""}
-          isReadOnly={isReadOnly}
-          name="mail_server_host"
-        />
-
-        <Input
-          id="client-mail-server-port"
-          label={<label htmlFor="client-mail-server-port">邮件服务器端口</label>}
-          defaultValue={initialData?.mail_server_port || ""}
-          isReadOnly={isReadOnly}
-          name="mail_server_port"
-        />
-
-        <Input
-          id="client-mail-server-user"
-          label={<label htmlFor="client-mail-server-user">邮件服务器用户名</label>}
-          defaultValue={initialData?.mail_server_user || ""}
-          isReadOnly={isReadOnly}
-          name="mail_server_user"
-        />
-
-        <PasswordInput
-          id="client-mail-server-password"
-          label={<label htmlFor="client-mail-server-password">邮件服务器密码</label>}
-          defaultValue={initialData?.mail_server_password || ""}
-          isReadOnly={isReadOnly}
-          name="mail_server_password"
         />
 
         <Input

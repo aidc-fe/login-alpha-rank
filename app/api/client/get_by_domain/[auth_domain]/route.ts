@@ -3,6 +3,18 @@ import { NextRequest, NextResponse } from "next/server";
 import { getClientByAuthDomain, updateClient } from "@/lib/database";
 import { formateError, formatSuccess } from "@/lib/request";
 
+function sanitizeClient<T extends Record<string, any>>(client: T) {
+  const {
+    support_email,
+    mail_server_host,
+    mail_server_port,
+    mail_server_user,
+    mail_server_password,
+    ...safeClient
+  } = client;
+  return safeClient;
+}
+
 export async function GET(
   request: NextRequest,
   {
@@ -31,7 +43,7 @@ export async function GET(
     }
 
     // 返回客户端详情
-    return NextResponse.json(formatSuccess({ data: client }));
+    return NextResponse.json(formatSuccess({ data: sanitizeClient(client) }));
   } catch (error) {
     return NextResponse.json(
       formateError({

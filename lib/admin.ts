@@ -43,7 +43,18 @@ export const authMethodOptions = [
   },
 ]; //允许的登录方式
 
-export type ClientDataType = Omit<Client, "materials" | "redirect_uris" | "scope"> & {
+// 前端不应暴露敏感/内部配置字段（如邮件服务器配置、支持邮箱）
+export type ClientDataType = Omit<
+  Client,
+  | "materials"
+  | "redirect_uris"
+  | "scope"
+  | "support_email"
+  | "mail_server_host"
+  | "mail_server_port"
+  | "mail_server_user"
+  | "mail_server_password"
+> & {
   redirect_uris: string[];
   materials?: {
     description: string;
