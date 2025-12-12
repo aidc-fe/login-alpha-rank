@@ -22,7 +22,7 @@ export default function SignUpPage() {
   const [callbackUrl, setCallbackUrl] = useState("");
   const [token, setToken] = useState("");
 
-  const { businessDomainId, isSSO, redirect_uris, client_id, pp_doc, tos_doc, url } = useClient();
+  const { businessDomainId, isSSO, redirect_uris, pp_doc, tos_doc, url } = useClient();
 
   // 根据是否是单点登录，判断登录后跳转的页面
   useEffect(() => {
@@ -36,7 +36,7 @@ export default function SignUpPage() {
       const loginReferral = sessionStorage.getItem("loginReferral");
       const utmSource = sessionStorage.getItem("utmSource");
       setCallbackUrl(
-        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&client_id=${client_id}&auth_action=sign_up${invite ? `&invite=${invite}` : ""}${loginReferral ? `&loginReferral=${loginReferral}` : ""}${utmSource ? `&utm_source=${utmSource}` : ""}`
+        `/api/oauth/authorize/default?redirect_uri=${redirect_uris?.[0]}&auth_action=sign_up${invite ? `&invite=${invite}` : ""}${loginReferral ? `&loginReferral=${loginReferral}` : ""}${utmSource ? `&utm_source=${utmSource}` : ""}`
       );
     }
   }, [isSSO]);
@@ -84,7 +84,6 @@ export default function SignUpPage() {
         password: encryptedPassword,
         targetUrl: callbackUrl,
         businessDomainId,
-        client_id,
         token,
       }),
     })

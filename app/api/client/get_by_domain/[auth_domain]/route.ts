@@ -5,6 +5,7 @@ import { formateError, formatSuccess } from "@/lib/request";
 
 function sanitizeClient<T extends Record<string, any>>(client: T) {
   const {
+    client_secret,
     support_email,
     mail_server_host,
     mail_server_port,

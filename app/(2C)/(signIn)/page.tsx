@@ -37,7 +37,6 @@ export default function Home() {
     businessDomainId,
     isSSO,
     redirect_uris,
-    client_id,
     pp_doc,
     tos_doc,
     login_methods = [],
@@ -57,7 +56,7 @@ export default function Home() {
       setCallbackUrl(
         `/api/oauth/authorize/default?redirect_uri=${
           redirect_uris?.[0]
-        }&client_id=${client_id}&callbackUrl=${
+        }&callbackUrl=${
           window.opener && window.name === "loginWindow"
             ? `${window.location.origin}/popup-login`
             : ""

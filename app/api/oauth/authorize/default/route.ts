@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth/next";
 import { NextRequest, NextResponse } from "next/server";
 
 import { authOptions } from "@/lib/authOptions";
-import { createAuthorizationCode, findClientByClientId } from "@/lib/database";
+import { createAuthorizationCode, findClientByClientId, getClientByAuthDomain } from "@/lib/database";
 import { generateAuthorizationCode } from "@/lib/secret";
 import { is3Minutes } from "@/lib/utils";
 
@@ -30,13 +30,17 @@ export async function GET(request: NextRequest) {
     userId = session?.id;
   }
 
-  // 参数校验
-  if (!client_id) {
-    return NextResponse.json({ message: "Client id missing" }, { status: 400 });
-  }
+  // 查询 client：优先 client_id，其次按当前 host 推导（避免 client_id 暴露到浏览器）
+  const host = request.headers.get("host") || request.headers.get(":authority");
+  const client = client_id
+    ? await findClientByClientId(client_id)
+    : host
+      ? await getClientByAuthDomain(host)
+      : null;
 
-  // 查询 client_id 对应的 client 信息
-  const client = await findClientByClientId(client_id);
+  if (!client) {
+    return NextResponse.json({ message: "Client not found" }, { status: 400 });
+  }
 
   // 验证 redirect_uri 是否有效
   if (!redirect_uri || !client?.redirect_uris?.includes(redirect_uri)) {
@@ -49,7 +53,7 @@ export async function GET(request: NextRequest) {
   // 创建授权码记录
   const authorizationCode = await createAuthorizationCode({
     code,
-    client_id,
+    client_id: client.client_id,
     redirect_uri,
   });
 

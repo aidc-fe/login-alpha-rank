@@ -24,7 +24,6 @@ import Link from "next/link";
 import request from "@/lib/request";
 import Loader from "@/components/ui/loader";
 import { ClientDataType } from "@/lib/admin";
-import CopyButton from "@/components/CopyButton";
 
 function getList(
   current: number,
@@ -114,7 +113,6 @@ export default function List() {
           <Table removeWrapper>
             <TableHeader>
               <TableColumn>Name</TableColumn>
-              <TableColumn>Client Id</TableColumn>
               <TableColumn>Activate</TableColumn>
               <TableColumn className="w-40">Action</TableColumn>
             </TableHeader>
@@ -128,12 +126,6 @@ export default function List() {
                     >
                       {item.name}
                     </Link>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      <span>{item.client_id}</span>
-                      <CopyButton textToCopy={item.client_id} />
-                    </div>
                   </TableCell>
                   <TableCell>
                     <Switch

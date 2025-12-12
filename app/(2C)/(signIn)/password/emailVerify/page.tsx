@@ -13,7 +13,7 @@ import request from "@/lib/request";
 import { encryptWithRSA } from "@/lib/rsa";
 
 export default function Page() {
-  const { businessDomainId, client_id } = useClient();
+  const { businessDomainId } = useClient();
   const searchParams = useSearchParams();
   const [email, setEmail] = useState<string>(decodeURIComponent(searchParams.get("email") || ""));
   const [loading, setLoading] = useState(false);
@@ -55,7 +55,6 @@ export default function Page() {
           email,
           password: encryptedPassword,
           businessDomainId,
-          client_id,
           token,
         }),
       })

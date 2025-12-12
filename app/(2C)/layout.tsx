@@ -37,6 +37,8 @@ async function getClient() {
 
   // 不把敏感/内部配置字段序列化到浏览器端
   const {
+    client_id,
+    client_secret,
     support_email,
     mail_server_host,
     mail_server_port,

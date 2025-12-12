@@ -49,6 +49,7 @@ export type ClientDataType = Omit<
   | "materials"
   | "redirect_uris"
   | "scope"
+  | "client_secret"
   | "support_email"
   | "mail_server_host"
   | "mail_server_port"

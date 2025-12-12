@@ -11,7 +11,6 @@ import request from "@/lib/request";
 import { ClientDataType } from "@/lib/admin";
 import Loader from "@/components/ui/loader";
 import ClientForm, { FormMode } from "@/components/admin/ClientForm";
-import CopyButton from "@/components/CopyButton";
 
 export default function ClientDetail({ params: { clientId } }: { params: { clientId: string } }) {
   const [mode, setMode] = useState<FormMode>("view");
@@ -78,20 +77,6 @@ export default function ClientDetail({ params: { clientId } }: { params: { clien
         {details ? (
           <div className="flex-shrink-0 order-1 flex flex-col gap-4 w-96 static xl:order-1 xl:sticky xl:top-24 xl:self-start z-0">
             <div className="text-2xl font-semibold">Additional Information</div>
-            <div className="flex flex-col gap-2 pl-3">
-              <div className="text-base text-foreground flex items-center">Client Id</div>
-              <div className="text-sm leading-none text-muted break-all">
-                <span className="leading-5">{details?.client_id}</span>
-                <CopyButton textToCopy={details?.client_id} />
-              </div>
-            </div>
-            <div className="flex flex-col gap-2 pl-3">
-              <div className="text-base text-foreground flex items-center">Client Secret</div>
-              <div className="text-sm leading-none text-muted break-all">
-                <span className="leading-5">{details?.client_secret}</span>
-                <CopyButton textToCopy={details?.client_secret} />
-              </div>
-            </div>
             <div className="flex flex-col gap-2 pl-3">
               <div className="text-base text-foreground flex items-center">Create Time</div>
               <div className="text-sm text-muted break-all">

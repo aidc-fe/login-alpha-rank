@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { ERROR_CONFIG } from "@/lib/errors";
-import { createVerificationToken, findClientByClientId, getUser } from "@/lib/database";
+import {
+  createVerificationToken,
+  findClientByClientId,
+  getClientByAuthDomain,
+  getUser,
+} from "@/lib/database";
 import { sendVerificationEmail } from "@/lib/email";
 import { formateError, formatSuccess } from "@/lib/request";
 import { verifyToken } from "@/lib/auth";
@@ -48,7 +53,20 @@ export async function POST(request: NextRequest) {
       });
       const verificationLink = `${baseUrl}/api/signUp/email/verify?token=${newToken.token}`;
       console.log(verificationLink);
-      const client = await findClientByClientId(userInfo?.client_id);
+      const client = userInfo?.client_id
+        ? await findClientByClientId(userInfo?.client_id)
+        : host
+          ? await getClientByAuthDomain(host)
+          : null;
+
+      if (!client) {
+        return NextResponse.json(
+          formateError({
+            code: "CLIENT_NOT_FOUND",
+            message: "Client not found",
+          })
+        );
+      }
 
       // 发送验证邮件
       await sendVerificationEmail(

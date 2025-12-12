@@ -5,6 +5,7 @@ import { createClient, getClients } from "@/lib/database";
 
 function sanitizeClient<T extends Record<string, any>>(client: T) {
   const {
+    client_secret,
     support_email,
     mail_server_host,
     mail_server_port,
